@@ -1,0 +1,10 @@
+﻿using TennisAcademyApp.ViewModels.Coach;
+
+namespace TennisAcademyApp.Services.Core.Contracts
+{
+    public interface ICoachService
+    {
+        Task <IEnumerable<AllCoachesViewModel>?> GetAllCoachesAsync(string? userId);
+        Task <CoachDetailsViewModel> GetCoachDetailsAsync(string? userId, Guid? id);
+    }
+}

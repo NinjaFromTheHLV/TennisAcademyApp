@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TennisAcademy.Data.Models\TennisAcademyApp.Data.Models.csproj" />
+    <ProjectReference Include="..\TennisAcademy.Data\TennisAcademyApp.Data.csproj" />
+    <ProjectReference Include="..\TennisAcademyApp.GCommon\TennisAcademyApp.GCommon.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,38 @@
+﻿@using TennisAcademyApp.ViewModels.Coach;
+@model CoachDetailsViewModel;
+
+@{
+    ViewData["Title"] = "Coach Details";
+}
+
+<h2 class="mb-4">Coach Details</h2>
+
+<div class="card mb-3 shadow">
+    <div class="row g-0">
+        <div class="col-md-4">
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl" class="img-fluid rounded-start" alt="@Model.CoachName" />
+            }
+            else
+            {
+                <img src="https://via.placeholder.com/300x300?text=No+Image" class="img-fluid rounded-start" alt="No image" />
+            }
+        </div>
+        <div class="col-md-8">
+            <div class="card-body">
+                <h5 class="card-title">@Model.CoachName</h5>
+                <p class="card-text">
+                    <strong>Age:</strong> @Model.CoachAge <br/>
+                    <strong>Description:</strong> @Model.Description <br/>
+                </p>
+                @if (Model.IsAddedBy)
+                {
+                    <a asp-action="Edit" asp-route-id="@Model.CoachId" class="btn btn-warning">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@Model.CoachId" class="btn btn-warning">Delete</a>
+                }
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>

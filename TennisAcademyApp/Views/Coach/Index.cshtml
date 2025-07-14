@@ -1,0 +1,51 @@
+﻿@using TennisAcademyApp.ViewModels.Coach;
+@model IEnumerable<AllCoachesViewModel>
+
+@{
+    ViewData["Title"] = "Coaches";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Our Coaches</h2>
+    @if (User?.Identity?.IsAuthenticated == true)
+    {
+        <a asp-action="Create" class="btn btn-success d-flex align-items-center justify-content-center gap-2" style="line-height: 1.2;">
+            <span style="font-size: 1.75rem; font-weight: bold; display: inline-block; transform: translateY(-1px);">&#43;</span>
+            <span style="font-size: 1rem;">Add New Coach</span>
+        </a>
+    }
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    @foreach (var coach in Model)
+    {
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                @if (!string.IsNullOrEmpty(coach.ImageUrl))
+                {
+                    <img src="@Url.Content(coach.ImageUrl)"
+                         class="img-fluid"
+                         alt="@coach.CoachName"
+                         style="height: 380px; object-fit: cover; width: 100%;" />
+                }
+                else
+                {
+                    <img src="https://via.placeholder.com/600x250?text=No+Image"
+                         class="card-img-top mx-auto d-block"
+                         alt="No image" />
+                }
+                <div class="card-body">
+                    <h5 class="card-title">@coach.CoachName</h5>
+                    <p class="card-text">
+                        <strong>Age:</strong> @coach.CoachAge<br/>
+                        <strong>Description:</strong><br />
+                        @coach.Description
+                    </p>
+                </div>
+                <div class="card-footer text-end">
+                    <a asp-action="Details" asp-route-id="@coach.CoachId" class="btn btn-primary px-4 py-2 fs-5">Details</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
