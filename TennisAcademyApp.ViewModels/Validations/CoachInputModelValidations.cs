@@ -1,0 +1,19 @@
+﻿namespace TennisAcademyApp.ViewModels.Validations
+{
+    public static class CoachInputModelValidations
+    {
+        public const string RequiredNameMessage = "Name is required.";
+        public const string NameMinLengthMessage = "Name must be at least 5 characters.";
+        public const string NameMaxLengthMessage = "Name cannot exceed 50 characters.";
+
+        public const string AgeRequiredMessage = "Age is required.";
+        public const string AgeMinLengthMessage = "Age must be at least 18.";
+        public const string AgeMaxLengthMessage = "Age cannot exceed 75.";
+
+        public const string DescriptionRequiredMessage = "Description is required.";
+        public const string DescriptionMinLengthMessage = "Description must be at least 10 characters.";
+        public const string DescriptionMaxLengthMessage = "Description cannot exceed 150 characters.";
+
+        public const string Error = "Error while adding movie. Try again!";
+    }
+}

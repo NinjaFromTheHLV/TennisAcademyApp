@@ -52,5 +52,19 @@ namespace TennisAcademyApp.Controllers
                 return RedirectToAction(nameof(Index), "Home");
             }
         }
+        [HttpGet]
+        public async Task<IActionResult> Add()
+        {
+            try
+            {
+                return View();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return RedirectToAction(nameof(Index));
+
+            }
+        }
     }
 }
