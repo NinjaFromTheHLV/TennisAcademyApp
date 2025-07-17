@@ -5,33 +5,34 @@
     ViewData["Title"] = "Coach Details";
 }
 
-<h2 class="mb-4">Coach Details</h2>
-
-<div class="card mb-3 shadow">
+<div class="coach-card mb-5 mt-4">
     <div class="row g-0">
-        <div class="col-md-4">
+        <div class="col-md-5">
             @if (!string.IsNullOrEmpty(Model.ImageUrl))
             {
-                <img src="@Model.ImageUrl" class="img-fluid rounded-start" alt="@Model.CoachName" />
+                <img src="@Model.ImageUrl" class="img-fluid h-100" alt="@Model.CoachName" />
             }
             else
             {
-                <img src="https://via.placeholder.com/300x300?text=No+Image" class="img-fluid rounded-start" alt="No image" />
+                <img src="https://via.placeholder.com/300x400?text=No+Image" class="img-fluid h-100" alt="No image" />
             }
         </div>
-        <div class="col-md-8">
-            <div class="card-body">
-                <h5 class="card-title">@Model.CoachName</h5>
-                <p class="card-text">
-                    <strong>Age:</strong> @Model.CoachAge <br/>
-                    <strong>Description:</strong> @Model.Description <br/>
-                </p>
-                @if (Model.IsAddedBy)
-                {
-                    <a asp-action="Edit" asp-route-id="@Model.CoachId" class="btn btn-warning">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@Model.CoachId" class="btn btn-warning">Delete</a>
-                }
-                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        <div class="col-md-7">
+            <div class="card-body d-flex flex-column justify-content-between h-100">
+                <div>
+                    <h3 class="card-title mb-3">@Model.CoachName</h3>
+                    <p class="mb-2"><strong>Age:</strong> @Model.CoachAge</p>
+                    <p><strong>Description:</strong><br />@Model.Description</p>
+                </div>
+
+                <div class="mt-4 d-flex flex-wrap gap-2">
+                    @if (Model.IsAddedBy)
+                    {
+                        <a asp-action="Edit" asp-route-id="@Model.CoachId" class="btn btn-warning">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@Model.CoachId" class="btn btn-danger">Delete</a>
+                    }
+                    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                </div>
             </div>
         </div>
     </div>

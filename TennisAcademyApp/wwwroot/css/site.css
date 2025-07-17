@@ -22,3 +22,35 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+/* Coach Details css */
+.coach-card {
+    max-width: 800px;
+    margin: auto;
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+    .coach-card img {
+        object-fit: cover;
+        height: 100%;
+        width: 100%;
+    }
+
+    .coach-card .card-body {
+        padding: 2rem;
+    }
+
+    .coach-card .btn {
+        min-width: 120px;
+    }
+
+/* Coach Input model */
+.form-wrapper {
+    padding: 2rem;
+    border-color: black;
+    border-radius: 1rem;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}

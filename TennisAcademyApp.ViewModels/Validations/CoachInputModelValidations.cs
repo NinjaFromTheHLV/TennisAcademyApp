@@ -12,7 +12,5 @@
         public const string DescriptionRequiredMessage = "Description is required.";
         public const string DescriptionMinLengthMessage = "Description must be at least 10 characters.";
         public const string DescriptionMaxLengthMessage = "Description cannot exceed 150 characters.";
-
-        public const string Error = "Error while adding movie. Try again!";
     }
 }
