@@ -91,5 +91,26 @@ namespace TennisAcademyApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
+        [HttpGet]
+        public async Task<IActionResult> Edit(Guid? id)
+        {
+            try
+            {
+                string user = GetUserId()!;
+                CoachEditViewModel edit = await this.coachService
+                    .GetCoachForEdittingAsync(id, user);
+
+                if (edit == null)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                return View(edit);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return RedirectToAction(nameof(Index));
+            }
+        }
     }
 }

@@ -86,5 +86,33 @@ namespace TennisAcademyApp.Services.Core
             }
             return result;
         }
+
+        public async Task<CoachEditViewModel> GetCoachForEdittingAsync(Guid? id, string? userId)
+        {
+            CoachEditViewModel? model = null;
+            IdentityUser user = await this.userManager
+                .FindByIdAsync(userId);
+
+            if (id.HasValue)
+            {
+                var coach = await this.dbContext
+                    .Coaches
+                    .AsNoTracking()
+                    .SingleOrDefaultAsync(c => c.CoachId == id.Value);
+                if (coach != null && coach.UserId.ToLower() == userId.ToLower())
+                {
+                    model = new CoachEditViewModel
+                    {
+                        CoachId = coach.CoachId,
+                        Name = coach.Name,
+                        Age = coach.Age,
+                        Description = coach.Description,
+                        ImageUrl = coach.ImageUrl,
+                    };
+                }
+            }
+            return model;
+
+        }
     }
 }
