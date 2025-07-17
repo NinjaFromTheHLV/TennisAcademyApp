@@ -112,5 +112,31 @@ namespace TennisAcademyApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
+        public async Task<IActionResult> Edit(CoachEditViewModel model)
+        {
+            try
+            {
+                string userId = GetUserId()!;
+                if (ModelState.IsValid == false)
+                {
+                    return RedirectToAction(nameof(Edit), new { id = model.CoachId });
+                }
+                bool result = await this.coachService
+                    .EdittedCoachAsync(userId, model);
+
+                if (result == false)
+                {
+                    ModelState.AddModelError(string.Empty, "An error occured, please try again");
+                    return RedirectToAction(nameof(Edit), new { id = model.CoachId });
+                }
+
+                return RedirectToAction(nameof(Details), new {id = model.CoachId});
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return RedirectToAction(nameof(Index));
+            }
+        }
     }
 }

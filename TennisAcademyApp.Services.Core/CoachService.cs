@@ -87,11 +87,11 @@ namespace TennisAcademyApp.Services.Core
             return result;
         }
 
-        public async Task<CoachEditViewModel> GetCoachForEdittingAsync(Guid? id, string? userId)
+        public async Task<CoachEditViewModel?> GetCoachForEdittingAsync(Guid? id, string? userId)
         {
             CoachEditViewModel? model = null;
-            IdentityUser user = await this.userManager
-                .FindByIdAsync(userId);
+            IdentityUser? user = await this.userManager
+                .FindByIdAsync(userId!);
 
             if (id.HasValue)
             {
@@ -99,7 +99,7 @@ namespace TennisAcademyApp.Services.Core
                     .Coaches
                     .AsNoTracking()
                     .SingleOrDefaultAsync(c => c.CoachId == id.Value);
-                if (coach != null && coach.UserId.ToLower() == userId.ToLower())
+                if (coach != null && coach.UserId.ToLower() == userId!.ToLower())
                 {
                     model = new CoachEditViewModel
                     {
@@ -113,6 +113,29 @@ namespace TennisAcademyApp.Services.Core
             }
             return model;
 
+        }
+
+        public async Task<bool> EdittedCoachAsync(string userId, CoachEditViewModel model)
+        {
+            bool result = false;
+            IdentityUser? user = await this.userManager
+                .FindByIdAsync(userId);
+            Coach? coach = await this.dbContext
+                .Coaches
+                .FindAsync(model.CoachId);
+
+            if (userId != null && coach != null && coach.UserId.ToLower() == userId.ToLower())
+            {
+                coach.Name = model.Name;
+                coach.Age = model.Age;
+                coach.Description = model.Description;
+                coach.ImageUrl = model.ImageUrl;
+                coach.CoachId = model.CoachId;
+
+                await this.dbContext.SaveChangesAsync();
+                result = true;
+            }
+            return result;
         }
     }
 }
