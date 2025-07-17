@@ -13,8 +13,7 @@ namespace TennisAcademyApp.ViewModels.Coach
         public string Name { get; set; } = null!;
         [Required(ErrorMessage = AgeRequiredMessage)]
         [Display(Name = "Coach Age")]
-        [MinLength(CoachAgeMinLenght, ErrorMessage = AgeMinLengthMessage)]
-        [MaxLength(CoachAgeMaxLenght, ErrorMessage = AgeMaxLengthMessage)]
+        [Range(CoachAgeMinLenght, CoachAgeMaxLenght, ErrorMessage = AgeErrorMessage)]
         public int Age { get; set; }
 
         [Required(ErrorMessage = DescriptionRequiredMessage)]

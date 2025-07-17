@@ -7,8 +7,7 @@
         public const string NameMaxLengthMessage = "Name cannot exceed 50 characters.";
 
         public const string AgeRequiredMessage = "Age is required.";
-        public const string AgeMinLengthMessage = "Age must be at least 18.";
-        public const string AgeMaxLengthMessage = "Age cannot exceed 75.";
+        public const string AgeErrorMessage = "Age must be between 18 and 75!";
 
         public const string DescriptionRequiredMessage = "Description is required.";
         public const string DescriptionMinLengthMessage = "Description must be at least 10 characters.";

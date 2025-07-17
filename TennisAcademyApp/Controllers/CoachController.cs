@@ -15,7 +15,7 @@ namespace TennisAcademyApp.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task <IActionResult> Index()
+        public async Task<IActionResult> Index()
         {
             try
             {
@@ -63,7 +63,32 @@ namespace TennisAcademyApp.Controllers
             {
                 Console.WriteLine(ex.Message);
                 return RedirectToAction(nameof(Index));
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> Add(AddCoachInputModel inputModel)
+        {
+            try
+            {
+                string userId = GetUserId()!;
+                if (ModelState.IsValid == false)
+                {
+                    return View(inputModel);
+                }
+                bool result = await this.coachService
+                    .AddCoachAsync(userId, inputModel);
 
+                if (result == false)
+                {
+                    return View(inputModel);
+                }
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return RedirectToAction(nameof(Index));
             }
         }
     }

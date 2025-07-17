@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TennisAcademyApp.Data;
+using TennisAcademyApp.Data.Models;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Coach;
 
@@ -61,6 +62,29 @@ namespace TennisAcademyApp.Services.Core
                 }
             }
             return coachDetails;
+        }
+        public async Task<bool> AddCoachAsync(string userId, AddCoachInputModel inputModel)
+        {
+            bool result = false;
+            IdentityUser? user = await this.userManager
+                .FindByIdAsync(userId);
+
+            if (user != null)
+            {
+                var coach = new Coach
+                {
+                    Name = inputModel.Name,
+                    ImageUrl = inputModel.ImageUrl,
+                    Age = inputModel.Age,
+                    UserId = userId,
+                    Description = inputModel.Description,
+                };
+                await dbContext.Coaches.AddAsync(coach);
+                await dbContext.SaveChangesAsync();
+
+                result = true;
+            }
+            return result;
         }
     }
 }
