@@ -13,7 +13,7 @@ namespace TennisAcademyApp.Controllers
         }
         protected string? GetUserId()
         {
-            string userId = null;
+            string? userId = null;
             bool isAuthenticated = this.IsUserAuthenticated();
             if (isAuthenticated)
             {

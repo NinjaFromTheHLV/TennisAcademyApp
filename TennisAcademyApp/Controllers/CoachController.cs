@@ -20,7 +20,7 @@ namespace TennisAcademyApp.Controllers
             try
             {
                 string userId = GetUserId()!;
-                IEnumerable<AllCoachesViewModel> allCoaches = await this.coachService
+                IEnumerable<AllCoachesViewModel>? allCoaches = await this.coachService
                     .GetAllCoachesAsync(userId);
 
                 return View(allCoaches);
@@ -97,7 +97,7 @@ namespace TennisAcademyApp.Controllers
             try
             {
                 string user = GetUserId()!;
-                CoachEditViewModel edit = await this.coachService
+                CoachEditViewModel? edit = await this.coachService
                     .GetCoachForEdittingAsync(id, user);
 
                 if (edit == null)
@@ -131,6 +131,26 @@ namespace TennisAcademyApp.Controllers
                 }
 
                 return RedirectToAction(nameof(Details), new {id = model.CoachId});
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return RedirectToAction(nameof(Index));
+            }
+        }
+        public async Task<IActionResult> Delete(string userId, Guid Id)
+        {
+            try
+            {
+                userId = GetUserId()!;
+                DeleteCoachViewModel? delete = await this.coachService
+                    .GetCoachForDeletingAsync(userId, Id);
+
+                if (delete == null)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                return View(delete);
             }
             catch (Exception ex)
             {

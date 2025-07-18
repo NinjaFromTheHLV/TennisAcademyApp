@@ -112,7 +112,6 @@ namespace TennisAcademyApp.Services.Core
                 }
             }
             return model;
-
         }
 
         public async Task<bool> EdittedCoachAsync(string userId, CoachEditViewModel model)
@@ -136,6 +135,33 @@ namespace TennisAcademyApp.Services.Core
                 result = true;
             }
             return result;
+        }
+
+        public async Task<DeleteCoachViewModel?> GetCoachForDeletingAsync(string? userId, Guid? id)
+        {
+            DeleteCoachViewModel? model = null;
+            IdentityUser? user = await this.userManager
+                .FindByIdAsync(userId!);
+
+            if (id.HasValue)
+            {
+                var coach = await this.dbContext
+                    .Coaches
+                    .AsNoTracking()
+                    .SingleOrDefaultAsync(c => c.CoachId == id.Value);
+                if (coach != null && coach.UserId.ToLower() == userId!.ToLower())
+                {
+                    model = new DeleteCoachViewModel
+                    {
+                        CoachId = coach.CoachId,
+                        Name = coach.Name,
+                        Age = coach.Age,
+                        Description = coach.Description,
+                        ImageUrl = coach.ImageUrl,
+                    };
+                }
+            }
+            return model;
         }
     }
 }
