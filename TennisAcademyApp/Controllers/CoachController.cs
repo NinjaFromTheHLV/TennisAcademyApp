@@ -112,6 +112,7 @@ namespace TennisAcademyApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
+        [HttpPost]
         public async Task<IActionResult> Edit(CoachEditViewModel model)
         {
             try
@@ -138,6 +139,7 @@ namespace TennisAcademyApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
+        [HttpGet]
         public async Task<IActionResult> Delete(string userId, Guid Id)
         {
             try
@@ -156,6 +158,33 @@ namespace TennisAcademyApp.Controllers
             {
                 Console.WriteLine(ex.Message);
                 return RedirectToAction(nameof(Index));
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteConfirmed(string userId, DeleteCoachViewModel model)
+        {
+            try
+            {
+                userId = GetUserId()!;
+                if (ModelState.IsValid == false)
+                {
+                    return RedirectToAction(nameof(Delete), new { id = model.CoachId });
+                }
+                bool result = await this.coachService
+                    .DeletedCoachAsync(userId, model);
+
+                if (result == false)
+                {
+                    ModelState.AddModelError(string.Empty, "An error occured, please try again");
+                    return RedirectToAction(nameof(Delete), new { id = model.CoachId });
+                }
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return RedirectToAction(nameof(Index), "Home");
             }
         }
     }

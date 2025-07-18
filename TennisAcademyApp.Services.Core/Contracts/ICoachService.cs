@@ -10,5 +10,6 @@ namespace TennisAcademyApp.Services.Core.Contracts
         Task<CoachEditViewModel?> GetCoachForEdittingAsync(Guid? id, string? userId);
         Task<bool> EdittedCoachAsync(string userId, CoachEditViewModel model);
         Task<DeleteCoachViewModel?> GetCoachForDeletingAsync(string? userId, Guid? id);
+        Task<bool> DeletedCoachAsync(string? userId, DeleteCoachViewModel model);
     }
 }

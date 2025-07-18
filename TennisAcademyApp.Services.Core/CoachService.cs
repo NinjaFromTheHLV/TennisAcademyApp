@@ -148,7 +148,7 @@ namespace TennisAcademyApp.Services.Core
                 var coach = await this.dbContext
                     .Coaches
                     .AsNoTracking()
-                    .SingleOrDefaultAsync(c => c.CoachId == id.Value);
+                    .SingleOrDefaultAsync(c => c.CoachId == id);
                 if (coach != null && coach.UserId.ToLower() == userId!.ToLower())
                 {
                     model = new DeleteCoachViewModel
@@ -162,6 +162,25 @@ namespace TennisAcademyApp.Services.Core
                 }
             }
             return model;
+        }
+
+        public async Task<bool> DeletedCoachAsync(string? userId, DeleteCoachViewModel model)
+        {
+            bool result = false;
+            IdentityUser? user = await this.userManager
+                .FindByIdAsync(userId!);
+            Coach? coach = await this.dbContext
+                .Coaches
+                .SingleOrDefaultAsync(c => c.CoachId == model.CoachId);
+
+            if (userId != null && coach != null && coach.UserId.ToLower() == userId.ToLower())
+            {
+                this.dbContext.Remove(coach);
+
+                await this.dbContext.SaveChangesAsync();
+                result = true;
+            }
+            return result;
         }
     }
 }
