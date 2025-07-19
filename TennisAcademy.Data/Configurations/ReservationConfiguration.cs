@@ -9,8 +9,6 @@ namespace TennisAcademyApp.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Reservation> config)
         {
-            config
-                .HasQueryFilter(r => r.IsDeleted == false);
 
             config
                 .Property(r => r.Note)
@@ -20,7 +18,7 @@ namespace TennisAcademyApp.Data.Configurations
                 .HasOne(r => r.Coach)
                 .WithMany(r => r.Reservations)
                 .HasForeignKey(r => r.CoachId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.NoAction);
 
             config
                 .HasOne(r => r.Surface)

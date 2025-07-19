@@ -17,11 +17,10 @@ namespace TennisAcademyApp.Services.Core
             this.userManager = userManager;
         }
 
-        public async Task<IEnumerable<AllCoachesViewModel>?> GetAllCoachesAsync(string? userId)
+        public async Task<IEnumerable<AllCoachesViewModel>?> GetAllCoachesAsync()
         {
             IEnumerable<AllCoachesViewModel> allCoaches = await this.dbContext
                 .Coaches
-                .Include(uc => uc.UsersCoaches)
                 .AsNoTracking()
                 .Select(c => new AllCoachesViewModel
                 {
@@ -35,7 +34,7 @@ namespace TennisAcademyApp.Services.Core
 
             return allCoaches;
         }
-        public async Task<CoachDetailsViewModel> GetCoachDetailsAsync(string? userId, Guid? id)
+        public async Task<CoachDetailsViewModel> GetCoachDetailsAsync(string? userId, int? id)
         {
             CoachDetailsViewModel coachDetails = null!;
 
@@ -45,7 +44,7 @@ namespace TennisAcademyApp.Services.Core
                     .Coaches
                     .Include(c => c.User)
                     .AsNoTracking()
-                    .SingleOrDefaultAsync(c => c.CoachId == id.Value);
+                    .FirstOrDefaultAsync(c => c.CoachId == id.Value);
 
                 if (coaches != null)
                 {
@@ -56,6 +55,7 @@ namespace TennisAcademyApp.Services.Core
                         CoachName = coaches.Name,
                         Description = coaches.Description,
                         ImageUrl = coaches.ImageUrl,
+                        Nationality = coaches.Nationality,
                         IsAddedBy = userId != null ?
                             coaches.UserId.ToLower() == userId.ToLower() : false,
                     };
@@ -76,6 +76,7 @@ namespace TennisAcademyApp.Services.Core
                     Name = inputModel.Name,
                     ImageUrl = inputModel.ImageUrl,
                     Age = inputModel.Age,
+                    Nationality = inputModel.Nationality,
                     UserId = userId,
                     Description = inputModel.Description,
                 };
@@ -87,7 +88,7 @@ namespace TennisAcademyApp.Services.Core
             return result;
         }
 
-        public async Task<CoachEditViewModel?> GetCoachForEdittingAsync(Guid? id, string? userId)
+        public async Task<CoachEditViewModel?> GetCoachForEdittingAsync(int? id, string? userId)
         {
             CoachEditViewModel? model = null;
             IdentityUser? user = await this.userManager
@@ -98,7 +99,7 @@ namespace TennisAcademyApp.Services.Core
                 var coach = await this.dbContext
                     .Coaches
                     .AsNoTracking()
-                    .SingleOrDefaultAsync(c => c.CoachId == id.Value);
+                    .FirstOrDefaultAsync(c => c.CoachId == id.Value);
                 if (coach != null && coach.UserId.ToLower() == userId!.ToLower())
                 {
                     model = new CoachEditViewModel
@@ -106,6 +107,7 @@ namespace TennisAcademyApp.Services.Core
                         CoachId = coach.CoachId,
                         Name = coach.Name,
                         Age = coach.Age,
+                        Nationality = coach.Nationality,
                         Description = coach.Description,
                         ImageUrl = coach.ImageUrl,
                     };
@@ -117,9 +119,10 @@ namespace TennisAcademyApp.Services.Core
         public async Task<bool> EdittedCoachAsync(string userId, CoachEditViewModel model)
         {
             bool result = false;
-            IdentityUser? user = await this.userManager
+            var user = await this.userManager
                 .FindByIdAsync(userId);
-            Coach? coach = await this.dbContext
+
+            var coach = await this.dbContext
                 .Coaches
                 .FindAsync(model.CoachId);
 
@@ -127,60 +130,66 @@ namespace TennisAcademyApp.Services.Core
             {
                 coach.Name = model.Name;
                 coach.Age = model.Age;
+                coach.Nationality = model.Nationality;
                 coach.Description = model.Description;
                 coach.ImageUrl = model.ImageUrl;
                 coach.CoachId = model.CoachId;
 
-                await this.dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync();
                 result = true;
             }
             return result;
         }
 
-        public async Task<DeleteCoachViewModel?> GetCoachForDeletingAsync(string? userId, Guid? id)
+        public async Task<DeleteCoachViewModel?> GetCoachForDeletingAsync(int id)
         {
-            DeleteCoachViewModel? model = null;
-            IdentityUser? user = await this.userManager
-                .FindByIdAsync(userId!);
-
-            if (id.HasValue)
-            {
-                var coach = await this.dbContext
-                    .Coaches
-                    .AsNoTracking()
-                    .SingleOrDefaultAsync(c => c.CoachId == id);
-                if (coach != null && coach.UserId.ToLower() == userId!.ToLower())
+            return await dbContext.Coaches
+                .Where(c => c.CoachId == id)
+                .Select(c => new DeleteCoachViewModel
                 {
-                    model = new DeleteCoachViewModel
-                    {
-                        CoachId = coach.CoachId,
-                        Name = coach.Name,
-                        Age = coach.Age,
-                        Description = coach.Description,
-                        ImageUrl = coach.ImageUrl,
-                    };
-                }
-            }
-            return model;
+                    Name = c.Name,
+                    Age = c.Age,
+                    Description = c.Description,
+                    ImageUrl = c.ImageUrl,
+                    CoachId = id
+                })
+                .FirstOrDefaultAsync();
         }
 
-        public async Task<bool> DeletedCoachAsync(string? userId, DeleteCoachViewModel model)
+        public async Task DeletedCoachAsync(int id, string userId)
         {
-            bool result = false;
-            IdentityUser? user = await this.userManager
-                .FindByIdAsync(userId!);
-            Coach? coach = await this.dbContext
-                .Coaches
-                .SingleOrDefaultAsync(c => c.CoachId == model.CoachId);
+            // check for admin role
 
-            if (userId != null && coach != null && coach.UserId.ToLower() == userId.ToLower())
+            var user = await userManager.FindByIdAsync(userId);
+
+            var coach = await this.dbContext.Coaches.FindAsync(id);
+
+            if (userId != null && coach != null)
             {
-                this.dbContext.Remove(coach);
-
-                await this.dbContext.SaveChangesAsync();
-                result = true;
+                dbContext.Coaches.Remove(coach);
+                await dbContext.SaveChangesAsync();
             }
-            return result;
         }
+
+
+        //public async Task<IEnumerable<FavouriteCoachViewModel>?> GetFavouritesAsync(string? userId)
+        //{
+        //    IEnumerable<FavouriteCoachViewModel> favourites = await this.dbContext
+        //        .UsersCoaches
+        //        .Include(c => c.Coach)
+        //        .AsNoTracking()
+        //        .Where(c => c.UserId.ToLowerInvariant() == userId!.ToLowerInvariant())
+        //        .Select(uc => new FavouriteCoachViewModel
+        //        {
+        //            CoachId = uc.CoachId,
+        //            CoachName = uc.Coach.Name,
+        //            CoachAge = uc.Coach.Age,
+        //            ImageUrl = uc.Coach.ImageUrl,
+        //            Description = uc.Coach.Description,
+        //        })
+        //        .ToListAsync();
+
+        //    return favourites;
+        //}
     }
 }

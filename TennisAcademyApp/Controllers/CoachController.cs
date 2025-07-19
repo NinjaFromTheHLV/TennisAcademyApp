@@ -19,9 +19,8 @@ namespace TennisAcademyApp.Controllers
         {
             try
             {
-                string userId = GetUserId()!;
                 IEnumerable<AllCoachesViewModel>? allCoaches = await this.coachService
-                    .GetAllCoachesAsync(userId);
+                    .GetAllCoachesAsync();
 
                 return View(allCoaches);
             }
@@ -34,7 +33,7 @@ namespace TennisAcademyApp.Controllers
         }
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Details(Guid? id)
+        public async Task<IActionResult> Details(int? id)
         {
             try
             {
@@ -92,7 +91,7 @@ namespace TennisAcademyApp.Controllers
             }
         }
         [HttpGet]
-        public async Task<IActionResult> Edit(Guid? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             try
             {
@@ -140,13 +139,13 @@ namespace TennisAcademyApp.Controllers
             }
         }
         [HttpGet]
-        public async Task<IActionResult> Delete(string userId, Guid Id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                userId = GetUserId()!;
-                DeleteCoachViewModel? delete = await this.coachService
-                    .GetCoachForDeletingAsync(userId, Id);
+                string userId = GetUserId()!;
+                var delete = await this.coachService
+                    .GetCoachForDeletingAsync(id);
 
                 if (delete == null)
                 {
@@ -161,23 +160,20 @@ namespace TennisAcademyApp.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> DeleteConfirmed(string userId, DeleteCoachViewModel model)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(DeleteCoachViewModel model)
         {
             try
             {
-                userId = GetUserId()!;
+                string userId = GetUserId()!;
+
                 if (ModelState.IsValid == false)
                 {
                     return RedirectToAction(nameof(Delete), new { id = model.CoachId });
                 }
-                bool result = await this.coachService
-                    .DeletedCoachAsync(userId, model);
 
-                if (result == false)
-                {
-                    ModelState.AddModelError(string.Empty, "An error occured, please try again");
-                    return RedirectToAction(nameof(Delete), new { id = model.CoachId });
-                }
+                await this.coachService
+                .DeletedCoachAsync(model.CoachId, userId);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -187,5 +183,18 @@ namespace TennisAcademyApp.Controllers
                 return RedirectToAction(nameof(Index), "Home");
             }
         }
+        //[HttpGet]
+        //public async Task<IActionResult> Favourite()
+        //{
+        //    try
+        //    {
+        //        // TODO: favourite coach get request
+        //    }
+        //    catch (Exception ex)
+        //    {
+
+        //    }
+        //}
+
     }
 }

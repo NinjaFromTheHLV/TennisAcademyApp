@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace TennisAcademyApp.Data.Migrations
 {
     /// <inheritdoc />
@@ -189,13 +191,14 @@ namespace TennisAcademyApp.Data.Migrations
                 name: "Coaches",
                 columns: table => new
                 {
-                    CoachId = table.Column<Guid>(type: "uniqueidentifier", nullable: false, comment: "Coach Identifier"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Coach Name"),
+                    CoachId = table.Column<int>(type: "int", nullable: false, comment: "Coach Identifier")
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false, comment: "Coach Name"),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true, comment: "Coach Image"),
                     Age = table.Column<int>(type: "int", nullable: false, comment: "Coach Age"),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Coach Description"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false, comment: "Foreign key of IdentityUser"),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Description = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false, comment: "Coach Description"),
+                    Nationality = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Coach Nationality"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false, comment: "Foreign key of IdentityUser")
                 },
                 constraints: table =>
                 {
@@ -215,13 +218,12 @@ namespace TennisAcademyApp.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false, comment: "Reservation Identifier")
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true, comment: "Player Notes"),
+                    Note = table.Column<string>(type: "nvarchar(70)", maxLength: 70, nullable: true, comment: "Player Notes"),
                     SurfaceId = table.Column<int>(type: "int", nullable: false, comment: "Choosing a surface"),
-                    CoachId = table.Column<Guid>(type: "uniqueidentifier", nullable: false, comment: "Choosing a coach"),
+                    CoachId = table.Column<int>(type: "int", nullable: false, comment: "Choosing a coach"),
                     TrainingTypeId = table.Column<int>(type: "int", nullable: false, comment: "Choosing a training type"),
                     PlayerId = table.Column<string>(type: "nvarchar(450)", nullable: false, comment: "Player Identifer"),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false, comment: "Date Select"),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false, comment: "Date Select")
                 },
                 constraints: table =>
                 {
@@ -258,7 +260,7 @@ namespace TennisAcademyApp.Data.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false, comment: "Foreign Key which references to IdentityUser"),
-                    CoachId = table.Column<Guid>(type: "uniqueidentifier", nullable: false, comment: "Foreign Key which references to IdentityUser")
+                    CoachId = table.Column<int>(type: "int", nullable: false, comment: "Foreign Key which references to IdentityUser")
                 },
                 constraints: table =>
                 {
@@ -277,6 +279,44 @@ namespace TennisAcademyApp.Data.Migrations
                         onDelete: ReferentialAction.Restrict);
                 },
                 comment: "Users Favourite Coach");
+
+            migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[] { "seed-user-id-123", 0, "d3ff9796-1f86-4286-a8e3-8dbea92a9e20", "coachadmin@example.com", true, false, null, "COACHADMIN@EXAMPLE.COM", "COACHADMIN", "AQAAAAIAAYagAAAAEL/jotCs12eXoD9Ne5YvD0oKavfgcVzJKECZy0lN68IGy5Ojd5gajc2kwQ4YDcBuJA==", null, false, "e5bdfc7a-c763-4e0f-8f3b-9860cea9f650", false, "coachadmin" });
+
+            migrationBuilder.InsertData(
+                table: "Surfaces",
+                columns: new[] { "Id", "ImageUrl", "Name" },
+                values: new object[,]
+                {
+                    { 1, "https://www.google.com/imgres?q=clay%20court&imgurl=https%3A%2F%2Fcdn11.bigcommerce.com%2Fs-pop81y%2Fimages%2Fstencil%2F960x545%2Fuploaded_images%2Fallstartennissupply-281535-clay-tennis-courts-blogbanner1.jpg%3Ft%3D1703002083&imgrefurl=https%3A%2F%2Fwww.allstartennissupply.com%2Fblog%2Fwhat-is-the-best-climate-for-clay-tennis-courts%2F%3Fsrsltid%3DAfmBOorm03gyRg52IMAFa7-l2ig3k_9l9SE1UjjQCmsplj7SJUMqY2Ci&docid=wGtAwbkIqo2SLM&tbnid=587J-uncERjX8M&vet=12ahUKEwjRzYidybaOAxVeX_EDHZpnGxwQM3oECFEQAA..i&w=960&h=539&hcb=2&ved=2ahUKEwjRzYidybaOAxVeX_EDHZpnGxwQM3oECFEQAA", "Clay" },
+                    { 2, "https://www.google.com/imgres?q=Hard%20court&imgurl=https%3A%2F%2Fwww.edwardssports.co.uk%2Fpub%2Fmedia%2Fwysiwyg%2FPlaying_On_A_Hard_Tennis_Court.jpg&imgrefurl=https%3A%2F%2Fwww.edwardssports.co.uk%2Fnews%2Fpost%2Fclay-court-vs-hard-court-tennis&docid=_e_VzZEOyVdxeM&tbnid=O670DpSc8HOqTM&vet=12ahUKEwir89etybaOAxW6evEDHSxsBQ0QM3oECB0QAA..i&w=900&h=500&hcb=2&ved=2ahUKEwir89etybaOAxW6evEDHSxsBQ0QM3oECB0QAA", "Hard" },
+                    { 3, "https://www.google.com/imgres?q=Grass%20court&imgurl=https%3A%2F%2Fi.abcnewsfe.com%2Fa%2F172020d0-16bb-4c84-a3d2-b436b77d5f7e%2Fwimbledon5-2023-gty-ml-240614_1718369987464_hpMain.jpg&imgrefurl=https%3A%2F%2Fabcnews.go.com%2FUS%2Fstaggering-science-art-wimbledons-legendary-grass-courts%2Fstory%3Fid%3D111433116&docid=7Ne81Wn1LUAVtM&tbnid=f5ihWuIF1wvqzM&vet=12ahUKEwjyxZTSybaOAxVaSfEDHU1jGa4QM3oECBoQAA..i&w=3072&h=2048&hcb=2&ved=2ahUKEwjyxZTSybaOAxVaSfEDHU1jGa4QM3oECBoQAA", "Grass" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Trainings",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Physical Conditioning Routine" },
+                    { 2, "Technical Skill Development" },
+                    { 3, "Tactical Game Strategy" },
+                    { 4, "Mental Toughness Training" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Coaches",
+                columns: new[] { "CoachId", "Age", "Description", "ImageUrl", "Name", "Nationality", "UserId" },
+                values: new object[,]
+                {
+                    { 1, 38, "One of the greatest tennis players of all time, known for his clay court dominance.", "~/pictures/rafa.jpg", "Rafael Nadal", "Spanish", "seed-user-id-123" },
+                    { 2, 43, "Swiss tennis legend with unmatched elegance and 20 Grand Slam titles.", "https://a.espncdn.com/combiner/i?img=/i/headshots/tennis/players/full/425.png", "Roger Federer", "Swiss", "seed-user-id-123" },
+                    { 3, 37, "Serbian champion, known for his resilience and complete game.", "https://a.espncdn.com/i/headshots/tennis/players/full/296.png", "Novak Djokovic", "Serbian", "seed-user-id-123" },
+                    { 4, 55, "American icon who redefined tennis in the 90s with a colorful personality.", "https://www.atptour.com/-/media/alias/player-headshot/A092", "Andre Agassi", "American", "seed-user-id-123" },
+                    { 5, 68, "Swedish legend with ice-cold nerves and six French Open titles.", "https://lavercup.com/wp-content/uploads/2022/12/figure-borg-2.png", "Björn Borg", "Swedish", "seed-user-id-123" }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

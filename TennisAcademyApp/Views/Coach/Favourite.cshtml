@@ -1,0 +1,46 @@
+﻿@using TennisAcademyApp.ViewModels.Coach;
+@model IEnumerable<FavouriteCoachViewModel>
+
+@{
+    ViewData["Title"] = "Favourites";
+}
+
+<h2 class="mb-4">My Favourite Coaches</h2>
+
+@if (!Model.Any())
+{
+    <p>You don't have any favourite coaches yet.</p>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        @foreach (var coach in Model)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    @if (!string.IsNullOrEmpty(coach.ImageUrl))
+                    {
+                        <img src="@coach.ImageUrl" class="img-fluid" alt="@coach.CoachName" style="height: 350px; object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <img src="https://via.placeholder.com/600x350?text=No+Image" class="img-fluid" alt="No image" />
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title">@coach.CoachName</h5>
+                        <p class="card-text">
+                            <strong>Age:</strong> @coach.CoachAge<br />
+                            <strong>Description:</strong> @coach.Description
+                        </p>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <a asp-action="Details" asp-route-id="@coach.CoachId" class="btn btn-primary btn-sm">Details</a>
+                        <form asp-action="RemoveFromFavourites" asp-route-id="@coach.CoachId" method="post">
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

@@ -18,7 +18,7 @@ namespace TennisAcademyApp.Data.Models
         public virtual Surface Surface { get; set; } = null!;
         [Comment("Choosing a coach")]
         [Required]
-        public Guid CoachId { get; set; }
+        public int CoachId { get; set; }
         public virtual Coach Coach { get; set; } = null!;
         [Comment("Choosing a training type")]
         [Required]
@@ -31,7 +31,6 @@ namespace TennisAcademyApp.Data.Models
         [Comment("Date Select")]
         [Required]
         public DateTime Date { get; set; }
-        public bool IsDeleted { get; set; }
         
     }
 }

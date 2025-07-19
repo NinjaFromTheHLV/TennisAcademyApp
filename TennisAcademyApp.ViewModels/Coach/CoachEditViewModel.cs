@@ -6,7 +6,7 @@ namespace TennisAcademyApp.ViewModels.Coach
 {
     public class CoachEditViewModel
     {
-        public Guid CoachId { get; set; }
+        public int CoachId { get; set; }
         [Required(ErrorMessage = RequiredNameMessage)]
         [Display(Name = "Coach Name")]
         [MinLength(CoachNameMinLenght, ErrorMessage = NameMinLengthMessage)]
@@ -22,7 +22,11 @@ namespace TennisAcademyApp.ViewModels.Coach
         [MinLength(CoachDescriptionMinLenght, ErrorMessage = DescriptionMinLengthMessage)]
         [MaxLength(CoachDescriptionMaxLenght, ErrorMessage = DescriptionMaxLengthMessage)]
         public string Description { get; set; } = null!;
+        [Required(ErrorMessage = "Nationality is required!")]
+        [Display(Name = "Coach Nationality")]
+        public string Nationality { get; set; } = null!;
         [Display(Name = "Coach Image")]
+
         public string? ImageUrl { get; set; }
     }
 }

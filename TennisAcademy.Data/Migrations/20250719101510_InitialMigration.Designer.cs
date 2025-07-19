@@ -12,8 +12,8 @@ using TennisAcademyApp.Data;
 namespace TennisAcademyApp.Data.Migrations
 {
     [DbContext(typeof(TennisAcademyDbContext))]
-    [Migration("20250714162958_NadalChangedUrl")]
-    partial class NadalChangedUrl
+    [Migration("20250719101510_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -146,15 +146,15 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = "seed-user-id-123",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "45797579-f9f4-4cce-879f-0c57e1bf1473",
+                            ConcurrencyStamp = "d3ff9796-1f86-4286-a8e3-8dbea92a9e20",
                             Email = "coachadmin@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "COACHADMIN@EXAMPLE.COM",
                             NormalizedUserName = "COACHADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAENN+cbfrhzg6zSUSDVWD9WkfGc5IzblIoymKUXA5esKlgQwKTuXwiMLCB9pp1GgW4Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEL/jotCs12eXoD9Ne5YvD0oKavfgcVzJKECZy0lN68IGy5Ojd5gajc2kwQ4YDcBuJA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "3795000c-d084-4988-aa05-1d1982fda55e",
+                            SecurityStamp = "e5bdfc7a-c763-4e0f-8f3b-9860cea9f650",
                             TwoFactorEnabled = false,
                             UserName = "coachadmin"
                         });
@@ -247,10 +247,12 @@ namespace TennisAcademyApp.Data.Migrations
 
             modelBuilder.Entity("TennisAcademyApp.Data.Models.Coach", b =>
                 {
-                    b.Property<Guid>("CoachId")
+                    b.Property<int>("CoachId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("int")
                         .HasComment("Coach Identifier");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CoachId"));
 
                     b.Property<int>("Age")
                         .HasColumnType("int")
@@ -258,23 +260,25 @@ namespace TennisAcademyApp.Data.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)")
                         .HasComment("Coach Description");
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)")
                         .HasComment("Coach Image");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(35)
+                        .HasMaxLength(50)
                         .IsUnicode(true)
-                        .HasColumnType("nvarchar(35)")
+                        .HasColumnType("nvarchar(50)")
                         .HasComment("Coach Name");
+
+                    b.Property<string>("Nationality")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("Coach Nationality");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -293,53 +297,53 @@ namespace TennisAcademyApp.Data.Migrations
                     b.HasData(
                         new
                         {
-                            CoachId = new Guid("0f640ec0-da3a-4435-b2bb-62160a59c7b3"),
+                            CoachId = 1,
                             Age = 38,
                             Description = "One of the greatest tennis players of all time, known for his clay court dominance.",
-                            ImageUrl = "https://a.espncdn.com/combiner/i?img=/i/headshots/tennis/players/full/261.png",
-                            IsDeleted = false,
+                            ImageUrl = "~/pictures/rafa.jpg",
                             Name = "Rafael Nadal",
-                            UserId = "068f642f-ce05-4f68-a9d7-5e7721595c68"
+                            Nationality = "Spanish",
+                            UserId = "seed-user-id-123"
                         },
                         new
                         {
-                            CoachId = new Guid("893aa403-c106-42bd-84ee-a66b909aba7a"),
+                            CoachId = 2,
                             Age = 43,
                             Description = "Swiss tennis legend with unmatched elegance and 20 Grand Slam titles.",
-                            ImageUrl = "https://www.google.com/imgres?q=roger%20federer&imgurl=https%3A%2F%2Fwww.atptour.com%2F-%2Fmedia%2Falias%2Fplayer-headshot%2Ff324&imgrefurl=https%3A%2F%2Fwww.atptour.com%2Fen%2Fplayers%2Froger-federer%2Ff324%2Foverview&docid=M6568FadTUBTgM&tbnid=2jEmAALd9M0LIM&vet=12ahUKEwjarIq4xraOAxWhBdsEHV-rA4gQM3oECHEQAA..i&w=379&h=603&hcb=2&ved=2ahUKEwjarIq4xraOAxWhBdsEHV-rA4gQM3oECHEQAA",
-                            IsDeleted = false,
+                            ImageUrl = "https://a.espncdn.com/combiner/i?img=/i/headshots/tennis/players/full/425.png",
                             Name = "Roger Federer",
-                            UserId = "068f642f-ce05-4f68-a9d7-5e7721595c68"
+                            Nationality = "Swiss",
+                            UserId = "seed-user-id-123"
                         },
                         new
                         {
-                            CoachId = new Guid("f0735cef-5c6b-438c-9621-e2135bb98e1f"),
+                            CoachId = 3,
                             Age = 37,
                             Description = "Serbian champion, known for his resilience and complete game.",
-                            ImageUrl = "https://www.google.com/imgres?q=novak%20djokovic&imgurl=https%3A%2F%2Fa.espncdn.com%2Fi%2Fheadshots%2Ftennis%2Fplayers%2Ffull%2F296.png&imgrefurl=https%3A%2F%2Fwww.espn.com%2Ftennis%2Fplayer%2F_%2Fid%2F296%2Fnovak-djokovic&docid=2OMGcknRlaYD5M&tbnid=Up5bOK2dmBA9KM&vet=12ahUKEwjnoqLPxraOAxV4c_EDHW7-AMAQM3oECFoQAA..i&w=600&h=436&hcb=2&ved=2ahUKEwjnoqLPxraOAxV4c_EDHW7-AMAQM3oECFoQAA",
-                            IsDeleted = false,
+                            ImageUrl = "https://a.espncdn.com/i/headshots/tennis/players/full/296.png",
                             Name = "Novak Djokovic",
-                            UserId = "068f642f-ce05-4f68-a9d7-5e7721595c68"
+                            Nationality = "Serbian",
+                            UserId = "seed-user-id-123"
                         },
                         new
                         {
-                            CoachId = new Guid("e9430eaf-7b86-4d2d-bf9c-fc20087e815d"),
+                            CoachId = 4,
                             Age = 55,
                             Description = "American icon who redefined tennis in the 90s with a colorful personality.",
-                            ImageUrl = "https://www.google.com/imgres?q=agassi&imgurl=https%3A%2F%2Fphoto-assets.usopen.org%2Fimages%2Fpics%2Flarge%2Ff_Agassi_20240522.jpg&imgrefurl=https%3A%2F%2Fwww.usopen.org%2Fen_US%2Fnews%2Farticles%2F2024-05-22%2Fandre_agassi_to_captain_team_world_at_laver_cup_beginning_in_2025.html&docid=sNSnFHHM55CAnM&tbnid=44pBN3aOPFbpZM&vet=12ahUKEwiT05juxraOAxXzcfEDHdmfMZ8QM3oECHsQAA..i&w=1280&h=720&hcb=2&ved=2ahUKEwiT05juxraOAxXzcfEDHdmfMZ8QM3oECHsQAA",
-                            IsDeleted = false,
+                            ImageUrl = "https://www.atptour.com/-/media/alias/player-headshot/A092",
                             Name = "Andre Agassi",
-                            UserId = "068f642f-ce05-4f68-a9d7-5e7721595c68"
+                            Nationality = "American",
+                            UserId = "seed-user-id-123"
                         },
                         new
                         {
-                            CoachId = new Guid("89891916-c461-453b-9c9e-d6559bc26149"),
+                            CoachId = 5,
                             Age = 68,
                             Description = "Swedish legend with ice-cold nerves and six French Open titles.",
-                            ImageUrl = "https://www.google.com/imgres?q=bjong%20borg&imgurl=https%3A%2F%2Flavercup.com%2Fwp-content%2Fuploads%2F2022%2F12%2Ffigure-borg-2.png&imgrefurl=https%3A%2F%2Flavercup.com%2Fcaptains%2Fbjorn-borg&docid=uHC93uLecxmVaM&tbnid=ueuT_lH79uqMBM&vet=12ahUKEwi_9ISVx7aOAxXFcfEDHbCkIN0QM3oECFUQAA..i&w=506&h=495&hcb=2&ved=2ahUKEwi_9ISVx7aOAxXFcfEDHbCkIN0QM3oECFUQAA",
-                            IsDeleted = false,
+                            ImageUrl = "https://lavercup.com/wp-content/uploads/2022/12/figure-borg-2.png",
                             Name = "Björn Borg",
-                            UserId = "068f642f-ce05-4f68-a9d7-5e7721595c68"
+                            Nationality = "Swedish",
+                            UserId = "seed-user-id-123"
                         });
                 });
 
@@ -352,20 +356,17 @@ namespace TennisAcademyApp.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<Guid>("CoachId")
-                        .HasColumnType("uniqueidentifier")
+                    b.Property<int>("CoachId")
+                        .HasColumnType("int")
                         .HasComment("Choosing a coach");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2")
                         .HasComment("Date Select");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Note")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(70)
+                        .HasColumnType("nvarchar(70)")
                         .HasComment("Player Notes");
 
                     b.Property<string>("PlayerId")
@@ -494,8 +495,8 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasColumnType("nvarchar(450)")
                         .HasComment("Foreign Key which references to IdentityUser");
 
-                    b.Property<Guid>("CoachId")
-                        .HasColumnType("uniqueidentifier")
+                    b.Property<int>("CoachId")
+                        .HasColumnType("int")
                         .HasComment("Foreign Key which references to IdentityUser");
 
                     b.HasKey("UserId", "CoachId");

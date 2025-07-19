@@ -143,15 +143,15 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = "seed-user-id-123",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "5e380ee2-91aa-4f8e-80fd-0e18a2445b8f",
+                            ConcurrencyStamp = "0f94fb93-99f7-4701-b49e-c668e467080e",
                             Email = "coachadmin@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "COACHADMIN@EXAMPLE.COM",
                             NormalizedUserName = "COACHADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEB9DsocRp9PmFZlqgIMv6C5xxmvouZSwHFZ2k77Z3Ibk3VEvMIbdYnlVIAhymPcu0A==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEN9sk38YaAN7umTNwFb9GdxL9eYs6bSrKnVJb95jVgMjS8K8NbBdm1DZhScUtVbpAw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "a38bc567-b37a-4c5a-87f1-a13f3da36ed2",
+                            SecurityStamp = "3fbc05fd-4f73-425d-9db8-0c7bd7721847",
                             TwoFactorEnabled = false,
                             UserName = "coachadmin"
                         });
@@ -244,10 +244,12 @@ namespace TennisAcademyApp.Data.Migrations
 
             modelBuilder.Entity("TennisAcademyApp.Data.Models.Coach", b =>
                 {
-                    b.Property<Guid>("CoachId")
+                    b.Property<int>("CoachId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("int")
                         .HasComment("Coach Identifier");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CoachId"));
 
                     b.Property<int>("Age")
                         .HasColumnType("int")
@@ -255,23 +257,25 @@ namespace TennisAcademyApp.Data.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)")
                         .HasComment("Coach Description");
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)")
                         .HasComment("Coach Image");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(35)
+                        .HasMaxLength(50)
                         .IsUnicode(true)
-                        .HasColumnType("nvarchar(35)")
+                        .HasColumnType("nvarchar(50)")
                         .HasComment("Coach Name");
+
+                    b.Property<string>("Nationality")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("Coach Nationality");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -290,53 +294,53 @@ namespace TennisAcademyApp.Data.Migrations
                     b.HasData(
                         new
                         {
-                            CoachId = new Guid("681d9470-3ad0-4d6b-b9b4-163e7605a256"),
+                            CoachId = 1,
                             Age = 38,
                             Description = "One of the greatest tennis players of all time, known for his clay court dominance.",
-                            ImageUrl = "https://a.espncdn.com/combiner/i?img=/i/headshots/tennis/players/full/261.png",
-                            IsDeleted = false,
+                            ImageUrl = "~/pictures/rafa.jpg",
                             Name = "Rafael Nadal",
-                            UserId = "068f642f-ce05-4f68-a9d7-5e7721595c68"
+                            Nationality = "Spanish",
+                            UserId = "5542dacf-f728-49be-8594-2100c4bfd5c8"
                         },
                         new
                         {
-                            CoachId = new Guid("01462166-f9a9-4da9-b0ce-b34b6a6517fe"),
+                            CoachId = 2,
                             Age = 43,
                             Description = "Swiss tennis legend with unmatched elegance and 20 Grand Slam titles.",
                             ImageUrl = "https://a.espncdn.com/combiner/i?img=/i/headshots/tennis/players/full/425.png",
-                            IsDeleted = false,
                             Name = "Roger Federer",
-                            UserId = "068f642f-ce05-4f68-a9d7-5e7721595c68"
+                            Nationality = "Swiss",
+                            UserId = "5542dacf-f728-49be-8594-2100c4bfd5c8"
                         },
                         new
                         {
-                            CoachId = new Guid("a13d250f-8b8d-48a8-a7ee-c0d7b5a4b314"),
+                            CoachId = 3,
                             Age = 37,
                             Description = "Serbian champion, known for his resilience and complete game.",
                             ImageUrl = "https://a.espncdn.com/i/headshots/tennis/players/full/296.png",
-                            IsDeleted = false,
                             Name = "Novak Djokovic",
-                            UserId = "068f642f-ce05-4f68-a9d7-5e7721595c68"
+                            Nationality = "Serbian",
+                            UserId = "5542dacf-f728-49be-8594-2100c4bfd5c8"
                         },
                         new
                         {
-                            CoachId = new Guid("e98c7e24-e4cd-48da-8097-b7e8765519f1"),
+                            CoachId = 4,
                             Age = 55,
                             Description = "American icon who redefined tennis in the 90s with a colorful personality.",
                             ImageUrl = "https://www.atptour.com/-/media/alias/player-headshot/A092",
-                            IsDeleted = false,
                             Name = "Andre Agassi",
-                            UserId = "068f642f-ce05-4f68-a9d7-5e7721595c68"
+                            Nationality = "American",
+                            UserId = "5542dacf-f728-49be-8594-2100c4bfd5c8"
                         },
                         new
                         {
-                            CoachId = new Guid("1b80f46c-489e-4aa6-b183-510738f4e32f"),
+                            CoachId = 5,
                             Age = 68,
                             Description = "Swedish legend with ice-cold nerves and six French Open titles.",
                             ImageUrl = "https://lavercup.com/wp-content/uploads/2022/12/figure-borg-2.png",
-                            IsDeleted = false,
                             Name = "Björn Borg",
-                            UserId = "068f642f-ce05-4f68-a9d7-5e7721595c68"
+                            Nationality = "Swedish",
+                            UserId = "5542dacf-f728-49be-8594-2100c4bfd5c8"
                         });
                 });
 
@@ -349,20 +353,17 @@ namespace TennisAcademyApp.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<Guid>("CoachId")
-                        .HasColumnType("uniqueidentifier")
+                    b.Property<int>("CoachId")
+                        .HasColumnType("int")
                         .HasComment("Choosing a coach");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2")
                         .HasComment("Date Select");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Note")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(70)
+                        .HasColumnType("nvarchar(70)")
                         .HasComment("Player Notes");
 
                     b.Property<string>("PlayerId")
@@ -491,8 +492,8 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasColumnType("nvarchar(450)")
                         .HasComment("Foreign Key which references to IdentityUser");
 
-                    b.Property<Guid>("CoachId")
-                        .HasColumnType("uniqueidentifier")
+                    b.Property<int>("CoachId")
+                        .HasColumnType("int")
                         .HasComment("Foreign Key which references to IdentityUser");
 
                     b.HasKey("UserId", "CoachId");
@@ -572,7 +573,7 @@ namespace TennisAcademyApp.Data.Migrations
                     b.HasOne("TennisAcademyApp.Data.Models.Coach", "Coach")
                         .WithMany("Reservations")
                         .HasForeignKey("CoachId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Player")
@@ -607,13 +608,13 @@ namespace TennisAcademyApp.Data.Migrations
                     b.HasOne("TennisAcademyApp.Data.Models.Coach", "Coach")
                         .WithMany("UsersCoaches")
                         .HasForeignKey("CoachId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Coach");
