@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TennisAcademyApp.Data.Models;
-using static TennisAcademyApp.GCommon.ValidationConstants.Reservation;
+using static TennisAcademyApp.GCommon.Validations.ValidationConstants.Reservation;
 
 namespace TennisAcademyApp.Data.Configurations
 {

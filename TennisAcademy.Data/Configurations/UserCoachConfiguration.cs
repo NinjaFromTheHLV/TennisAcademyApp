@@ -5,9 +5,9 @@ using TennisAcademyApp.Data.Models;
 
 namespace TennisAcademyApp.Data.Configurations
 {
-    public class UserCoachConfiguration : IEntityTypeConfiguration<UserCoach>
+    public class UserCoachConfiguration : IEntityTypeConfiguration<UserFavourite>
     {
-        public void Configure(EntityTypeBuilder<UserCoach> config)
+        public void Configure(EntityTypeBuilder<UserFavourite> config)
         {
             config
                 .HasKey(uc => new { uc.UserId, uc.CoachId });

@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using static TennisAcademyApp.GCommon.ValidationConstants.Coach;
+using static TennisAcademyApp.GCommon.Validations.ValidationConstants.Coach;
 using static TennisAcademyApp.ViewModels.Validations.CoachInputModelValidations;
 
 namespace TennisAcademyApp.ViewModels.Coach

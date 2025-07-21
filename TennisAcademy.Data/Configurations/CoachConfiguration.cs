@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TennisAcademyApp.Data.Models;
-using static TennisAcademyApp.GCommon.ValidationConstants.Coach;
+using static TennisAcademyApp.GCommon.Validations.ValidationConstants.Coach;
 
 namespace TennisAcademyApp.Data.Configurations
 {
@@ -37,7 +37,7 @@ namespace TennisAcademyApp.Data.Configurations
                     Age = 38,
                     Description = "One of the greatest tennis players of all time, known for his clay court dominance.",
                     Nationality = "Spanish",
-                    UserId = "5542dacf-f728-49be-8594-2100c4bfd5c8",
+                    UserId = "90222459-c5ca-436e-a8b3-b92e0669c683",
                     ImageUrl = "~/pictures/rafa.jpg"
                 },
                 new Coach
@@ -47,7 +47,7 @@ namespace TennisAcademyApp.Data.Configurations
                     Age = 43,
                     Description = "Swiss tennis legend with unmatched elegance and 20 Grand Slam titles.",
                     Nationality = "Swiss",
-                    UserId = "5542dacf-f728-49be-8594-2100c4bfd5c8",
+                    UserId = "90222459-c5ca-436e-a8b3-b92e0669c683",
                     ImageUrl = "https://a.espncdn.com/combiner/i?img=/i/headshots/tennis/players/full/425.png"
                 },
                 new Coach
@@ -57,7 +57,7 @@ namespace TennisAcademyApp.Data.Configurations
                     Age = 37,
                     Description = "Serbian champion, known for his resilience and complete game.",
                     Nationality = "Serbian",
-                    UserId = "5542dacf-f728-49be-8594-2100c4bfd5c8",
+                    UserId = "90222459-c5ca-436e-a8b3-b92e0669c683",
                     ImageUrl = "https://a.espncdn.com/i/headshots/tennis/players/full/296.png"
                 },
                 new Coach
@@ -67,7 +67,7 @@ namespace TennisAcademyApp.Data.Configurations
                     Age = 55,
                     Description = "American icon who redefined tennis in the 90s with a colorful personality.",
                     Nationality = "American",
-                    UserId = "5542dacf-f728-49be-8594-2100c4bfd5c8",
+                    UserId = "90222459-c5ca-436e-a8b3-b92e0669c683",
                     ImageUrl = "https://www.atptour.com/-/media/alias/player-headshot/A092"
                 },
                 new Coach
@@ -77,7 +77,7 @@ namespace TennisAcademyApp.Data.Configurations
                     Age = 68,
                     Description = "Swedish legend with ice-cold nerves and six French Open titles.",
                     Nationality = "Swedish",
-                    UserId = "5542dacf-f728-49be-8594-2100c4bfd5c8",
+                    UserId = "90222459-c5ca-436e-a8b3-b92e0669c683",
                     ImageUrl = "https://lavercup.com/wp-content/uploads/2022/12/figure-borg-2.png"
                 }
             };
