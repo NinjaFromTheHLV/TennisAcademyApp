@@ -30,6 +30,6 @@ namespace TennisAcademyApp.Data.Models
         public string UserId { get; set; } = null!;
         public virtual IdentityUser User { get; set; } = null!;
         public virtual ICollection<Reservation> Reservations { get; set; } = new HashSet<Reservation>();
-        public virtual ICollection<UserCoach> UsersCoaches { get; set; } = new HashSet<UserCoach>();
+        public virtual ICollection<UserFavourite> UsersCoaches { get; set; } = new HashSet<UserFavourite>();
     }
 }
