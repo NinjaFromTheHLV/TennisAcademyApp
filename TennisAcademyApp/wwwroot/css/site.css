@@ -20,7 +20,8 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    background-color: #f8f9fa;
 }
 
 /* Coach Details css */
@@ -56,10 +57,6 @@ body {
 }
 
 /* Edit Coach css */
-body {
-    background-color: #f8f9fa;
-}
-
 .edit-form-wrapper {
     max-width: 800px;
     margin: 40px auto;
