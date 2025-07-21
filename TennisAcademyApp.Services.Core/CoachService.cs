@@ -141,55 +141,71 @@ namespace TennisAcademyApp.Services.Core
             return result;
         }
 
-        public async Task<DeleteCoachViewModel?> GetCoachForDeletingAsync(int id)
+        public async Task<DeleteCoachViewModel?> GetCoachForDeletingAsync(string? userId, int? id)
         {
-            return await dbContext.Coaches
-                .Where(c => c.CoachId == id)
-                .Select(c => new DeleteCoachViewModel
+            DeleteCoachViewModel? model = null;
+            var user = await this.userManager
+                .FindByIdAsync(userId!);
+
+            if (id.HasValue)
+            {
+                var coach = await this.dbContext
+                    .Coaches
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.CoachId == id.Value);
+                if (coach != null)
                 {
-                    Name = c.Name,
-                    Age = c.Age,
-                    Description = c.Description,
-                    ImageUrl = c.ImageUrl,
-                    CoachId = id
-                })
-                .FirstOrDefaultAsync();
+                    model = new DeleteCoachViewModel
+                    {
+                        CoachId = coach.CoachId,
+                        Name = coach.Name,
+                        Age = coach.Age,
+                        Description = coach.Description,
+                        ImageUrl = coach.ImageUrl,
+                    };
+                }
+            }
+            return model;
         }
 
-        public async Task DeletedCoachAsync(int id, string userId)
+        public async Task<bool> DeletedCoachAsync(string? userId, DeleteCoachViewModel model)
         {
             // check for admin role
+            bool result = false;
 
-            var user = await userManager.FindByIdAsync(userId);
+            var user = await userManager.FindByIdAsync(userId!);
 
-            var coach = await this.dbContext.Coaches.FindAsync(id);
+            var coach = await this.dbContext.Coaches.FindAsync(model.CoachId);
 
             if (userId != null && coach != null)
             {
                 dbContext.Coaches.Remove(coach);
                 await dbContext.SaveChangesAsync();
+
+                result = true;
             }
+            return result;
         }
 
 
-        //public async Task<IEnumerable<FavouriteCoachViewModel>?> GetFavouritesAsync(string? userId)
-        //{
-        //    IEnumerable<FavouriteCoachViewModel> favourites = await this.dbContext
-        //        .UsersCoaches
-        //        .Include(c => c.Coach)
-        //        .AsNoTracking()
-        //        .Where(c => c.UserId.ToLowerInvariant() == userId!.ToLowerInvariant())
-        //        .Select(uc => new FavouriteCoachViewModel
-        //        {
-        //            CoachId = uc.CoachId,
-        //            CoachName = uc.Coach.Name,
-        //            CoachAge = uc.Coach.Age,
-        //            ImageUrl = uc.Coach.ImageUrl,
-        //            Description = uc.Coach.Description,
-        //        })
-        //        .ToListAsync();
+        public async Task<IEnumerable<FavouriteCoachViewModel>> GetFavouritesAsync(string? userId)
+        {
+            IEnumerable<FavouriteCoachViewModel> favourites = await this.dbContext
+                .UserFavourites
+                .Include(c => c.Coach)
+                .AsNoTracking()
+                .Where(c => c.UserId == userId)
+                .Select(uc => new FavouriteCoachViewModel
+                {
+                    CoachId = uc.CoachId,
+                    CoachName = uc.Coach.Name,
+                    CoachAge = uc.Coach.Age,
+                    ImageUrl = uc.Coach.ImageUrl,
+                    Description = uc.Coach.Description,
+                })
+                .ToListAsync();
 
-        //    return favourites;
-        //}
+            return favourites;
+        }
     }
 }

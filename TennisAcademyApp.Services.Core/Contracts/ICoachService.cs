@@ -9,8 +9,10 @@ namespace TennisAcademyApp.Services.Core.Contracts
         Task<bool> AddCoachAsync(string userId, AddCoachInputModel inputModel);
         Task<CoachEditViewModel?> GetCoachForEdittingAsync(int? id, string? userId);
         Task<bool> EdittedCoachAsync(string userId, CoachEditViewModel model);
-        Task<DeleteCoachViewModel?> GetCoachForDeletingAsync(int id);
-        Task DeletedCoachAsync(int id, string userId);
-        //Task<IEnumerable<FavouriteCoachViewModel>> GetFavouritesAsync(string? userId);
+        Task<DeleteCoachViewModel?> GetCoachForDeletingAsync(string? userId,int? id);
+        Task<bool> DeletedCoachAsync(string? userId, DeleteCoachViewModel model);
+        Task<IEnumerable<FavouriteCoachViewModel>> GetFavouritesAsync(string? userId);
+        // TODO: Add a property to check if the coach is in user favourites
+        // TODO: Post tasks for adding and removing coaches from favourites
     }
 }
