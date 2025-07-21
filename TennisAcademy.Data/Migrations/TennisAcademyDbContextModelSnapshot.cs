@@ -143,15 +143,15 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = "seed-user-id-123",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "0f94fb93-99f7-4701-b49e-c668e467080e",
+                            ConcurrencyStamp = "9782f2ee-eae0-4714-b0ec-22cbc141ebab",
                             Email = "coachadmin@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "COACHADMIN@EXAMPLE.COM",
                             NormalizedUserName = "COACHADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEN9sk38YaAN7umTNwFb9GdxL9eYs6bSrKnVJb95jVgMjS8K8NbBdm1DZhScUtVbpAw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEE3oijHanhHMuvxTgbS3Tn9e82dmmQcazmnlXSsZfePsw4JMHVlCm01z/2SEDArQtw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "3fbc05fd-4f73-425d-9db8-0c7bd7721847",
+                            SecurityStamp = "499509da-e67f-490d-9127-d691737c951a",
                             TwoFactorEnabled = false,
                             UserName = "coachadmin"
                         });
@@ -300,7 +300,7 @@ namespace TennisAcademyApp.Data.Migrations
                             ImageUrl = "~/pictures/rafa.jpg",
                             Name = "Rafael Nadal",
                             Nationality = "Spanish",
-                            UserId = "5542dacf-f728-49be-8594-2100c4bfd5c8"
+                            UserId = "90222459-c5ca-436e-a8b3-b92e0669c683"
                         },
                         new
                         {
@@ -310,7 +310,7 @@ namespace TennisAcademyApp.Data.Migrations
                             ImageUrl = "https://a.espncdn.com/combiner/i?img=/i/headshots/tennis/players/full/425.png",
                             Name = "Roger Federer",
                             Nationality = "Swiss",
-                            UserId = "5542dacf-f728-49be-8594-2100c4bfd5c8"
+                            UserId = "90222459-c5ca-436e-a8b3-b92e0669c683"
                         },
                         new
                         {
@@ -320,7 +320,7 @@ namespace TennisAcademyApp.Data.Migrations
                             ImageUrl = "https://a.espncdn.com/i/headshots/tennis/players/full/296.png",
                             Name = "Novak Djokovic",
                             Nationality = "Serbian",
-                            UserId = "5542dacf-f728-49be-8594-2100c4bfd5c8"
+                            UserId = "90222459-c5ca-436e-a8b3-b92e0669c683"
                         },
                         new
                         {
@@ -330,7 +330,7 @@ namespace TennisAcademyApp.Data.Migrations
                             ImageUrl = "https://www.atptour.com/-/media/alias/player-headshot/A092",
                             Name = "Andre Agassi",
                             Nationality = "American",
-                            UserId = "5542dacf-f728-49be-8594-2100c4bfd5c8"
+                            UserId = "90222459-c5ca-436e-a8b3-b92e0669c683"
                         },
                         new
                         {
@@ -340,7 +340,7 @@ namespace TennisAcademyApp.Data.Migrations
                             ImageUrl = "https://lavercup.com/wp-content/uploads/2022/12/figure-borg-2.png",
                             Name = "Björn Borg",
                             Nationality = "Swedish",
-                            UserId = "5542dacf-f728-49be-8594-2100c4bfd5c8"
+                            UserId = "90222459-c5ca-436e-a8b3-b92e0669c683"
                         });
                 });
 
@@ -486,7 +486,7 @@ namespace TennisAcademyApp.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("TennisAcademyApp.Data.Models.UserCoach", b =>
+            modelBuilder.Entity("TennisAcademyApp.Data.Models.UserFavourite", b =>
                 {
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)")
@@ -500,7 +500,7 @@ namespace TennisAcademyApp.Data.Migrations
 
                     b.HasIndex("CoachId");
 
-                    b.ToTable("UsersCoaches", t =>
+                    b.ToTable("UserFavourites", t =>
                         {
                             t.HasComment("Users Favourite Coach");
                         });
@@ -603,7 +603,7 @@ namespace TennisAcademyApp.Data.Migrations
                     b.Navigation("TrainingType");
                 });
 
-            modelBuilder.Entity("TennisAcademyApp.Data.Models.UserCoach", b =>
+            modelBuilder.Entity("TennisAcademyApp.Data.Models.UserFavourite", b =>
                 {
                     b.HasOne("TennisAcademyApp.Data.Models.Coach", "Coach")
                         .WithMany("UsersCoaches")
