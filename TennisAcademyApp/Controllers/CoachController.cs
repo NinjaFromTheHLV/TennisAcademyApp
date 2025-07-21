@@ -145,7 +145,7 @@ namespace TennisAcademyApp.Controllers
             {
                 string userId = GetUserId()!;
                 var delete = await this.coachService
-                    .GetCoachForDeletingAsync(id);
+                    .GetCoachForDeletingAsync(userId, id);
 
                 if (delete == null)
                 {
@@ -173,7 +173,7 @@ namespace TennisAcademyApp.Controllers
                 }
 
                 await this.coachService
-                .DeletedCoachAsync(model.CoachId, userId);
+                .DeletedCoachAsync(userId, model);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -183,18 +183,24 @@ namespace TennisAcademyApp.Controllers
                 return RedirectToAction(nameof(Index), "Home");
             }
         }
-        //[HttpGet]
-        //public async Task<IActionResult> Favourite()
-        //{
-        //    try
-        //    {
-        //        // TODO: favourite coach get request
-        //    }
-        //    catch (Exception ex)
-        //    {
+        [HttpGet]
+        public async Task<IActionResult> Favourite()
+        {
+            try
+            {
+                string userId = GetUserId()!;
 
-        //    }
-        //}
+                var favourites = await this.coachService
+                    .GetFavouritesAsync(userId);
+
+                return View(favourites);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return RedirectToAction(nameof(Index), "Home");
+            }
+        }
 
     }
 }
