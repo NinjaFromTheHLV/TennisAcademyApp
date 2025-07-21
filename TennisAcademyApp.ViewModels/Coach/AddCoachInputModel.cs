@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using static TennisAcademyApp.ViewModels.Validations.CoachInputModelValidations;
-using static TennisAcademyApp.GCommon.ValidationConstants.Coach;
+using static TennisAcademyApp.GCommon.Validations.ValidationConstants.Coach;
 
 namespace TennisAcademyApp.ViewModels.Coach
 {
