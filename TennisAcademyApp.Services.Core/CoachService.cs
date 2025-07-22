@@ -159,8 +159,6 @@ namespace TennisAcademyApp.Services.Core
                     {
                         CoachId = coach.CoachId,
                         Name = coach.Name,
-                        Age = coach.Age,
-                        Description = coach.Description,
                         ImageUrl = coach.ImageUrl,
                     };
                 }

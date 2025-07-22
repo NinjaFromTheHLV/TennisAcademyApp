@@ -167,13 +167,14 @@ namespace TennisAcademyApp.Controllers
             {
                 string userId = GetUserId()!;
 
-                if (ModelState.IsValid == false)
+                bool result = await this.coachService
+                .DeletedCoachAsync(userId, model);
+
+                if (result == false)
                 {
+                    ModelState.AddModelError(string.Empty, "An error occured, please try again");
                     return RedirectToAction(nameof(Delete), new { id = model.CoachId });
                 }
-
-                await this.coachService
-                .DeletedCoachAsync(userId, model);
 
                 return RedirectToAction(nameof(Index));
             }
