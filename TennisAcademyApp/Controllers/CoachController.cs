@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Coach;
 
@@ -202,6 +203,51 @@ namespace TennisAcademyApp.Controllers
                 return RedirectToAction(nameof(Index), "Home");
             }
         }
+        [HttpPost]
+        public async Task<IActionResult> AddToFavourites(int id)
+        {
+            try
+            {
+                string userId = GetUserId()!;
 
+                bool result = await coachService
+                    .AddFavouriteCoachAsync(userId, id);
+
+                if (result == false)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+
+                return RedirectToAction(nameof(Favourite));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{ex.Message}");
+                return RedirectToAction(nameof(Index));
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> RemoveFromFavourites(int id)
+        {
+            try
+            {
+                var userId = GetUserId()!;
+
+                bool result = await coachService
+                    .RemoveFromFavouritesAsync(userId, id);
+
+                if (result == false)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+
+                return RedirectToAction(nameof(Favourite));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return RedirectToAction(nameof(Index));
+            }
+        }
     }
 }
