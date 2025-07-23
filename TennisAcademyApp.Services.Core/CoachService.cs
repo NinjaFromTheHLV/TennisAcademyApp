@@ -43,6 +43,7 @@ namespace TennisAcademyApp.Services.Core
                 var coaches = await this.dbContext
                     .Coaches
                     .Include(c => c.User)
+                    .Include(uc => uc.UsersCoaches)
                     .AsNoTracking()
                     .FirstOrDefaultAsync(c => c.CoachId == id.Value);
 
@@ -58,6 +59,9 @@ namespace TennisAcademyApp.Services.Core
                         Nationality = coaches.Nationality,
                         IsAddedBy = userId != null ?
                             coaches.UserId.ToLower() == userId.ToLower() : false,
+                        IsInUserFavorites = userId != null ?
+                            dbContext.UserFavourites.Any(uc => uc.UserId == userId 
+                            && uc.CoachId == coaches.CoachId) : false
                     };
                 }
             }
@@ -192,7 +196,7 @@ namespace TennisAcademyApp.Services.Core
                 .UserFavourites
                 .Include(c => c.Coach)
                 .AsNoTracking()
-                .Where(c => c.UserId == userId)
+                .Where(uc => uc.UserId == userId)
                 .Select(uc => new FavouriteCoachViewModel
                 {
                     CoachId = uc.CoachId,
@@ -204,6 +208,63 @@ namespace TennisAcademyApp.Services.Core
                 .ToListAsync();
 
             return favourites;
+        }
+
+        public async Task<bool> AddFavouriteCoachAsync(string userId, int id)
+        {
+            bool result = false;
+            var user = await userManager
+                .FindByIdAsync(userId);
+
+            var coach = await dbContext.Coaches
+                .FindAsync(id);
+
+            if (user != null && coach != null)
+            {
+                var favouriteCoach = await dbContext
+                    .UserFavourites
+                    .FirstOrDefaultAsync(uc => uc.UserId == userId && uc.CoachId == id);
+
+                if (favouriteCoach == null)
+                {
+                    favouriteCoach = new UserFavourite()
+                    {
+                        UserId = userId,
+                        CoachId = id,
+                    };
+                    await dbContext.UserFavourites.AddAsync(favouriteCoach);
+                    await dbContext.SaveChangesAsync();
+
+                    result = true;
+                }
+            }
+            return result;
+        }
+
+        public async Task<bool> RemoveFromFavouritesAsync(string userId, int? id)
+        {
+            bool result = false;
+
+            var user = await userManager.
+                FindByIdAsync(userId);
+            if (id.HasValue)
+            {
+                var coach = await dbContext.Coaches
+                    .FindAsync(id.Value);
+            }
+
+            if (user != null && id != null)
+            {
+                var favouriteCoach = await dbContext
+                    .UserFavourites
+                    .FirstOrDefaultAsync(uc => uc.UserId == userId && uc.CoachId == id);
+
+                dbContext.UserFavourites.Remove(favouriteCoach);
+                await dbContext.SaveChangesAsync();
+
+                result = true;
+            }
+            return result;
         }
     }
 }

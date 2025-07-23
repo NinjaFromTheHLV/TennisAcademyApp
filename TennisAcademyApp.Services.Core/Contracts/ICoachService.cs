@@ -12,7 +12,7 @@ namespace TennisAcademyApp.Services.Core.Contracts
         Task<DeleteCoachViewModel?> GetCoachForDeletingAsync(string? userId,int? id);
         Task<bool> DeletedCoachAsync(string? userId, DeleteCoachViewModel model);
         Task<IEnumerable<FavouriteCoachViewModel>> GetFavouritesAsync(string? userId);
-        // TODO: Add a property to check if the coach is in user favourites
-        // TODO: Post tasks for adding and removing coaches from favourites
+        Task<bool> AddFavouriteCoachAsync(string userId, int id);
+        Task<bool> RemoveFromFavouritesAsync(string userId, int? id);
     }
 }
