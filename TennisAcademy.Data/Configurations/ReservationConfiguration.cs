@@ -34,6 +34,7 @@ namespace TennisAcademyApp.Data.Configurations
                 .HasOne(r => r.TrainingType)
                 .WithMany(r => r.Reservations)
                 .HasForeignKey(r => r.TrainingTypeId);
+
         }
     }
 }

@@ -28,6 +28,9 @@ namespace TennisAcademyApp.Data.Models
         [Required]
         public string PlayerId { get; set; } = null!;
         public virtual IdentityUser Player { get; set; } = null!;
+        [Comment("Duration of the session")]
+        [Required]
+        public int Duration { get; set; }
         [Comment("Date Select")]
         [Required]
         public DateTime Date { get; set; }
