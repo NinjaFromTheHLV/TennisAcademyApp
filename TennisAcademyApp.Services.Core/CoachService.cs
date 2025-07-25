@@ -4,6 +4,7 @@ using TennisAcademyApp.Data;
 using TennisAcademyApp.Data.Models;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Coach;
+using TennisAcademyApp.ViewModels.Reservation;
 
 namespace TennisAcademyApp.Services.Core
 {
@@ -19,8 +20,7 @@ namespace TennisAcademyApp.Services.Core
 
         public async Task<IEnumerable<AllCoachesViewModel>?> GetAllCoachesAsync()
         {
-            IEnumerable<AllCoachesViewModel> allCoaches = await this.dbContext
-                .Coaches
+            IEnumerable<AllCoachesViewModel> allCoaches = await dbContext.Coaches
                 .AsNoTracking()
                 .Select(c => new AllCoachesViewModel
                 {
@@ -34,13 +34,30 @@ namespace TennisAcademyApp.Services.Core
 
             return allCoaches;
         }
-        public async Task<CoachDetailsViewModel> GetCoachDetailsAsync(string? userId, int? id)
+
+        public async Task<IEnumerable<CoachDropDownModel>> GetGoachesForDropDownAsync()
+        {
+            IEnumerable<CoachDropDownModel> coaches = await dbContext.Coaches
+                .AsNoTracking()
+                .Select(c => new CoachDropDownModel
+                {
+                    Id = c.CoachId,
+                    Name = c.Name,
+                })
+                .ToListAsync();
+
+            return coaches;
+
+        }
+        public async Task<CoachDetailsViewModel> GetCoachDetailsAsync(string userId, int? id)
         {
             CoachDetailsViewModel coachDetails = null!;
 
+            var user = await userManager.FindByIdAsync(userId);
+
             if (id.HasValue)
             {
-                var coaches = await this.dbContext
+                var coaches = await dbContext
                     .Coaches
                     .Include(c => c.User)
                     .Include(uc => uc.UsersCoaches)
@@ -70,7 +87,7 @@ namespace TennisAcademyApp.Services.Core
         public async Task<bool> AddCoachAsync(string userId, AddCoachInputModel inputModel)
         {
             bool result = false;
-            IdentityUser? user = await this.userManager
+            var user = await userManager
                 .FindByIdAsync(userId);
 
             if (user != null)
@@ -92,21 +109,21 @@ namespace TennisAcademyApp.Services.Core
             return result;
         }
 
-        public async Task<CoachEditViewModel?> GetCoachForEdittingAsync(int? id, string? userId)
+        public async Task<CoachEditInputModel?> GetCoachForEdittingAsync(int? id, string? userId)
         {
-            CoachEditViewModel? model = null;
-            IdentityUser? user = await this.userManager
+            CoachEditInputModel? model = null;
+            var user = await userManager
                 .FindByIdAsync(userId!);
 
             if (id.HasValue)
             {
-                var coach = await this.dbContext
+                var coach = await dbContext
                     .Coaches
                     .AsNoTracking()
                     .FirstOrDefaultAsync(c => c.CoachId == id.Value);
                 if (coach != null && coach.UserId.ToLower() == userId!.ToLower())
                 {
-                    model = new CoachEditViewModel
+                    model = new CoachEditInputModel
                     {
                         CoachId = coach.CoachId,
                         Name = coach.Name,
@@ -120,13 +137,13 @@ namespace TennisAcademyApp.Services.Core
             return model;
         }
 
-        public async Task<bool> EdittedCoachAsync(string userId, CoachEditViewModel model)
+        public async Task<bool> EdittedCoachAsync(string userId, CoachEditInputModel model)
         {
             bool result = false;
-            var user = await this.userManager
+            var user = await userManager
                 .FindByIdAsync(userId);
 
-            var coach = await this.dbContext
+            var coach = await dbContext
                 .Coaches
                 .FindAsync(model.CoachId);
 
@@ -148,12 +165,12 @@ namespace TennisAcademyApp.Services.Core
         public async Task<DeleteCoachViewModel?> GetCoachForDeletingAsync(string? userId, int? id)
         {
             DeleteCoachViewModel? model = null;
-            var user = await this.userManager
+            var user = await userManager
                 .FindByIdAsync(userId!);
 
             if (id.HasValue)
             {
-                var coach = await this.dbContext
+                var coach = await dbContext
                     .Coaches
                     .AsNoTracking()
                     .FirstOrDefaultAsync(c => c.CoachId == id.Value);
@@ -177,7 +194,7 @@ namespace TennisAcademyApp.Services.Core
 
             var user = await userManager.FindByIdAsync(userId!);
 
-            var coach = await this.dbContext.Coaches.FindAsync(model.CoachId);
+            var coach = await dbContext.Coaches.FindAsync(model.CoachId);
 
             if (userId != null && coach != null)
             {
@@ -189,10 +206,9 @@ namespace TennisAcademyApp.Services.Core
             return result;
         }
 
-
         public async Task<IEnumerable<FavouriteCoachViewModel>> GetFavouritesAsync(string? userId)
         {
-            IEnumerable<FavouriteCoachViewModel> favourites = await this.dbContext
+            IEnumerable<FavouriteCoachViewModel> favourites = await dbContext
                 .UserFavourites
                 .Include(c => c.Coach)
                 .AsNoTracking()
@@ -247,10 +263,10 @@ namespace TennisAcademyApp.Services.Core
 
             var user = await userManager.
                 FindByIdAsync(userId);
+
             if (id.HasValue)
             {
-                var coach = await dbContext.Coaches
-                    .FindAsync(id.Value);
+                var coach = await dbContext.Coaches.FindAsync(id.Value);
             }
 
             if (user != null && id != null)
@@ -259,12 +275,15 @@ namespace TennisAcademyApp.Services.Core
                     .UserFavourites
                     .FirstOrDefaultAsync(uc => uc.UserId == userId && uc.CoachId == id);
 
-                dbContext.UserFavourites.Remove(favouriteCoach);
-                await dbContext.SaveChangesAsync();
+                if (favouriteCoach != null)
+                {
+                    dbContext.UserFavourites.Remove(favouriteCoach!);
+                    await dbContext.SaveChangesAsync();
 
-                result = true;
+                    result = true;
+                }
             }
             return result;
-        }
+        } 
     }
 }

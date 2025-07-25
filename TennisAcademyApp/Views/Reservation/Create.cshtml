@@ -1,0 +1,78 @@
+﻿@using TennisAcademyApp.ViewModels.Reservation;
+@using static TennisAcademyApp.GCommon.Validations.ValidationConstants.Reservation;
+@model ReservationCreateInputModel
+
+@{
+    ViewData["Title"] = "Create Reservation";
+}
+
+<h2>Create Reservation</h2>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    var globalErrors = ViewData.ModelState[string.Empty]?.Errors;
+    if (globalErrors != null && globalErrors.Count > 0)
+    {
+        <div class="alert alert-danger text-center">
+            @foreach (var error in globalErrors)
+            {
+                <p>@error.ErrorMessage</p>
+            }
+        </div>
+    }
+}
+
+<form asp-action="Create" method="post">
+    <div class="mb-3">
+        <label asp-for="Date" class="form-label"></label>
+        <input asp-for="Date" class="form-control" type="datetime-local"
+               value="@Model.Date.ToString(DateFormat)" />
+        <span asp-validation-for="Date" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Duration" class="form-label"></label>
+        <select asp-for="Duration" class="form-control">
+            <option value="60">60 minutes</option>
+            <option value="120">120 minutes</option>
+        </select>
+        <span asp-validation-for="Duration" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CoachId" class="form-label"></label>
+        <select asp-for="CoachId" class="form-control" asp-items="@(new SelectList(Model.Coaches, "Id", "Name"))">
+            <option value="">-- Select Coach --</option>
+        </select>
+        <span asp-validation-for="CoachId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="SurfaceId" class="form-label"></label>
+        <select asp-for="SurfaceId" class="form-control" asp-items="@(new SelectList(Model.Surfaces, "Id", "Name"))">
+            <option value="">-- Select Surface --</option>
+        </select>
+        <span asp-validation-for="SurfaceId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="TrainingTypeId" class="form-label"></label>
+        <select asp-for="TrainingTypeId" class="form-control" asp-items="@(new SelectList(Model.TrainingTypes, "Id", "Name"))">
+            <option value="">-- Select Training Type --</option>
+        </select>
+        <span asp-validation-for="TrainingTypeId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Note" class="form-label"></label>
+        <textarea asp-for="Note" class="form-control"></textarea>
+        <span asp-validation-for="Note" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">Reserve</button>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
