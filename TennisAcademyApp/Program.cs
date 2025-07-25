@@ -31,6 +31,9 @@ namespace TennisAcademyApp
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddScoped<ICoachService, CoachService>();
+            builder.Services.AddScoped<IReservationService, ReservationService>();
+            builder.Services.AddScoped<ISurfaceService, SurfaceService>();
+            builder.Services.AddScoped<ITrainingTypeService, TrainingTypeService>();
 
             var app = builder.Build();
 
