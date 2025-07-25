@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Coach;
 
@@ -97,7 +96,7 @@ namespace TennisAcademyApp.Controllers
             try
             {
                 string user = GetUserId()!;
-                CoachEditViewModel? edit = await this.coachService
+                CoachEditInputModel? edit = await this.coachService
                     .GetCoachForEdittingAsync(id, user);
 
                 if (edit == null)
@@ -113,7 +112,7 @@ namespace TennisAcademyApp.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> Edit(CoachEditViewModel model)
+        public async Task<IActionResult> Edit(CoachEditInputModel model)
         {
             try
             {
