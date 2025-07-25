@@ -1,20 +1,20 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using static TennisAcademyApp.GCommon.Validations.ValidationConstants.Coach;
-using static TennisAcademyApp.ViewModels.Validations.CoachInputModelValidations;
+using static TennisAcademyApp.GCommon.Validations.RequiredMessages.Coach;
+using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Coach;
 
 namespace TennisAcademyApp.ViewModels.Coach
 {
-    public class CoachEditViewModel
+    public class CoachEditInputModel
     {
         public int CoachId { get; set; }
         [Required(ErrorMessage = RequiredNameMessage)]
         [Display(Name = "Coach Name")]
-        [MinLength(CoachNameMinLenght, ErrorMessage = NameMinLengthMessage)]
         [MaxLength(CoachNameMaxLenght, ErrorMessage = NameMaxLengthMessage)]
         public string Name { get; set; } = null!;
         [Required(ErrorMessage = AgeRequiredMessage)]
         [Display(Name = "Coach Age")]
-        [Range(CoachAgeMinLenght, CoachAgeMaxLenght, ErrorMessage = AgeErrorMessage)]
+        [Range(CoachAgeMinRequirement, CoachAgeMaxRequirement, ErrorMessage = AgeErrorMessage)]
         public int Age { get; set; }
 
         [Required(ErrorMessage = DescriptionRequiredMessage)]
