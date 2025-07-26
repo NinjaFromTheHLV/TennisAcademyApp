@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TennisAcademyApp.Data;
 
@@ -11,9 +12,11 @@ using TennisAcademyApp.Data;
 namespace TennisAcademyApp.Data.Migrations
 {
     [DbContext(typeof(TennisAcademyDbContext))]
-    partial class TennisAcademyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250726150716_ReservationIsDeletedPropertyAdded")]
+    partial class ReservationIsDeletedPropertyAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

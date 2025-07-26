@@ -35,6 +35,13 @@ namespace TennisAcademyApp.Data.Configurations
                 .WithMany(r => r.Reservations)
                 .HasForeignKey(r => r.TrainingTypeId);
 
+            config
+                .Property(r => r.IsDeleted)
+                .HasDefaultValue(false);
+
+            config
+                .HasQueryFilter(c => c.IsDeleted == false);
+
         }
     }
 }
