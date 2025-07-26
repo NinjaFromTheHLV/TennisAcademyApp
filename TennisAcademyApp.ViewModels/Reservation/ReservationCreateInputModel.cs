@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using TennisAcademyApp.ViewModels.DropDown;
 using static TennisAcademyApp.GCommon.Validations.RequiredMessages.Reservation;
 
 namespace TennisAcademyApp.ViewModels.Reservation

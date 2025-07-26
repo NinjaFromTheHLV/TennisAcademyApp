@@ -1,6 +1,6 @@
-﻿namespace TennisAcademyApp.ViewModels.Reservation
+﻿namespace TennisAcademyApp.ViewModels.DropDown
 {
-    public class CoachDropDownModel
+    public class TrainingTypeDropDownModel
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;

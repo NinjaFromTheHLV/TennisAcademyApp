@@ -1,4 +1,4 @@
-﻿namespace TennisAcademyApp.ViewModels.Reservation
+﻿namespace TennisAcademyApp.ViewModels.DropDown
 {
     public class SurfaceDropDownModel
     {
