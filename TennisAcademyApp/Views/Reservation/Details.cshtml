@@ -1,0 +1,40 @@
+﻿@using static TennisAcademyApp.GCommon.Validations.ValidationConstants.Reservation;
+@using TennisAcademyApp.ViewModels.Reservation;
+@model TennisAcademyApp.ViewModels.Reservation.ReservationDetailsViewModel
+
+@{
+    ViewData["Title"] = "Reservation Details";
+}
+
+<h2 class="mb-4 text-center">Reservation Details</h2>
+
+<div class="card mb-5 shadow-lg">
+    <div class="row g-0">
+        <div class="col-md-5">
+            <img src="@Url.Content(Model.ImageUrl)"
+                 class="img-fluid rounded-start w-100 h-100 object-fit-cover"
+                 style="max-height: 300px;"
+                 alt="Surface Image" />
+        </div>
+
+        <div class="col-md-7">
+            <div class="card-body p-4">
+                <h4 class="card-title mb-4 text-primary">@Model.TrainingTypeName with @Model.CoachName</h4>
+
+                <div class="mb-2"><strong>Date & Time:</strong> @Model.Date.ToString(DateFormat)</div>
+                <div class="mb-2"><strong>Duration:</strong> @Model.Duration minutes</div>
+                <div class="mb-2"><strong>Surface:</strong> @Model.SurfaceName</div>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Note))
+                {
+                    <div class="mb-2"><strong>Note:</strong> @Model.Note</div>
+                }
+
+                <div class="mt-4">
+                    <a asp-action="Index" class="btn btn-outline-secondary me-2 px-4 py-2">Back</a>
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger px-4 py-2">Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

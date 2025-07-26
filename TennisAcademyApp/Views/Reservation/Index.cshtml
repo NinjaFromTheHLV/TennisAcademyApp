@@ -17,10 +17,8 @@ else
         <thead class="table-light">
             <tr>
                 <th>Date & Time</th>
-                <th>Duration (min)</th>
                 <th>Coach</th>
                 <th>Training Type</th>
-                <th>Surface</th>
                 <th>Details</th>
             </tr>
         </thead>
@@ -29,10 +27,8 @@ else
             {
                 <tr>
                     <td>@r.Date</td>
-                    <td>@r.Duration</td>
                     <td>@r.CoachName</td>
                     <td>@r.TrainingTypeName</td>
-                    <td>@r.SurfaceName</td>
                     <td>
                         <a asp-action="Details" asp-route-id="@r.ReservationId" class="btn btn-info btn-sm">Details</a>
                     </td>
