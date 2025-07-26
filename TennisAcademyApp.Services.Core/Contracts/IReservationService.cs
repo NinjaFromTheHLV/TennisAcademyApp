@@ -6,6 +6,9 @@ namespace TennisAcademyApp.Services.Core.Contracts
     {
         Task<IEnumerable<ReservationIndexViewModel>?> GetUserReservationsAsync(string userId);
         Task<bool> CreateReservationAsync(string userId, ReservationCreateInputModel model);
-        //Task<ReservationDetailsViewModel> GetUserReservationDetailsAsync(string userId);
+        Task<bool> AutoReservationDeleteAsync();
+        Task<ReservationDetailsViewModel> GetUserReservationDetailsAsync(string userId, int? id);
+        Task<ReservationDeleteViewModel> GetUserReservationForDeletingAsync(string userId, int? id);
+        Task<bool> DeleteReservationAsync(string userId, ReservationDeleteViewModel model);
     }
 }

@@ -21,16 +21,7 @@ namespace TennisAcademyApp.Services.Core
 
         public async Task<IEnumerable<ReservationIndexViewModel>?> GetUserReservationsAsync(string userId)
         {
-            var expiredReservations = await dbContext.Reservations
-                .Where(r => r.Date <= DateTime.Now)
-                .ToListAsync();
-
-            if (expiredReservations.Any())
-            {
-                dbContext.Reservations.RemoveRange(expiredReservations);
-                await dbContext.SaveChangesAsync();
-            }
-
+            var autoDelete = await AutoReservationDeleteAsync();
             var user = await userManager.FindByIdAsync(userId);
 
             var reservations = await dbContext.Reservations
@@ -43,10 +34,8 @@ namespace TennisAcademyApp.Services.Core
                 {
                     ReservationId = r.Id,
                     CoachName = r.Coach.Name,
-                    SurfaceName = r.Surface.Name,
                     TrainingTypeName = r.TrainingType.Name,
                     Date = r.Date.ToString(DateFormat),
-                    Duration = r.Duration,
                 })
                 .ToListAsync();
 
@@ -84,7 +73,11 @@ namespace TennisAcademyApp.Services.Core
             {
                 throw new ArgumentException(PastDateErrorMessage);
             }
-            if (model.Date >= DateTime.Now.AddDays(14))
+            if (model.Date < DateTime.Now.AddHours(2))
+            {
+                throw new ArgumentException(TwoHoursErrorMessage);
+            }
+            if (model.Date > DateTime.Now.AddDays(14))
             {
                 throw new ArgumentException(FutureDateErrorMessage);
             }
@@ -113,6 +106,119 @@ namespace TennisAcademyApp.Services.Core
             };
             await dbContext.Reservations.AddAsync(newReservation);
             await dbContext.SaveChangesAsync();
+
+            result = true;
+
+            return result;
+        }
+
+        public async Task<bool> AutoReservationDeleteAsync()
+        {
+            bool result = false;
+            var expiredReservations = await dbContext.Reservations
+                .Where(r => r.Date <= DateTime.Now)
+                .ToListAsync();
+
+            if (expiredReservations.Any())
+            {
+                dbContext.Reservations.RemoveRange(expiredReservations);
+                await dbContext.SaveChangesAsync();
+
+                return true;
+            }
+            return result;
+        }
+
+        public async Task<ReservationDetailsViewModel> GetUserReservationDetailsAsync(string userId, int? id)
+        {
+            ReservationDetailsViewModel? details = null;
+            var user = await userManager.FindByIdAsync(userId);
+
+            if (id.HasValue && user != null)
+            {
+                var reservationDetails = await dbContext.Reservations
+                    .AsNoTracking()
+                    .Include(r => r.Coach)
+                    .Include(r => r.Surface)
+                    .Include(r => r.TrainingType)
+                    .FirstOrDefaultAsync(r => r.Id == id && r.PlayerId == userId);
+
+                if (reservationDetails.PlayerId != userId)
+                {
+                    throw new ArgumentException(YouCannotSeeOthersReservationsErrorMessage);
+                }
+
+                if (reservationDetails == null)
+                {
+                    throw new ArgumentException(ReservationNotFoundErrorMessage);
+                }
+
+                details = new ReservationDetailsViewModel
+                {
+                    Id = reservationDetails.Id,
+                    ImageUrl = reservationDetails.Surface.ImageUrl,
+                    CoachName = reservationDetails.Coach.Name,
+                    SurfaceName = reservationDetails.Surface.Name,
+                    TrainingTypeName = reservationDetails.TrainingType.Name,
+                    Date = reservationDetails.Date,
+                    Duration = reservationDetails.Duration,
+                    Note = reservationDetails.Note
+                };
+            }
+            return details;
+        }
+
+        public async Task<ReservationDeleteViewModel> GetUserReservationForDeletingAsync(string userId, int? id)
+        {
+            ReservationDeleteViewModel? reservationToDelete = null;
+
+            var user = await userManager.FindByIdAsync(userId);
+
+            if (id.HasValue && user != null)
+            {
+                var reservation = await dbContext.Reservations
+                    .AsNoTracking()
+                    .Include(r => r.Coach)
+                    .Include(r => r.Surface)
+                    .FirstOrDefaultAsync(r => r.Id == id && r.PlayerId == userId);
+                if (reservation == null)
+                {
+                    throw new ArgumentException(ReservationNotFoundErrorMessage);
+                }
+
+                if (reservation.PlayerId == userId)
+                {
+                    reservationToDelete = new ReservationDeleteViewModel
+                    {
+                        Id = reservation.Id,
+                        SurfaceName = reservation.Surface.Name,
+                        Date = reservation.Date,
+                        ImageUrl = reservation.Surface.ImageUrl
+                    };
+                }
+            }
+            return reservationToDelete;
+        }
+
+        public async Task<bool> DeleteReservationAsync(string userId, ReservationDeleteViewModel model)
+        {
+            bool result = false;
+
+            var user = await userManager.FindByIdAsync(userId);
+            var reservation = await dbContext.Reservations.FindAsync(model.Id);
+            if (user == null)
+            {
+                return false;
+            }
+            if (reservation == null)
+            {
+                throw new ArgumentException(ReservationNotFoundErrorMessage);
+            }
+            if (reservation.PlayerId == userId)
+            {
+                dbContext.Reservations.Remove(reservation);
+                await dbContext.SaveChangesAsync();
+            }
 
             result = true;
 

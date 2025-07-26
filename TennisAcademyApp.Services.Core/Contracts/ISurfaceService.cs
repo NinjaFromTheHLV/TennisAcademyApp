@@ -1,4 +1,4 @@
-﻿using TennisAcademyApp.ViewModels.Reservation;
+﻿using TennisAcademyApp.ViewModels.DropDown;
 
 namespace TennisAcademyApp.Services.Core.Contracts
 {

@@ -1,7 +1,7 @@
 ﻿using TennisAcademyApp.Services.Core.Contracts;
-using TennisAcademyApp.ViewModels.Reservation;
 using TennisAcademyApp.Data;
 using Microsoft.EntityFrameworkCore;
+using TennisAcademyApp.ViewModels.DropDown;
 
 namespace TennisAcademyApp.Services.Core
 {
