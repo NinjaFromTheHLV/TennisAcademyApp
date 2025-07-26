@@ -55,6 +55,7 @@ namespace TennisAcademyApp.Controllers
         {
             try
             {
+                await Task.CompletedTask;
                 return View();
             }
             catch (Exception ex)
@@ -94,7 +95,7 @@ namespace TennisAcademyApp.Controllers
             try
             {
                 string user = GetUserId()!;
-                var coachEdit = await this.coachService.GetCoachForEdittingAsync(id, user);
+                var coachEdit = await this.coachService.GetCoachForEdittingAsync(user, id);
 
                 if (coachEdit == null)
                 {
