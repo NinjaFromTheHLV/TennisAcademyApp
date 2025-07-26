@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using TennisAcademyApp.Data;
 using TennisAcademyApp.Data.Models;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Coach;
 using TennisAcademyApp.ViewModels.DropDown;
 using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Coach;
+using static TennisAcademyApp.GCommon.Validations.ValidationConstants.Coach;
 
 namespace TennisAcademyApp.Services.Core
 {
@@ -32,6 +34,14 @@ namespace TennisAcademyApp.Services.Core
                     Description = c.Description,
                 })
                 .ToListAsync();
+
+            foreach (var coach in allCoaches)
+            {
+                if (coach.ImageUrl.IsNullOrEmpty())
+                {
+                    coach.ImageUrl = NoImageUrl;
+                }
+            }
 
             return allCoaches;
         }
@@ -77,7 +87,7 @@ namespace TennisAcademyApp.Services.Core
                         IsAddedBy = userId != null ?
                             coaches.UserId.ToLower() == userId.ToLower() : false,
                         IsInUserFavorites = userId != null ?
-                            dbContext.UserFavourites.Any(uc => uc.UserId == userId 
+                            await dbContext.UserFavourites.AnyAsync(uc => uc.UserId == userId 
                             && uc.CoachId == coaches.CoachId) : false
                     };
                 }
@@ -111,7 +121,7 @@ namespace TennisAcademyApp.Services.Core
             return result;
         }
 
-        public async Task<CoachEditInputModel?> GetCoachForEdittingAsync(int? id, string userId)
+        public async Task<CoachEditInputModel> GetCoachForEdittingAsync(string userId, int? id)
         {
             CoachEditInputModel model = null!;
             var user = await userManager.FindByIdAsync(userId);
