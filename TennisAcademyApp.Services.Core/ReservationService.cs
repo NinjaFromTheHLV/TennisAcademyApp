@@ -60,9 +60,14 @@ namespace TennisAcademyApp.Services.Core
                 return false;
             }
 
+            var endDate = model.Date.AddMinutes(model.Duration);
+
             bool existingReservation = await dbContext.Reservations
                 .AsNoTracking()
-                .AnyAsync(r => r.CoachId == model.CoachId && r.Date == model.Date);
+                .AnyAsync(r =>
+                    r.CoachId == model.CoachId &&
+                    r.Date < endDate &&
+                    r.Date.AddMinutes(r.Duration) > model.Date);
 
             if (existingReservation)
             {
