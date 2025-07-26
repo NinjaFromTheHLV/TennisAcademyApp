@@ -19,8 +19,7 @@ namespace TennisAcademyApp.Controllers
         {
             try
             {
-                IEnumerable<AllCoachesViewModel>? allCoaches = await this.coachService
-                    .GetAllCoachesAsync();
+                var allCoaches = await this.coachService.GetAllCoachesAsync();
 
                 return View(allCoaches);
             }
@@ -74,8 +73,7 @@ namespace TennisAcademyApp.Controllers
                 {
                     return View(inputModel);
                 }
-                bool result = await this.coachService
-                    .AddCoachAsync(userId, inputModel);
+                bool result = await this.coachService.AddCoachAsync(userId, inputModel);
 
                 if (result == false)
                 {
@@ -96,14 +94,13 @@ namespace TennisAcademyApp.Controllers
             try
             {
                 string user = GetUserId()!;
-                CoachEditInputModel? edit = await this.coachService
-                    .GetCoachForEdittingAsync(id, user);
+                var coachEdit = await this.coachService.GetCoachForEdittingAsync(id, user);
 
-                if (edit == null)
+                if (coachEdit == null)
                 {
                     return RedirectToAction(nameof(Index));
                 }
-                return View(edit);
+                return View(coachEdit);
             }
             catch (Exception ex)
             {
@@ -121,8 +118,7 @@ namespace TennisAcademyApp.Controllers
                 {
                     return RedirectToAction(nameof(Edit), new { id = model.CoachId });
                 }
-                bool result = await this.coachService
-                    .EdittedCoachAsync(userId, model);
+                bool result = await this.coachService.EdittedCoachAsync(userId, model);
 
                 if (result == false)
                 {
@@ -132,9 +128,9 @@ namespace TennisAcademyApp.Controllers
 
                 return RedirectToAction(nameof(Details), new {id = model.CoachId});
             }
-            catch (Exception ex)
+            catch (ArgumentException ex)
             {
-                Console.WriteLine(ex.Message);
+                ModelState.AddModelError(string.Empty, ex.Message);
                 return RedirectToAction(nameof(Index));
             }
         }
@@ -144,8 +140,7 @@ namespace TennisAcademyApp.Controllers
             try
             {
                 string userId = GetUserId()!;
-                var delete = await this.coachService
-                    .GetCoachForDeletingAsync(userId, id);
+                var delete = await this.coachService.GetCoachForDeletingAsync(userId, id);
 
                 if (delete == null)
                 {
@@ -160,15 +155,13 @@ namespace TennisAcademyApp.Controllers
             }
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(DeleteCoachViewModel model)
         {
             try
             {
                 string userId = GetUserId()!;
 
-                bool result = await this.coachService
-                .DeletedCoachAsync(userId, model);
+                bool result = await this.coachService.DeletedCoachAsync(userId, model);
 
                 if (result == false)
                 {
@@ -191,8 +184,7 @@ namespace TennisAcademyApp.Controllers
             {
                 string userId = GetUserId()!;
 
-                var favourites = await this.coachService
-                    .GetFavouritesAsync(userId);
+                var favourites = await this.coachService.GetFavouritesAsync(userId);
 
                 return View(favourites);
             }
@@ -209,8 +201,7 @@ namespace TennisAcademyApp.Controllers
             {
                 string userId = GetUserId()!;
 
-                bool result = await coachService
-                    .AddFavouriteCoachAsync(userId, id);
+                bool result = await coachService.AddFavouriteCoachAsync(userId, id);
 
                 if (result == false)
                 {
@@ -219,9 +210,9 @@ namespace TennisAcademyApp.Controllers
 
                 return RedirectToAction(nameof(Favourite));
             }
-            catch (Exception ex)
+            catch (ArgumentException ex)
             {
-                Console.WriteLine($"{ex.Message}");
+                ModelState.AddModelError(string.Empty, ex.Message);
                 return RedirectToAction(nameof(Index));
             }
         }
@@ -232,8 +223,7 @@ namespace TennisAcademyApp.Controllers
             {
                 var userId = GetUserId()!;
 
-                bool result = await coachService
-                    .RemoveFromFavouritesAsync(userId, id);
+                bool result = await coachService.RemoveFromFavouritesAsync(userId, id);
 
                 if (result == false)
                 {
@@ -242,9 +232,9 @@ namespace TennisAcademyApp.Controllers
 
                 return RedirectToAction(nameof(Favourite));
             }
-            catch (Exception ex)
+            catch (ArgumentException ex)
             {
-                Console.WriteLine(ex.Message);
+                ModelState.AddModelError(string.Empty, ex.Message);
                 return RedirectToAction(nameof(Index));
             }
         }
