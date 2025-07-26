@@ -34,6 +34,6 @@ namespace TennisAcademyApp.Data.Models
         [Comment("Date Select")]
         [Required]
         public DateTime Date { get; set; }
-        
+        public bool IsDeleted { get; set; } 
     }
 }
