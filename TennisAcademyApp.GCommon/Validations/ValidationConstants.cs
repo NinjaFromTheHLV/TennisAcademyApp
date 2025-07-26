@@ -12,6 +12,8 @@
 
             public const int CoachDescriptionMinLenght = 10;
             public const int CoachDescriptionMaxLenght = 150;
+
+            public const string NoImageUrl = "~/pictures/DefaultUserImage.webp";
         }
         public static class Reservation
         {

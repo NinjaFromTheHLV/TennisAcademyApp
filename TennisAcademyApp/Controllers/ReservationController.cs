@@ -149,5 +149,20 @@ namespace TennisAcademyApp.Controllers
                 return RedirectToAction(nameof(Index), "Home");
             }
         }
+        public async Task<IActionResult> ReservationHistory()
+        {
+            try
+            {
+                string userId = GetUserId()!;
+
+                var reservationHistory = await reservationService.GetUserReservationHistoryAsync(userId);
+                return View(reservationHistory);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return RedirectToAction(nameof(Index), "Home");
+            }
+        }
     }
 }

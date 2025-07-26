@@ -1,0 +1,39 @@
+﻿@using TennisAcademyApp.ViewModels.Reservation
+@model IEnumerable<ReservationHistoryViewModel>
+
+@{
+    ViewData["Title"] = "Past Reservations";
+}
+
+<h2 class="mb-4 text-center">⏳ Past Reservations</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info text-center">You have no past reservations.</div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        @foreach (var r in Model)
+        {
+            <div class="col">
+                <div class="card shadow-sm h-100">
+                    <img src="@r.SurfaceImageUrl"
+                         class="card-img-top object-fit-cover"
+                         alt="Surface Image"
+                         style="height: 200px; object-fit: cover;" />
+
+                    <div class="card-body">
+                        <h5 class="card-title">@r.CoachName</h5>
+                        <p class="card-text mb-1"><strong>Training:</strong> @r.TrainingTypeName</p>
+                        <p class="card-text"><strong>Surface:</strong> @r.SurfaceName</p>
+                    </div>
+
+                    <div class="card-footer text-muted small text-end">
+                        Completed
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

@@ -29,7 +29,7 @@ namespace TennisAcademyApp.Services.Core
                 .Include(r => r.Coach)
                 .Include(r => r.Surface)
                 .Include(r => r.TrainingType)
-                .Where(r => r.PlayerId == userId)
+                .Where(r => r.PlayerId == userId && r.IsDeleted == false)
                 .Select(r => new ReservationIndexViewModel
                 {
                     ReservationId = r.Id,
@@ -111,7 +111,6 @@ namespace TennisAcademyApp.Services.Core
 
             return result;
         }
-
         public async Task<bool> AutoReservationDeleteAsync()
         {
             bool result = false;
@@ -121,7 +120,7 @@ namespace TennisAcademyApp.Services.Core
 
             if (expiredReservations.Any())
             {
-                dbContext.Reservations.RemoveRange(expiredReservations);
+                expiredReservations.ForEach(r => r.IsDeleted = true);
                 await dbContext.SaveChangesAsync();
 
                 return true;
@@ -131,7 +130,7 @@ namespace TennisAcademyApp.Services.Core
 
         public async Task<ReservationDetailsViewModel> GetUserReservationDetailsAsync(string userId, int? id)
         {
-            ReservationDetailsViewModel? details = null;
+            ReservationDetailsViewModel details = null!;
             var user = await userManager.FindByIdAsync(userId);
 
             if (id.HasValue && user != null)
@@ -143,7 +142,7 @@ namespace TennisAcademyApp.Services.Core
                     .Include(r => r.TrainingType)
                     .FirstOrDefaultAsync(r => r.Id == id && r.PlayerId == userId);
 
-                if (reservationDetails.PlayerId != userId)
+                if (reservationDetails!.PlayerId != userId)
                 {
                     throw new ArgumentException(YouCannotSeeOthersReservationsErrorMessage);
                 }
@@ -170,7 +169,7 @@ namespace TennisAcademyApp.Services.Core
 
         public async Task<ReservationDeleteViewModel> GetUserReservationForDeletingAsync(string userId, int? id)
         {
-            ReservationDeleteViewModel? reservationToDelete = null;
+            ReservationDeleteViewModel reservationToDelete = null!;
 
             var user = await userManager.FindByIdAsync(userId);
 
@@ -216,13 +215,37 @@ namespace TennisAcademyApp.Services.Core
             }
             if (reservation.PlayerId == userId)
             {
-                dbContext.Reservations.Remove(reservation);
+                reservation.IsDeleted = true;
                 await dbContext.SaveChangesAsync();
             }
 
             result = true;
 
             return result;
+        }
+
+        public async Task<IEnumerable<ReservationHistoryViewModel>?> GetUserReservationHistoryAsync(string userId)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+
+            var pastReservations = await dbContext.Reservations
+                .AsNoTracking()
+                .IgnoreQueryFilters()
+                .Include(r => r.Coach)
+                .Include(r => r.Surface)
+                .Include(r => r.TrainingType)
+                .Where(r => r.PlayerId == userId && r.IsDeleted == true)
+                .Select(r => new ReservationHistoryViewModel
+                {
+                    ReservationId = r.Id,
+                    CoachName = r.Coach.Name,
+                    TrainingTypeName = r.TrainingType.Name,
+                    SurfaceImageUrl = r.Surface.ImageUrl,
+                    SurfaceName = r.Surface.Name
+                })
+                .ToListAsync();
+
+            return pastReservations;
         }
     }
 }
