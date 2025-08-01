@@ -27,12 +27,9 @@
                 </div>
 
                 <div class="mt-4 d-flex flex-wrap gap-2">
-                    @if (Model.IsAddedBy)
-                    {
                         <a asp-action="Edit" asp-route-id="@Model.CoachId" class="btn btn-warning">Edit</a>
                         <a asp-action="Delete" asp-route-id="@Model.CoachId" class="btn btn-danger">Delete</a>
-                    }
-                    @if (Model.IsAddedBy == false && this.User?.Identity?.IsAuthenticated == true && Model.IsInUserFavorites == false)
+                    @if (User?.Identity?.IsAuthenticated == true && Model.IsInUserFavorites == false)
                     {
                         <form asp-action="AddToFavourites" asp-route-id="@Model.CoachId" method="post" class="d-inline">
                             <button type="submit" class="btn btn-warning">Add to favourites</button>
