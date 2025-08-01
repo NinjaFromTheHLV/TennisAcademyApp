@@ -19,7 +19,7 @@
         }
         public static class Coach
         {
-            public const string AgeErrorMessage = "Age must be between 18 and 75!";
+            public const string AgeErrorMessage = "Age must be between 30 and 75!";
 
             public const string NameMaxLengthMessage = "Name cannot exceed 50 characters.";
 
@@ -27,6 +27,13 @@
             public const string DescriptionMaxLengthMessage = "Description cannot exceed 150 characters.";
 
             public const string CoachNotFoundErrorMessage = "Coach not found."; 
+        }
+        public static class Racket
+        {
+            public const string RacketNotFoundErrorMessage = "Racket not found.";
+            public const string RacketCannotBeNullErrorMessage = "Racket cannot be null.";
+
+            public const string PriceRangeErrorMessage = "Price must be between 30 and 1500.";
         }
     }
 }
