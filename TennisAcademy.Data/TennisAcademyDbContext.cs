@@ -17,6 +17,8 @@ namespace TennisAcademyApp.Data
         public virtual DbSet<Reservation> Reservations { get; set; } = null!;
         public virtual DbSet<TrainingType> Trainings { get; set; } = null!;
         public virtual DbSet<UserFavourite> UserFavourites { get; set; } = null!;
+        public virtual DbSet<Racket> Rackets { get; set; } = null!;
+        public virtual DbSet<RacketCart> RacketCart { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder config)
         {
