@@ -69,7 +69,6 @@ namespace TennisAcademyApp.Services.Core
             {
                 var coaches = await dbContext
                     .Coaches
-                    .Include(c => c.User)
                     .Include(uc => uc.UsersCoaches)
                     .AsNoTracking()
                     .FirstOrDefaultAsync(c => c.CoachId == id.Value);
@@ -84,8 +83,6 @@ namespace TennisAcademyApp.Services.Core
                         Description = coaches.Description,
                         ImageUrl = coaches.ImageUrl,
                         Nationality = coaches.Nationality,
-                        IsAddedBy = userId != null ?
-                            coaches.UserId.ToLower() == userId.ToLower() : false,
                         IsInUserFavorites = userId != null ?
                             await dbContext.UserFavourites.AnyAsync(uc => uc.UserId == userId 
                             && uc.CoachId == coaches.CoachId) : false
@@ -110,7 +107,6 @@ namespace TennisAcademyApp.Services.Core
                 ImageUrl = inputModel.ImageUrl,
                 Age = inputModel.Age,
                 Nationality = inputModel.Nationality,
-                UserId = userId,
                 Description = inputModel.Description,
             };
             await dbContext.Coaches.AddAsync(coach);
@@ -123,16 +119,15 @@ namespace TennisAcademyApp.Services.Core
 
         public async Task<CoachEditInputModel> GetCoachForEdittingAsync(string userId, int? id)
         {
-            CoachEditInputModel model = null!;
+            CoachEditInputModel? model = null;
             var user = await userManager.FindByIdAsync(userId);
 
             if (id.HasValue && user != null)
             {
-                var coach = await dbContext
-                    .Coaches
+                var coach = await dbContext.Coaches
                     .AsNoTracking()
                     .FirstOrDefaultAsync(c => c.CoachId == id.Value);
-                if (coach != null && coach.UserId.ToLower() == userId.ToLower())
+                if (coach != null)
                 {
                     model = new CoachEditInputModel
                     {
@@ -163,8 +158,6 @@ namespace TennisAcademyApp.Services.Core
             {
                 throw new ArgumentException(CoachNotFoundErrorMessage);
             }
-            if (coach.UserId.ToLower() == userId.ToLower())
-            {
                 coach.Name = model.Name;
                 coach.Age = model.Age;
                 coach.Nationality = model.Nationality;
@@ -174,7 +167,6 @@ namespace TennisAcademyApp.Services.Core
 
                 await dbContext.SaveChangesAsync();
                 result = true;
-            }
             return result;
         }
 
