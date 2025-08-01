@@ -1,0 +1,51 @@
+﻿@using TennisAcademyApp.ViewModels.Racket;
+@model IEnumerable<RacketIndexViewModel>
+
+@{
+    ViewData["Title"] = "Shop";
+}
+
+<div class="mb-4 text-end">
+    <a asp-controller="Racket" asp-action="Create" class="btn btn-primary px-4 py-2">
+        <i class="bi bi-plus-lg"></i> Add a Racket
+    </a>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    @foreach (var racket in Model)
+    {
+        <div class="col">
+            <div class="card h-100 shadow-sm d-flex flex-column">
+                <img src="@racket.ImageUrl" class="card-img-top object-fit-cover" alt="Racket Image" style="height: 315px;" />
+
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">@racket.Brand - @racket.Model</h5>
+                    <p class="card-text">Price: <strong>@racket.Price.ToString("C")</strong></p>
+                    <p class="card-text">In stock: @racket.Quantity</p>
+
+                    <div class="row mt-auto">
+                        <div class="col-6 pe-1">
+                            <a asp-action="Edit" asp-route-id="@racket.Id" class="btn btn-outline-warning w-100">Edit</a>
+                        </div>
+                        <div class="col-6 ps-1">
+                            <a asp-action="Delete" asp-route-id="@racket.Id" class="btn btn-outline-danger w-100">Delete</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-transparent border-0">
+                    @if (racket.Quantity > 0)
+                    {
+                        <form asp-action="AddToCart" asp-route-id="@racket.Id" method="post">
+                            <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <button class="btn btn-secondary w-100" disabled>Out of Stock</button>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
