@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TennisAcademyApp.Data;
 
@@ -11,9 +12,11 @@ using TennisAcademyApp.Data;
 namespace TennisAcademyApp.Data.Migrations
 {
     [DbContext(typeof(TennisAcademyDbContext))]
-    partial class TennisAcademyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250801143124_RacketsImageUrlSecondTry")]
+    partial class RacketsImageUrlSecondTry
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -358,7 +361,7 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = 1,
                             Brand = "Wilson",
-                            ImageUrl = "https://cdncloudcart.com/28710/products/images/134337/tenis-raketa-wilson-pro-staff-rf-97-v13-0-tns-fr-image_6358bfebb40a9_800x800.jpeg?1666760684",
+                            ImageUrl = "~/pictures/WilsonRacket.jpeg",
                             Model = "Pro Staff 97",
                             Price = 349.99m,
                             Quantity = 5
@@ -367,7 +370,7 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = 2,
                             Brand = "Babolat",
-                            ImageUrl = "https://babolat.bg/image/cache/catalog/tennis/2024/rackets/101474/101474-Pure_Drive_98-136-1-Face_2-250x250.jpg",
+                            ImageUrl = "~/pictures/BabolatRacket.jpg",
                             Model = "Pure Drive",
                             Price = 299.99m,
                             Quantity = 8
@@ -376,7 +379,7 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = 3,
                             Brand = "Head",
-                            ImageUrl = "https://i.sportisimo.com/products/images/1104/1104555/700x700/head-graphene-360-speed-mp_1.jpg",
+                            ImageUrl = "~/pictures/HeadRacket.jpg",
                             Model = "Graphene 360+ Speed",
                             Price = 279.99m,
                             Quantity = 10
@@ -385,7 +388,7 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = 4,
                             Brand = "Yonex",
-                            ImageUrl = "https://us.yonex.com/cdn/shop/files/EZ0898_BlastBlue_5868.jpg?v=1739481973&width=1946",
+                            ImageUrl = "~/pictures/YonexRacket.webp",
                             Model = "Ezone 98",
                             Price = 319.99m,
                             Quantity = 6
@@ -394,7 +397,7 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = 5,
                             Brand = "Prince",
-                            ImageUrl = "https://images.squarespace-cdn.com/content/v1/56e9b38c2b8dde820241b62d/1471886555425-JT9KKFKPOL4FNLAV9ZB0/r2.jpg",
+                            ImageUrl = "~/pictures/PrinceTourRacket.jpg",
                             Model = "Tour 100P",
                             Price = 259.99m,
                             Quantity = 4
@@ -403,7 +406,7 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = 6,
                             Brand = "Tecnifibre",
-                            ImageUrl = "https://www.tecnifibre.com/dw/image/v2/BHDN_PRD/on/demandware.static/-/Sites-tecnifibre-master-catalog/default/dwcf93310b/hi-res/T-FIGHT%202025/Packshots/305S/14FI305S5_04.jpg?sw=608&sh=608&sm=fit",
+                            ImageUrl = "~/pictures/TecnifibreRacket.jpg",
                             Model = "TFight 305",
                             Price = 289.99m,
                             Quantity = 7
@@ -540,13 +543,13 @@ namespace TennisAcademyApp.Data.Migrations
                         new
                         {
                             Id = 2,
-                            ImageUrl = "https://www.tennisnerd.net/wp-content/uploads/2024/06/grass-tennis.webp",
+                            ImageUrl = "https://asltenniscourts.com.au/wp-content/uploads/2021/03/AdobeStock_253105355-1024x683.jpeg",
                             Name = "Grass"
                         },
                         new
                         {
                             Id = 3,
-                            ImageUrl = "https://asltenniscourts.com.au/wp-content/uploads/2021/03/AdobeStock_253105355-1024x683.jpeg",
+                            ImageUrl = "https://www.tennisnerd.net/wp-content/uploads/2024/06/grass-tennis.webp",
                             Name = "Hard"
                         });
                 });

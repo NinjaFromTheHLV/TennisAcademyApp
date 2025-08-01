@@ -12,8 +12,8 @@ using TennisAcademyApp.Data;
 namespace TennisAcademyApp.Data.Migrations
 {
     [DbContext(typeof(TennisAcademyDbContext))]
-    [Migration("20250726082406_SurfaceImageUrl")]
-    partial class SurfaceImageUrl
+    [Migration("20250801144039_ImageUrls")]
+    partial class ImageUrls
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -140,24 +140,6 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "seed-user-id-123",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "e909aa46-df31-4dad-8863-216361afcfd9",
-                            Email = "coachadmin@example.com",
-                            EmailConfirmed = true,
-                            LockoutEnabled = false,
-                            NormalizedEmail = "COACHADMIN@EXAMPLE.COM",
-                            NormalizedUserName = "COACHADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAENSPTocZsWupEqiI5gVLElxy5Hv5vYLdHTtw4Oy0I8rr8LlxQuDU7owCIPqV9v56LQ==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "e64463ec-2510-4265-a911-c60cf20ee29a",
-                            TwoFactorEnabled = false,
-                            UserName = "coachadmin"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -270,9 +252,8 @@ namespace TennisAcademyApp.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
                         .IsUnicode(true)
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("nvarchar(max)")
                         .HasComment("Coach Name");
 
                     b.Property<string>("Nationality")
@@ -280,14 +261,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasComment("Coach Nationality");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)")
-                        .HasComment("Foreign key of IdentityUser");
-
                     b.HasKey("CoachId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Coaches", t =>
                         {
@@ -302,8 +276,7 @@ namespace TennisAcademyApp.Data.Migrations
                             Description = "One of the greatest tennis players of all time, known for his clay court dominance.",
                             ImageUrl = "~/pictures/rafa.jpg",
                             Name = "Rafael Nadal",
-                            Nationality = "Spanish",
-                            UserId = "90222459-c5ca-436e-a8b3-b92e0669c683"
+                            Nationality = "Spanish"
                         },
                         new
                         {
@@ -312,8 +285,7 @@ namespace TennisAcademyApp.Data.Migrations
                             Description = "Swiss tennis legend with unmatched elegance and 20 Grand Slam titles.",
                             ImageUrl = "https://a.espncdn.com/combiner/i?img=/i/headshots/tennis/players/full/425.png",
                             Name = "Roger Federer",
-                            Nationality = "Swiss",
-                            UserId = "90222459-c5ca-436e-a8b3-b92e0669c683"
+                            Nationality = "Swiss"
                         },
                         new
                         {
@@ -322,8 +294,7 @@ namespace TennisAcademyApp.Data.Migrations
                             Description = "Serbian champion, known for his resilience and complete game.",
                             ImageUrl = "https://a.espncdn.com/i/headshots/tennis/players/full/296.png",
                             Name = "Novak Djokovic",
-                            Nationality = "Serbian",
-                            UserId = "90222459-c5ca-436e-a8b3-b92e0669c683"
+                            Nationality = "Serbian"
                         },
                         new
                         {
@@ -332,8 +303,7 @@ namespace TennisAcademyApp.Data.Migrations
                             Description = "American icon who redefined tennis in the 90s with a colorful personality.",
                             ImageUrl = "https://www.atptour.com/-/media/alias/player-headshot/A092",
                             Name = "Andre Agassi",
-                            Nationality = "American",
-                            UserId = "90222459-c5ca-436e-a8b3-b92e0669c683"
+                            Nationality = "American"
                         },
                         new
                         {
@@ -342,8 +312,138 @@ namespace TennisAcademyApp.Data.Migrations
                             Description = "Swedish legend with ice-cold nerves and six French Open titles.",
                             ImageUrl = "https://lavercup.com/wp-content/uploads/2022/12/figure-borg-2.png",
                             Name = "Björn Borg",
-                            Nationality = "Swedish",
-                            UserId = "90222459-c5ca-436e-a8b3-b92e0669c683"
+                            Nationality = "Swedish"
+                        });
+                });
+
+            modelBuilder.Entity("TennisAcademyApp.Data.Models.Racket", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasComment("Racket Identifier");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Brand")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("Racket Brand");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("Racket Image");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("Racket Model");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Racket Price");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int")
+                        .HasComment("Available in stock");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Rackets", t =>
+                        {
+                            t.HasComment("Rackets Shop");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Brand = "Wilson",
+                            ImageUrl = "https://cdncloudcart.com/28710/products/images/134337/tenis-raketa-wilson-pro-staff-rf-97-v13-0-tns-fr-image_6358bfebb40a9_800x800.jpeg?1666760684",
+                            Model = "Pro Staff 97",
+                            Price = 349.99m,
+                            Quantity = 5
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Brand = "Babolat",
+                            ImageUrl = "https://babolat.bg/image/cache/catalog/tennis/2024/rackets/101474/101474-Pure_Drive_98-136-1-Face_2-250x250.jpg",
+                            Model = "Pure Drive",
+                            Price = 299.99m,
+                            Quantity = 8
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Brand = "Head",
+                            ImageUrl = "https://i.sportisimo.com/products/images/1104/1104555/700x700/head-graphene-360-speed-mp_1.jpg",
+                            Model = "Graphene 360+ Speed",
+                            Price = 279.99m,
+                            Quantity = 10
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Brand = "Yonex",
+                            ImageUrl = "https://us.yonex.com/cdn/shop/files/EZ0898_BlastBlue_5868.jpg?v=1739481973&width=1946",
+                            Model = "Ezone 98",
+                            Price = 319.99m,
+                            Quantity = 6
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Brand = "Prince",
+                            ImageUrl = "https://images.squarespace-cdn.com/content/v1/56e9b38c2b8dde820241b62d/1471886555425-JT9KKFKPOL4FNLAV9ZB0/r2.jpg",
+                            Model = "Tour 100P",
+                            Price = 259.99m,
+                            Quantity = 4
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Brand = "Tecnifibre",
+                            ImageUrl = "https://www.tecnifibre.com/dw/image/v2/BHDN_PRD/on/demandware.static/-/Sites-tecnifibre-master-catalog/default/dwcf93310b/hi-res/T-FIGHT%202025/Packshots/305S/14FI305S5_04.jpg?sw=608&sh=608&sm=fit",
+                            Model = "TFight 305",
+                            Price = 289.99m,
+                            Quantity = 7
+                        });
+                });
+
+            modelBuilder.Entity("TennisAcademyApp.Data.Models.RacketCart", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasComment("Racket Cart Identifier");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int")
+                        .HasComment("Quantity of Rackets in Cart");
+
+                    b.Property<int>("RacketId")
+                        .HasColumnType("int")
+                        .HasComment("Foreign Key of Racket");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)")
+                        .HasComment("Foreign Key of IdentityUser");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RacketId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RacketCart", t =>
+                        {
+                            t.HasComment("Racket Cart");
                         });
                 });
 
@@ -367,6 +467,11 @@ namespace TennisAcademyApp.Data.Migrations
                     b.Property<int>("Duration")
                         .HasColumnType("int")
                         .HasComment("Duration of the session");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Note")
                         .HasMaxLength(70)
@@ -439,13 +544,13 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = 2,
                             ImageUrl = "https://asltenniscourts.com.au/wp-content/uploads/2021/03/AdobeStock_253105355-1024x683.jpeg",
-                            Name = "Hard"
+                            Name = "Grass"
                         },
                         new
                         {
                             Id = 3,
                             ImageUrl = "https://www.tennisnerd.net/wp-content/uploads/2024/06/grass-tennis.webp",
-                            Name = "Grass"
+                            Name = "Hard"
                         });
                 });
 
@@ -501,7 +606,7 @@ namespace TennisAcademyApp.Data.Migrations
 
                     b.Property<int>("CoachId")
                         .HasColumnType("int")
-                        .HasComment("Foreign Key which references to IdentityUser");
+                        .HasComment("Foreign Key which references to Coach");
 
                     b.HasKey("UserId", "CoachId");
 
@@ -564,13 +669,21 @@ namespace TennisAcademyApp.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TennisAcademyApp.Data.Models.Coach", b =>
+            modelBuilder.Entity("TennisAcademyApp.Data.Models.RacketCart", b =>
                 {
+                    b.HasOne("TennisAcademyApp.Data.Models.Racket", "Racket")
+                        .WithMany("RacketCart")
+                        .HasForeignKey("RacketId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Racket");
 
                     b.Navigation("User");
                 });
@@ -634,6 +747,11 @@ namespace TennisAcademyApp.Data.Migrations
                     b.Navigation("Reservations");
 
                     b.Navigation("UsersCoaches");
+                });
+
+            modelBuilder.Entity("TennisAcademyApp.Data.Models.Racket", b =>
+                {
+                    b.Navigation("RacketCart");
                 });
 
             modelBuilder.Entity("TennisAcademyApp.Data.Models.Surface", b =>

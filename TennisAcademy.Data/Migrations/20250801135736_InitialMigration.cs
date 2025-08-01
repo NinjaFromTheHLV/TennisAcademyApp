@@ -53,6 +53,42 @@ namespace TennisAcademyApp.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Coaches",
+                columns: table => new
+                {
+                    CoachId = table.Column<int>(type: "int", nullable: false, comment: "Coach Identifier")
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Coach Name"),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true, comment: "Coach Image"),
+                    Age = table.Column<int>(type: "int", nullable: false, comment: "Coach Age"),
+                    Description = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false, comment: "Coach Description"),
+                    Nationality = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Coach Nationality")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Coaches", x => x.CoachId);
+                },
+                comment: "Tennis Academy Coaches");
+
+            migrationBuilder.CreateTable(
+                name: "Rackets",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false, comment: "Racket Identifier")
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Brand = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Racket Brand"),
+                    Model = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Racket Model"),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false, comment: "Racket Price"),
+                    Quantity = table.Column<int>(type: "int", nullable: false, comment: "Available in stock"),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Racket Image")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Rackets", x => x.Id);
+                },
+                comment: "Rackets Shop");
+
+            migrationBuilder.CreateTable(
                 name: "Surfaces",
                 columns: table => new
                 {
@@ -188,29 +224,55 @@ namespace TennisAcademyApp.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Coaches",
+                name: "UserFavourites",
                 columns: table => new
                 {
-                    CoachId = table.Column<int>(type: "int", nullable: false, comment: "Coach Identifier")
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Coach Name"),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true, comment: "Coach Image"),
-                    Age = table.Column<int>(type: "int", nullable: false, comment: "Coach Age"),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Coach Description"),
-                    Nationality = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Coach Nationality"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false, comment: "Foreign key of IdentityUser")
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false, comment: "Foreign Key which references to IdentityUser"),
+                    CoachId = table.Column<int>(type: "int", nullable: false, comment: "Foreign Key which references to Coach")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Coaches", x => x.CoachId);
+                    table.PrimaryKey("PK_UserFavourites", x => new { x.UserId, x.CoachId });
                     table.ForeignKey(
-                        name: "FK_Coaches_AspNetUsers_UserId",
+                        name: "FK_UserFavourites_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_UserFavourites_Coaches_CoachId",
+                        column: x => x.CoachId,
+                        principalTable: "Coaches",
+                        principalColumn: "CoachId");
+                },
+                comment: "Users Favourite Coach");
+
+            migrationBuilder.CreateTable(
+                name: "RacketCart",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false, comment: "Racket Cart Identifier")
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RacketId = table.Column<int>(type: "int", nullable: false, comment: "Foreign Key of Racket"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false, comment: "Foreign Key of IdentityUser"),
+                    Quantity = table.Column<int>(type: "int", nullable: false, comment: "Quantity of Rackets in Cart")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RacketCart", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RacketCart_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RacketCart_Rackets_RacketId",
+                        column: x => x.RacketId,
+                        principalTable: "Rackets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 },
-                comment: "Tennis Academy Coaches");
+                comment: "Racket Cart");
 
             migrationBuilder.CreateTable(
                 name: "Reservations",
@@ -223,7 +285,9 @@ namespace TennisAcademyApp.Data.Migrations
                     CoachId = table.Column<int>(type: "int", nullable: false, comment: "Choosing a coach"),
                     TrainingTypeId = table.Column<int>(type: "int", nullable: false, comment: "Choosing a training type"),
                     PlayerId = table.Column<string>(type: "nvarchar(450)", nullable: false, comment: "Player Identifer"),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false, comment: "Date Select")
+                    Duration = table.Column<int>(type: "int", nullable: false, comment: "Duration of the session"),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false, comment: "Date Select"),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
@@ -254,42 +318,39 @@ namespace TennisAcademyApp.Data.Migrations
                 },
                 comment: "Player Reservations");
 
-            migrationBuilder.CreateTable(
-                name: "UserFavourites",
-                columns: table => new
+            migrationBuilder.InsertData(
+                table: "Coaches",
+                columns: new[] { "CoachId", "Age", "Description", "ImageUrl", "Name", "Nationality" },
+                values: new object[,]
                 {
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false, comment: "Foreign Key which references to IdentityUser"),
-                    CoachId = table.Column<int>(type: "int", nullable: false, comment: "Foreign Key which references to IdentityUser")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserFavourites", x => new { x.UserId, x.CoachId });
-                    table.ForeignKey(
-                        name: "FK_UserFavourites_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_UserFavourites_Coaches_CoachId",
-                        column: x => x.CoachId,
-                        principalTable: "Coaches",
-                        principalColumn: "CoachId");
-                },
-                comment: "Users Favourite Coach");
+                    { 1, 38, "One of the greatest tennis players of all time, known for his clay court dominance.", "~/pictures/rafa.jpg", "Rafael Nadal", "Spanish" },
+                    { 2, 43, "Swiss tennis legend with unmatched elegance and 20 Grand Slam titles.", "https://a.espncdn.com/combiner/i?img=/i/headshots/tennis/players/full/425.png", "Roger Federer", "Swiss" },
+                    { 3, 37, "Serbian champion, known for his resilience and complete game.", "https://a.espncdn.com/i/headshots/tennis/players/full/296.png", "Novak Djokovic", "Serbian" },
+                    { 4, 55, "American icon who redefined tennis in the 90s with a colorful personality.", "https://www.atptour.com/-/media/alias/player-headshot/A092", "Andre Agassi", "American" },
+                    { 5, 68, "Swedish legend with ice-cold nerves and six French Open titles.", "https://lavercup.com/wp-content/uploads/2022/12/figure-borg-2.png", "Björn Borg", "Swedish" }
+                });
 
             migrationBuilder.InsertData(
-                table: "AspNetUsers",
-                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "seed-user-id-123", 0, "a77e2793-8ce5-40ad-996c-c5bc6b6aa520", "coachadmin@example.com", true, false, null, "COACHADMIN@EXAMPLE.COM", "COACHADMIN", "AQAAAAIAAYagAAAAEOl3ndjPd65Mu1sCXDlkbxnodkzbZ4bZp1ES99RiPr4yi1HlYNxWks3r146L058SWw==", null, false, "9ff15a0f-11b7-4e52-9882-21690abb2198", false, "coachadmin" });
+                table: "Rackets",
+                columns: new[] { "Id", "Brand", "ImageUrl", "Model", "Price", "Quantity" },
+                values: new object[,]
+                {
+                    { 1, "Wilson", "/images/rackets/wilson_prostaff.jpg", "Pro Staff 97", 349.99m, 5 },
+                    { 2, "Babolat", "/images/rackets/babolat_puredrive.jpg", "Pure Drive", 299.99m, 8 },
+                    { 3, "Head", "/images/rackets/head_speed.jpg", "Graphene 360+ Speed", 279.99m, 10 },
+                    { 4, "Yonex", "/images/rackets/yonex_ezone98.jpg", "Ezone 98", 319.99m, 6 },
+                    { 5, "Prince", "/images/rackets/prince_tour100p.jpg", "Tour 100P", 259.99m, 4 },
+                    { 6, "Tecnifibre", "/images/rackets/tecnifibre_tfight305.jpg", "TFight 305", 289.99m, 7 }
+                });
 
             migrationBuilder.InsertData(
                 table: "Surfaces",
                 columns: new[] { "Id", "ImageUrl", "Name" },
                 values: new object[,]
                 {
-                    { 1, "https://www.google.com/imgres?q=clay%20court&imgurl=https%3A%2F%2Fcdn11.bigcommerce.com%2Fs-pop81y%2Fimages%2Fstencil%2F960x545%2Fuploaded_images%2Fallstartennissupply-281535-clay-tennis-courts-blogbanner1.jpg%3Ft%3D1703002083&imgrefurl=https%3A%2F%2Fwww.allstartennissupply.com%2Fblog%2Fwhat-is-the-best-climate-for-clay-tennis-courts%2F%3Fsrsltid%3DAfmBOorm03gyRg52IMAFa7-l2ig3k_9l9SE1UjjQCmsplj7SJUMqY2Ci&docid=wGtAwbkIqo2SLM&tbnid=587J-uncERjX8M&vet=12ahUKEwjRzYidybaOAxVeX_EDHZpnGxwQM3oECFEQAA..i&w=960&h=539&hcb=2&ved=2ahUKEwjRzYidybaOAxVeX_EDHZpnGxwQM3oECFEQAA", "Clay" },
-                    { 2, "https://www.google.com/imgres?q=Hard%20court&imgurl=https%3A%2F%2Fwww.edwardssports.co.uk%2Fpub%2Fmedia%2Fwysiwyg%2FPlaying_On_A_Hard_Tennis_Court.jpg&imgrefurl=https%3A%2F%2Fwww.edwardssports.co.uk%2Fnews%2Fpost%2Fclay-court-vs-hard-court-tennis&docid=_e_VzZEOyVdxeM&tbnid=O670DpSc8HOqTM&vet=12ahUKEwir89etybaOAxW6evEDHSxsBQ0QM3oECB0QAA..i&w=900&h=500&hcb=2&ved=2ahUKEwir89etybaOAxW6evEDHSxsBQ0QM3oECB0QAA", "Hard" },
-                    { 3, "https://www.google.com/imgres?q=Grass%20court&imgurl=https%3A%2F%2Fi.abcnewsfe.com%2Fa%2F172020d0-16bb-4c84-a3d2-b436b77d5f7e%2Fwimbledon5-2023-gty-ml-240614_1718369987464_hpMain.jpg&imgrefurl=https%3A%2F%2Fabcnews.go.com%2FUS%2Fstaggering-science-art-wimbledons-legendary-grass-courts%2Fstory%3Fid%3D111433116&docid=7Ne81Wn1LUAVtM&tbnid=f5ihWuIF1wvqzM&vet=12ahUKEwjyxZTSybaOAxVaSfEDHU1jGa4QM3oECBoQAA..i&w=3072&h=2048&hcb=2&ved=2ahUKEwjyxZTSybaOAxVaSfEDHU1jGa4QM3oECBoQAA", "Grass" }
+                    { 1, "https://www.edwardssports.co.uk/pub/media/magefan_blog/Clay_Tennis_Courts.jpg", "Clay" },
+                    { 2, "https://asltenniscourts.com.au/wp-content/uploads/2021/03/AdobeStock_253105355-1024x683.jpeg", "Grass" },
+                    { 3, "https://www.tennisnerd.net/wp-content/uploads/2024/06/grass-tennis.webp", "Hard" }
                 });
 
             migrationBuilder.InsertData(
@@ -343,8 +404,13 @@ namespace TennisAcademyApp.Data.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Coaches_UserId",
-                table: "Coaches",
+                name: "IX_RacketCart_RacketId",
+                table: "RacketCart",
+                column: "RacketId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RacketCart_UserId",
+                table: "RacketCart",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -392,6 +458,9 @@ namespace TennisAcademyApp.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "RacketCart");
+
+            migrationBuilder.DropTable(
                 name: "Reservations");
 
             migrationBuilder.DropTable(
@@ -401,16 +470,19 @@ namespace TennisAcademyApp.Data.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
+                name: "Rackets");
+
+            migrationBuilder.DropTable(
                 name: "Surfaces");
 
             migrationBuilder.DropTable(
                 name: "Trainings");
 
             migrationBuilder.DropTable(
-                name: "Coaches");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "Coaches");
         }
     }
 }
