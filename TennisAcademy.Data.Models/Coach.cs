@@ -9,7 +9,7 @@ namespace TennisAcademyApp.Data.Models
     {
         [Key]
         [Comment("Coach Identifier")]
-        public int CoachId { get; set; } 
+        public int CoachId { get; set; }
         [Required]
         [Comment("Coach Name")]
         public string Name { get; set; } = null!;
@@ -27,8 +27,6 @@ namespace TennisAcademyApp.Data.Models
         public string Nationality { get; set; } = null!;
         [Required]
         [Comment("Foreign key of IdentityUser")]
-        public string UserId { get; set; } = null!;
-        public virtual IdentityUser User { get; set; } = null!;
         public virtual ICollection<Reservation> Reservations { get; set; } = new HashSet<Reservation>();
         public virtual ICollection<UserFavourite> UsersCoaches { get; set; } = new HashSet<UserFavourite>();
     }
