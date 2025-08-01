@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using TennisAcademyApp.Data;
 using TennisAcademyApp.Services.Core;
 using TennisAcademyApp.Services.Core.Contracts;
@@ -34,6 +35,7 @@ namespace TennisAcademyApp
             builder.Services.AddScoped<IReservationService, ReservationService>();
             builder.Services.AddScoped<ISurfaceService, SurfaceService>();
             builder.Services.AddScoped<ITrainingTypeService, TrainingTypeService>();
+            builder.Services.AddScoped<IRacketService, RacketService>();
 
             var app = builder.Build();
 
