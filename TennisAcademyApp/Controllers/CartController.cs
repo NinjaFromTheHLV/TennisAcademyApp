@@ -61,5 +61,26 @@ namespace TennisAcademyApp.Controllers
                 return RedirectToAction(nameof(Index), "Home");
             }
         }
+        public async Task<IActionResult> RacketCheckout()
+        {
+            try
+            {
+                string userId = GetUserId()!;
+                bool result = await cartService.CheckOutAllRacketsAsync(userId);
+                if (result)
+                {
+                    return RedirectToAction(nameof(RacketsIndex));
+                }
+                else
+                {
+                    return BadRequest("Failed to check out all rackets.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error checking out all rackets: {ex.Message}");
+                return RedirectToAction(nameof(Index), "Home");
+            }
+        }
     }
 }

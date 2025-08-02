@@ -31,14 +31,16 @@ namespace TennisAcademyApp.Services.Core
                     Model = rc.Racket.Model,
                     Price = rc.Racket.Price,
                     Quantity = rc.Quantity,
+                    TotalPrice = rc.Quantity * rc.Racket.Price,
                     ImageUrl = rc.Racket.ImageUrl
                 })
                 .ToListAsync();
 
             return racketsInCart;
         }
-        public async Task AddRacketToCartAsync(string userId, int racketId, int quantity)
+        public async Task<bool> AddRacketToCartAsync(string userId, int racketId, int quantity)
         {
+            bool result = false;
             var racket = await dbContext.Rackets.FindAsync(racketId);
             if (racket == null || quantity <= 0 || quantity > racket.Quantity)
             {
@@ -52,6 +54,8 @@ namespace TennisAcademyApp.Services.Core
             {
                 existingItem.Quantity += quantity;
                 racket.Quantity -= quantity;
+
+                result = true;
             }
             else
             {
@@ -64,9 +68,12 @@ namespace TennisAcademyApp.Services.Core
                 racket.Quantity -= quantity;
 
                 await dbContext.RacketCart.AddAsync(cartItem);
+                result = true;
             }
 
             await dbContext.SaveChangesAsync();
+
+            return result;
         }
 
         public async Task<bool> RemoveRacketFromCartAsync(string userId, int id, int racketId)
@@ -85,6 +92,25 @@ namespace TennisAcademyApp.Services.Core
             await dbContext.SaveChangesAsync();
             result = true;
 
+            return result;
+        }
+
+        public async Task<bool> CheckOutAllRacketsAsync(string userId)
+        {
+            bool result = false;
+            var user = await userManager.FindByIdAsync(userId);
+
+            var cartItems = await dbContext.RacketCart
+                .Where(rc => rc.UserId == userId)
+                .ToListAsync();
+
+            if (cartItems.Any())
+            {
+                dbContext.RacketCart.RemoveRange(cartItems);
+                await dbContext.SaveChangesAsync();
+
+                result = true;
+            }
             return result;
         }
     }

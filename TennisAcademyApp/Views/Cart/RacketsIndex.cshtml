@@ -25,7 +25,7 @@ else
                             <small>Price per unit: @item.Price.ToString("C")</small>
                         </div>
                         <div class="text-end">
-                            <p class="fw-bold mb-2">Total: @(item.Price * item.Quantity).ToString("C")</p>
+                            <p class="fw-bold mb-2">Total: @item.TotalPrice.ToString("C")</p>
                             <form asp-action="RemoveRacketFromCart" asp-route-id="@item.Id" method="post">
                                 <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
                             </form>
@@ -38,6 +38,6 @@ else
 
     <hr class="my-4" />
     <div class="text-end">
-        <a asp-action="Checkout" class="btn btn-success mt-3">Checkout</a>
+        <a asp-action="RacketCheckout" class="btn btn-success mt-3">Checkout</a>
     </div>
 }
