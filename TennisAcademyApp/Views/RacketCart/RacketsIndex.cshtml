@@ -1,5 +1,5 @@
 ﻿@using TennisAcademyApp.ViewModels.Cart;
-@model IEnumerable<RacketCartViewModel>
+@model IEnumerable<RacketCartIndexViewModel>
 
 @{
     ViewData["Title"] = "Shopping Cart";
@@ -22,12 +22,12 @@ else
                         <div>
                             <h5 class="mb-1">@item.Brand @item.Model</h5>
                             <small>Quantity: @item.Quantity</small><br />
-                            <small>Price per unit: @item.Price.ToString("C")</small>
+                            <small>Price per racket: @item.Price.ToString("C")</small>
                         </div>
                         <div class="text-end">
                             <p class="fw-bold mb-2">Total: @item.TotalPrice.ToString("C")</p>
                             <form asp-action="RemoveRacketFromCart" asp-route-id="@item.Id" method="post">
-                                <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+                                <button type="submit" class="btn btn-outline-danger btn-sm">Remove from cart</button>
                             </form>
                         </div>
                     </div>

@@ -2,7 +2,7 @@
 
 namespace TennisAcademyApp.ViewModels.Cart
 {
-    public class RacketCartViewModel : RacketIndexViewModel
+    public class RacketCartIndexViewModel : RacketIndexViewModel
     {
         public decimal TotalPrice { get; set; }
     }

@@ -8,23 +8,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace TennisAcademyApp.Services.Core
 {
-    public class CartService : ICartService
+    public class RacketCartService : IRacketCartService
     {
         private readonly TennisAcademyDbContext dbContext;
         private readonly UserManager<IdentityUser> userManager;
-        public CartService(TennisAcademyDbContext dbContext, UserManager<IdentityUser> userManager)
+        public RacketCartService(TennisAcademyDbContext dbContext, UserManager<IdentityUser> userManager)
         {
             this.dbContext = dbContext;
             this.userManager = userManager;
         }
-        public async Task<IEnumerable<RacketCartViewModel>> GetAllRacketsInCartAsync(string userId)
+        public async Task<IEnumerable<RacketCartIndexViewModel>> GetAllRacketsInCartAsync(string userId)
         {
             var user = await userManager.FindByIdAsync(userId);
 
             var racketsInCart = await dbContext.RacketCart
                 .Include(r => r.Racket)
                 .Where(rc => rc.UserId == userId)
-                .Select(rc => new RacketCartViewModel
+                .Select(rc => new RacketCartIndexViewModel
                 {
                     Id = rc.RacketId,
                     Brand = rc.Racket.Brand,
