@@ -40,12 +40,12 @@ namespace TennisAcademyApp.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> RemoveRacketFromCart(int id, int racketId)
+        public async Task<IActionResult> RemoveRacketFromCart(int id)
         {
             try
             {
                 string userId = GetUserId()!;
-                bool result = await cartService.RemoveRacketFromCartAsync(userId, id, racketId);
+                bool result = await cartService.RemoveRacketFromCartAsync(userId, id);
                 if (result)
                 {
                     return RedirectToAction(nameof(RacketsIndex));

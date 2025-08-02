@@ -31,7 +31,7 @@
                         <a asp-action="Delete" asp-route-id="@Model.CoachId" class="btn btn-danger">Delete</a>
                     @if (User?.Identity?.IsAuthenticated == true && Model.IsInUserFavorites == false)
                     {
-                        <form asp-action="AddToFavourites" asp-route-id="@Model.CoachId" method="post" class="d-inline">
+                        <form asp-controller="FavouriteCoach" asp-action="AddToFavourites" asp-route-id="@Model.CoachId" method="post" class="d-inline">
                             <button type="submit" class="btn btn-warning">Add to favourites</button>
                         </form>
                     }

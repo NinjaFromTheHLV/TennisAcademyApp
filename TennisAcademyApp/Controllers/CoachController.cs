@@ -32,7 +32,7 @@ namespace TennisAcademyApp.Controllers
         }
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
             try
             {
@@ -90,7 +90,7 @@ namespace TennisAcademyApp.Controllers
             }
         }
         [HttpGet]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
             try
             {
@@ -176,67 +176,6 @@ namespace TennisAcademyApp.Controllers
             {
                 Console.WriteLine(ex.Message);
                 return RedirectToAction(nameof(Index), "Home");
-            }
-        }
-        [HttpGet]
-        public async Task<IActionResult> Favourite()
-        {
-            try
-            {
-                string userId = GetUserId()!;
-
-                var favourites = await this.coachService.GetFavouritesAsync(userId);
-
-                return View(favourites);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
-            }
-        }
-        [HttpPost]
-        public async Task<IActionResult> AddToFavourites(int id)
-        {
-            try
-            {
-                string userId = GetUserId()!;
-
-                bool result = await coachService.AddFavouriteCoachAsync(userId, id);
-
-                if (result == false)
-                {
-                    return RedirectToAction(nameof(Index));
-                }
-
-                return RedirectToAction(nameof(Favourite));
-            }
-            catch (ArgumentException ex)
-            {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return RedirectToAction(nameof(Index));
-            }
-        }
-        [HttpPost]
-        public async Task<IActionResult> RemoveFromFavourites(int id)
-        {
-            try
-            {
-                var userId = GetUserId()!;
-
-                bool result = await coachService.RemoveFromFavouritesAsync(userId, id);
-
-                if (result == false)
-                {
-                    return RedirectToAction(nameof(Index));
-                }
-
-                return RedirectToAction(nameof(Favourite));
-            }
-            catch (ArgumentException ex)
-            {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return RedirectToAction(nameof(Index));
             }
         }
     }
