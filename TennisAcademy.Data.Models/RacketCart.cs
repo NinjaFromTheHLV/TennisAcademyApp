@@ -7,9 +7,6 @@ namespace TennisAcademyApp.Data.Models
     [Comment("Racket Cart")]
     public class RacketCart
     {
-        [Key]
-        [Comment("Racket Cart Identifier")]
-        public int Id { get; set; }
         [Required]
         [Comment("Foreign Key of Racket")]
         public int RacketId { get; set; }
