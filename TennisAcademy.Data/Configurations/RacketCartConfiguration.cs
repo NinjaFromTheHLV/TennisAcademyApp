@@ -14,12 +14,14 @@ namespace TennisAcademyApp.Data.Configurations
             config
                 .HasOne(rc => rc.Racket)
                 .WithMany(r => r.RacketCart)
-                .HasForeignKey(rc => rc.RacketId);
+                .HasForeignKey(rc => rc.RacketId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             config
                 .HasOne(rc => rc.User)
                 .WithMany()
-                .HasForeignKey(rc => rc.UserId);
+                .HasForeignKey(rc => rc.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
