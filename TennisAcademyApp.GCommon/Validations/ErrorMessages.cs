@@ -43,5 +43,16 @@
         {
             public const string InvalidQuantityErrorMessage = "Invalid quantity. Please enter a valid number.";
         }
+        public static class Ball
+        {
+            public const string BallNotFoundErrorMessage = "Ball not found.";
+            public const string BallCannotBeNullErrorMessage = "Ball cannot be null.";
+
+            public const string PriceRangeErrorMessage = "Price must be between 17 and 80.";
+        }
+        public static class BallCart
+        {
+            public const string InvalidQuantityErrorMessage = "Invalid quantity. Please enter a valid number.";
+        }
     }
 }

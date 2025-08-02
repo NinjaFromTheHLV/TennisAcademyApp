@@ -24,5 +24,14 @@
             public const string ImageUrlRequiredErrorMessage = "Image URL is required.";
             public const string RacketNotFoundErrorMessage = "Racket not found.";
         }
+        public static class Ball
+        {
+            public const string BrandRequiredErrorMessage = "Brand is required.";
+            public const string ModelRequiredErrorMessage = "Model is required.";
+            public const string PriceRequiredErrorMessage = "Price is required.";
+            public const string QuantityRequiredErrorMessage = "Quantity is required.";
+            public const string ImageUrlRequiredErrorMessage = "Image URL is required.";
+            public const string BallNotFoundErrorMessage = "Ball not found.";
+        }
     }
 }
