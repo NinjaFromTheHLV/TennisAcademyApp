@@ -35,5 +35,13 @@
 
             public const string PriceRangeErrorMessage = "Price must be between 30 and 1500.";
         }
+        public static class User
+        {
+            public const string UserNotFoundErrorMessage = "User not found.";
+        }
+        public static class RacketCart
+        {
+            public const string InvalidQuantityErrorMessage = "Invalid quantity. Please enter a valid number.";
+        }
     }
 }

@@ -6,7 +6,7 @@ namespace TennisAcademyApp.Services.Core.Contracts
     {
         Task<IEnumerable<RacketCartViewModel>> GetAllRacketsInCartAsync(string userId); 
         Task<bool> AddRacketToCartAsync(string userId, int racketId, int quantity);
-        Task<bool> RemoveRacketFromCartAsync(string userId, int id, int racketId);
+        Task<bool> RemoveRacketFromCartAsync(string userId, int racketId);
         Task<bool> CheckOutAllRacketsAsync(string userId);
     }
 }

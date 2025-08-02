@@ -3,7 +3,7 @@ using TennisAcademyApp.Data;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Cart;
 using TennisAcademyApp.Data.Models;
-using TennisAcademyApp.ViewModels.Racket;
+using static TennisAcademyApp.GCommon.Validations.ErrorMessages.RacketCart;
 using Microsoft.EntityFrameworkCore;
 
 namespace TennisAcademyApp.Services.Core
@@ -26,7 +26,7 @@ namespace TennisAcademyApp.Services.Core
                 .Where(rc => rc.UserId == userId)
                 .Select(rc => new RacketCartViewModel
                 {
-                    Id = rc.Id,
+                    Id = rc.RacketId,
                     Brand = rc.Racket.Brand,
                     Model = rc.Racket.Model,
                     Price = rc.Racket.Price,
@@ -44,7 +44,7 @@ namespace TennisAcademyApp.Services.Core
             var racket = await dbContext.Rackets.FindAsync(racketId);
             if (racket == null || quantity <= 0 || quantity > racket.Quantity)
             {
-                throw new InvalidOperationException("Invalid quantity.");
+                throw new InvalidOperationException(InvalidQuantityErrorMessage);
             }
 
             var existingItem = await dbContext.RacketCart
@@ -76,11 +76,13 @@ namespace TennisAcademyApp.Services.Core
             return result;
         }
 
-        public async Task<bool> RemoveRacketFromCartAsync(string userId, int id, int racketId)
+        public async Task<bool> RemoveRacketFromCartAsync(string userId, int racketId)
         {
             bool result = false;
             var racket = await dbContext.Rackets.FindAsync(racketId);
-            var cartItem = await dbContext.RacketCart.FirstOrDefaultAsync(rc => rc.Id == id && rc.UserId == userId);
+
+            var cartItem = await dbContext.RacketCart
+                .FirstOrDefaultAsync(rc => rc.RacketId == racketId && rc.UserId == userId);
 
             if (cartItem == null)
             {
