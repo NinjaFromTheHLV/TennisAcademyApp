@@ -10,7 +10,7 @@ namespace TennisAcademyApp.Controllers
         {
             this.cartService = cartService;
         }
-        public async Task<IActionResult> RacketsIndex()
+        public async Task<IActionResult> Index()
         {
             try
             {
@@ -31,7 +31,7 @@ namespace TennisAcademyApp.Controllers
             {
                 string userId = GetUserId()!;
                 await this.cartService.AddRacketToCartAsync(userId, racketid, quantity);
-                return RedirectToAction(nameof(RacketsIndex));
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
@@ -48,7 +48,7 @@ namespace TennisAcademyApp.Controllers
                 bool result = await cartService.RemoveRacketFromCartAsync(userId, id);
                 if (result)
                 {
-                    return RedirectToAction(nameof(RacketsIndex));
+                    return RedirectToAction(nameof(Index));
                 }
                 else
                 {
@@ -69,7 +69,7 @@ namespace TennisAcademyApp.Controllers
                 bool result = await cartService.CheckOutAllRacketsAsync(userId);
                 if (result)
                 {
-                    return RedirectToAction(nameof(RacketsIndex));
+                    return RedirectToAction(nameof(Index));
                 }
                 else
                 {
