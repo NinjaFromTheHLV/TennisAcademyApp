@@ -36,8 +36,13 @@
                 <div class="card-footer bg-transparent border-0">
                     @if (racket.Quantity > 0)
                     {
-                        <form asp-action="AddToCart" asp-route-id="@racket.Id" method="post">
-                            <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+                        <form asp-controller="Cart" asp-action="AddRacketToCart" method="post" class="d-flex flex-column align-items-stretch gap-2">
+                            <input type="hidden" name="racketId" value="@racket.Id" />
+
+                            <div class="input-group">
+                                <input type="number" name="quantity" class="form-control" value="1" min="1" max="@racket.Quantity" />
+                                <button type="submit" class="btn btn-primary">Add to Cart</button>
+                            </div>
                         </form>
                     }
                     else
