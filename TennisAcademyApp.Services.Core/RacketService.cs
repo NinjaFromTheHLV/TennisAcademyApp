@@ -20,6 +20,7 @@ namespace TennisAcademyApp.Services.Core
         public async Task<IEnumerable<RacketIndexViewModel>> GetAllRacketsAsync()
         {
             var rackets = await dbContext.Rackets
+                .Include(r => r.RacketCart)
                 .Select(r => new RacketIndexViewModel
                 {
                     Id = r.Id,
@@ -27,11 +28,30 @@ namespace TennisAcademyApp.Services.Core
                     Model = r.Model,
                     Price = r.Price,
                     Quantity = r.Quantity,
-                    ImageUrl = r.ImageUrl
+                    ImageUrl = r.ImageUrl,
                 })
                 .ToListAsync();
 
             return rackets;
+        }
+        public async Task<Racket> FindRacketByIdAsync(int? id)
+        {
+            if (id.HasValue)
+            {
+                var racket = await dbContext.Rackets
+                .AsNoTracking()
+                .FirstOrDefaultAsync(r => r.Id == id.Value);
+
+                if (racket == null)
+                {
+                    throw new ArgumentException(RacketNotFoundErrorMessage);
+                }
+                return racket;
+            }
+            else
+            {
+                throw new ArgumentException(RacketCannotBeNullErrorMessage);
+            }
         }
         public async Task<bool> AddRacketAsync(string userId, RacketCreateInputModel model)
         {
@@ -64,18 +84,7 @@ namespace TennisAcademyApp.Services.Core
             var user = await userManager.FindByIdAsync(userId);
             // check for admin role
             //if (user == null || !await userManager.IsInRoleAsync(user, "Admin"))
-            if (id.HasValue == false)
-            {
-                throw new ArgumentException(RacketCannotBeNullErrorMessage);
-            }
-            var racket = await dbContext.Rackets
-                .AsNoTracking()
-                .FirstOrDefaultAsync(r => r.Id == id.Value);
-
-            if (racket == null)
-            {
-                throw new ArgumentException(RacketNotFoundErrorMessage);
-            }
+            var racket = await FindRacketByIdAsync(id);
 
             model = new RacketEditFormModel
             {
@@ -119,18 +128,7 @@ namespace TennisAcademyApp.Services.Core
             // check for admin role
             //if (user == null || !await userManager.IsInRoleAsync(user, "Admin"))
 
-            if (id.HasValue == false)
-            {
-                throw new ArgumentException(RacketCannotBeNullErrorMessage);
-            }
-            var racket = await dbContext.Rackets
-                .AsNoTracking()
-                .FirstOrDefaultAsync(r => r.Id == id.Value);
-
-            if (racket == null)
-            {
-                throw new ArgumentException(RacketNotFoundErrorMessage);
-            }
+            var racket = await FindRacketByIdAsync(id);
 
             model = new RacketDeleteViewModel
             {
@@ -142,7 +140,6 @@ namespace TennisAcademyApp.Services.Core
 
             return model;
         }
-
         public async Task<bool> DeleteRacketAsync(string userId, RacketDeleteViewModel model)
         {
             bool result = false;
