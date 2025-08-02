@@ -24,5 +24,6 @@ namespace TennisAcademyApp.Data.Models
         [Required]
         [Comment("Racket Image")]
         public string ImageUrl { get; set; } = null!;
+        public virtual ICollection<RacketCart> RacketCarts { get; set; } = new HashSet<RacketCart>();
     }
 }
