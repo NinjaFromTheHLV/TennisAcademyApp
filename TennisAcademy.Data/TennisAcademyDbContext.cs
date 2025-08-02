@@ -19,6 +19,8 @@ namespace TennisAcademyApp.Data
         public virtual DbSet<UserFavourite> UserFavourites { get; set; } = null!;
         public virtual DbSet<Racket> Rackets { get; set; } = null!;
         public virtual DbSet<RacketCart> RacketCart { get; set; } = null!;
+        public virtual DbSet<Ball> Balls { get; set; } = null!;
+        public virtual DbSet<BallCart> BallCart { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder config)
         {
