@@ -3,10 +3,10 @@ using TennisAcademyApp.Services.Core.Contracts;
 
 namespace TennisAcademyApp.Controllers
 {
-    public class CartController : BaseController
+    public class RacketCartController : BaseController
     {
-        private readonly ICartService cartService;
-        public CartController(ICartService cartService)
+        private readonly IRacketCartService cartService;
+        public RacketCartController(IRacketCartService cartService)
         {
             this.cartService = cartService;
         }
