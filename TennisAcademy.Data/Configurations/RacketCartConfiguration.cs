@@ -9,6 +9,9 @@ namespace TennisAcademyApp.Data.Configurations
         public void Configure(EntityTypeBuilder<RacketCart> config)
         {
             config
+                .HasKey(rc => new { rc.RacketId, rc.UserId });
+
+            config
                 .HasOne(rc => rc.Racket)
                 .WithMany(r => r.RacketCart)
                 .HasForeignKey(rc => rc.RacketId);
