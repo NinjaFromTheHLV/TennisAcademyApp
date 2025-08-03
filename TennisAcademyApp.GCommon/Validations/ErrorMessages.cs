@@ -6,7 +6,7 @@
         {
             public const string PastDateErrorMessage = "Please select a valid date.";
             public const string TwoHoursErrorMessage = "Reservations can be made at least two hours from now.";    
-            public const string SelectedTimeErrorMessage = "Reservation time must be between 08:00 and 20:00.";
+            public const string SelectedTimeErrorMessage = "The Academy's work time is from 8:00 to 20:00.";
             public const string FutureDateErrorMessage = "Reservations can be made for the next 14 days.";
             public const string SundayErrorMessage = "Sunday is off day! Please choose other time.";
 
