@@ -105,7 +105,7 @@ namespace TennisAcademyApp.Services.Core
 
             if (racket == null)
             {
-                return false; // Throw an exception or handle it as needed
+                throw new ArgumentException(RacketNotFoundErrorMessage);
             }
 
             racket.Brand = model.Brand;

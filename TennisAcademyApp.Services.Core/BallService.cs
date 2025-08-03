@@ -4,6 +4,7 @@ using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Ball;
 using TennisAcademyApp.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Ball;
 
 namespace TennisAcademyApp.Services.Core
 {
@@ -47,14 +48,14 @@ namespace TennisAcademyApp.Services.Core
 
                 if (ball == null)
                 {
-                    throw new ArgumentException("Ball not found.");
+                    throw new ArgumentException(BallNotFoundErrorMessage);
                 }
 
                 return ball;
             }
             else
             {
-                throw new ArgumentException("Ball ID cannot be null.");
+                throw new ArgumentException(BallCannotBeNullErrorMessage);
             }
         }
 
@@ -106,7 +107,7 @@ namespace TennisAcademyApp.Services.Core
 
             if (ball == null)
             {
-                return false;
+                throw new ArgumentException(BallNotFoundErrorMessage);
             }
 
             ball.Brand = model.Brand;
@@ -148,7 +149,7 @@ namespace TennisAcademyApp.Services.Core
 
             if (ball == null)
             {
-                throw new ArgumentException("Ball not found.");
+                throw new ArgumentException(BallNotFoundErrorMessage);
             }
 
             dbContext.Balls.Remove(ball);
