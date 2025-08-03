@@ -14,6 +14,7 @@ namespace TennisAcademyApp.ViewModels.Ball
         [Range(17.00, 80.00, ErrorMessage = PriceRangeErrorMessage)]
         public decimal Price { get; set; }
         [Required(ErrorMessage = QuantityRequiredErrorMessage)]
+        [Range(1, int.MaxValue, ErrorMessage = QuantityRangeErrorMessage)]
         public int Quantity { get; set; }
         [Required(ErrorMessage = ImageUrlRequiredErrorMessage)]
         public string ImageUrl { get; set; } = null!;
