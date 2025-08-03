@@ -94,7 +94,8 @@ namespace TennisAcademyApp.Services.Core
             {
                 throw new ArgumentException(DurationErrorMessage);
             }
-            if (model.Date.TimeOfDay < TimeSpan.FromHours(8) || model.Date.TimeOfDay > TimeSpan.FromHours(20))
+            if (model.Date.TimeOfDay < TimeSpan.FromHours(8) 
+               || model.Date.AddMinutes(model.Duration).TimeOfDay > TimeSpan.FromHours(20))
             {
                 throw new ArgumentException(SelectedTimeErrorMessage);
             }
