@@ -21,8 +21,6 @@
         {
             public const string AgeErrorMessage = "Age must be between 30 and 75!";
 
-            public const string NameMaxLengthMessage = "Name cannot exceed 50 characters.";
-
             public const string DescriptionMinLengthMessage = "Description must be at least 10 characters.";
             public const string DescriptionMaxLengthMessage = "Description cannot exceed 150 characters.";
 
@@ -34,6 +32,7 @@
             public const string RacketCannotBeNullErrorMessage = "Racket cannot be null.";
 
             public const string PriceRangeErrorMessage = "Price must be between 30 and 1500.";
+            public const string QuantityRangeErrorMessage = "Quantity must be a positive number.";
         }
         public static class User
         {
@@ -49,10 +48,19 @@
             public const string BallCannotBeNullErrorMessage = "Ball cannot be null.";
 
             public const string PriceRangeErrorMessage = "Price must be between 17 and 80.";
+            public const string QuantityRangeErrorMessage = "Quantity must be a positive number.";
         }
         public static class BallCart
         {
             public const string InvalidQuantityErrorMessage = "Invalid quantity. Please enter a valid number.";
+        }
+        public static class Bag
+        {
+            public const string PriceRangeErrorMessage = "Price must be between 50.00 and 1000.00.";
+            public const string QuantityErrorMessage = "Quality must be a positive number";
+
+            public const string BagNotFoundErrorMessage = "Bag not found.";
+            public const string BagCannotBeNullErrorMessage = "Bag cannot be null.";
         }
     }
 }

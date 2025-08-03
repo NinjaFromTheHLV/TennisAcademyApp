@@ -33,5 +33,13 @@
             public const string ImageUrlRequiredErrorMessage = "Image URL is required.";
             public const string BallNotFoundErrorMessage = "Ball not found.";
         }
+        public static class Bag
+        {
+            public const string BrandRequiredErrorMessage = "Brand is required.";
+            public const string ModelRequiredErrorMessage = "Model is required.";
+            public const string PriceRequiredErrorMessage = "Price is required.";
+            public const string QuantityRequiredErrorMessage = "Quantity is required.";
+            public const string ImageUrlRequiredErrorMessage = "Image URL is required.";
+        }
     }
 }
