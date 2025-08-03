@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Coach;
+using static TennisAcademyApp.GCommon.Validations.SuccessfulMessages.Coach;
 
 namespace TennisAcademyApp.Controllers
 {
@@ -80,6 +81,7 @@ namespace TennisAcademyApp.Controllers
                 {
                     return View(inputModel);
                 }
+                TempData["SuccessMessage"] = CoachAddedSuccessfully;
 
                 return RedirectToAction(nameof(Index));
             }
