@@ -40,6 +40,8 @@ namespace TennisAcademyApp
             builder.Services.AddScoped<IFavouriteCoachService, FavouriteCoachService>();
             builder.Services.AddScoped<IBallService, BallService>();
             builder.Services.AddScoped<IBallCartService, BallCartService>();
+            builder.Services.AddScoped<IBagService, BagService>();
+            builder.Services.AddScoped<IBagCartService, BagCartService>();
 
             var app = builder.Build();
 
