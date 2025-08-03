@@ -21,6 +21,8 @@ namespace TennisAcademyApp.Data
         public virtual DbSet<RacketCart> RacketCart { get; set; } = null!;
         public virtual DbSet<Ball> Balls { get; set; } = null!;
         public virtual DbSet<BallCart> BallCart { get; set; } = null!;
+        public virtual DbSet<Bag> Bags { get; set; } = null!;
+        public virtual DbSet<BagCart> BagCart { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder config)
         {
