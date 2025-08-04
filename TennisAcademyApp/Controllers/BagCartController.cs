@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TennisAcademyApp.Services.Core.Contracts;
+using static TennisAcademyApp.GCommon.Validations.ErrorMessages.BagCart;
+using static TennisAcademyApp.GCommon.Validations.SuccessfulMessages.BagCart;
 
 namespace TennisAcademyApp.Controllers
 {
@@ -20,9 +22,9 @@ namespace TennisAcademyApp.Controllers
                 var bagsInCart = await this.cartService.GetAllBagsInCartAsync(userId);
                 return View(bagsInCart);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error retrieving bags in cart: {ex.Message}");
+                TempData["ErrorMessage"] = CannotLoadBagCartErrorMessage;
                 return RedirectToAction(nameof(Index), "Home");
             }
         }
@@ -33,13 +35,21 @@ namespace TennisAcademyApp.Controllers
             try
             {
                 string userId = GetUserId()!;
-                await this.cartService.AddBagToCartAsync(userId, bagId, quantity);
+                bool isAdded = await this.cartService.AddBagToCartAsync(userId, bagId, quantity);
+
+                if (!isAdded)
+                {
+                    TempData["ErrorMessage"] = InvalidQuantityErrorMessage;
+                    return RedirectToAction(nameof(Index), "Bag");
+                }
+
+                TempData["SuccessMessage"] = BagAddedToCartSuccessfully;
                 return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error adding bag to cart: {ex.Message}");
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = InvalidQuantityErrorMessage;
+                return RedirectToAction(nameof(Index), "Bag");
             }
         }
 
@@ -49,20 +59,21 @@ namespace TennisAcademyApp.Controllers
             try
             {
                 string userId = GetUserId()!;
-                bool result = await cartService.RemoveBagFromCartAsync(userId, id);
-                if (result)
+                bool isRemoved = await cartService.RemoveBagFromCartAsync(userId, id);
+
+                if (!isRemoved)
                 {
+                    TempData["ErrorMessage"] = BagFailedToRemoveFromCartErrorMessage;
                     return RedirectToAction(nameof(Index));
                 }
-                else
-                {
-                    return BadRequest("Failed to remove bag from cart.");
-                }
+
+                TempData["SuccessMessage"] = BagRemovedFromCartSuccessfully;
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error removing bag from cart: {ex.Message}");
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = BagFailedToRemoveFromCartErrorMessage;
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -71,20 +82,21 @@ namespace TennisAcademyApp.Controllers
             try
             {
                 string userId = GetUserId()!;
-                bool result = await cartService.CheckOutAllBagsAsync(userId);
-                if (result)
+                bool isCheckedOut = await cartService.CheckOutAllBagsAsync(userId);
+
+                if (!isCheckedOut)
                 {
+                    TempData["ErrorMessage"] = UnableToCheckoutErrorMessage;
                     return RedirectToAction(nameof(Index));
                 }
-                else
-                {
-                    return BadRequest("Failed to check out all bags.");
-                }
+
+                TempData["SuccessMessage"] = BagCheckoutSuccessful;
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error checking out all bags: {ex.Message}");
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = UnableToCheckoutErrorMessage;
+                return RedirectToAction(nameof(Index));
             }
         }
     }

@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TennisAcademyApp.Services.Core.Contracts;
+using static TennisAcademyApp.GCommon.Validations.SuccessfulMessages.BallCart;
+using static TennisAcademyApp.GCommon.Validations.ErrorMessages.BallCart;
 
 namespace TennisAcademyApp.Controllers
 {
@@ -20,10 +22,10 @@ namespace TennisAcademyApp.Controllers
                 var ballsInCart = await this.cartService.GetAllBallsInCartAsync(userId);
                 return View(ballsInCart);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error retrieving balls in cart: {ex.Message}");
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = CannotLoadBallCartErrorMessage;
+                return RedirectToAction("Index", "Home");
             }
         }
 
@@ -33,13 +35,21 @@ namespace TennisAcademyApp.Controllers
             try
             {
                 string userId = GetUserId()!;
-                await this.cartService.AddBallToCartAsync(userId, ballId, quantity);
+                bool isAdded = await this.cartService.AddBallToCartAsync(userId, ballId, quantity);
+
+                if (!isAdded)
+                {
+                    TempData["ErrorMessage"] = InvalidQuantityErrorMessage;
+                    return RedirectToAction(nameof(Index), "Ball");
+                }
+
+                TempData["SuccessMessage"] = BallAddedToCartSuccessfully;
                 return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error adding ball to cart: {ex.Message}");
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = InvalidQuantityErrorMessage;
+                return RedirectToAction(nameof(Index), "Ball");
             }
         }
 
@@ -49,41 +59,49 @@ namespace TennisAcademyApp.Controllers
             try
             {
                 string userId = GetUserId()!;
-                bool result = await cartService.RemoveBallFromCartAsync(userId, id);
-                if (result)
+                bool isRemoved = await cartService.RemoveBallFromCartAsync(userId, id);
+
+                if (!isRemoved)
                 {
+                    TempData["ErrorMessage"] = BallFailedToRemoveFromCartErrorMessage;
                     return RedirectToAction(nameof(Index));
                 }
-                else
-                {
-                    return BadRequest("Failed to remove ball from cart.");
-                }
+
+                TempData["SuccessMessage"] = BallRemovedFromCartSuccessfully;
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (ArgumentException)
             {
-                Console.WriteLine($"Error removing ball from cart: {ex.Message}");
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = BallFailedToRemoveFromCartErrorMessage;
+                return RedirectToAction(nameof(Index));
+            }
+            catch (InvalidOperationException)
+            {
+                TempData["ErrorMessage"] = BallNotFoundInCartErrorMessage;
+                return RedirectToAction(nameof(Index));
             }
         }
+
         public async Task<IActionResult> BallCheckout()
         {
             try
             {
                 string userId = GetUserId()!;
-                bool result = await cartService.CheckOutAllBallsAsync(userId);
-                if (result)
+                bool isCheckedOut = await cartService.CheckOutAllBallsAsync(userId);
+
+                if (!isCheckedOut)
                 {
+                    TempData["ErrorMessage"] = UnableToCheckoutErrorMessage;
                     return RedirectToAction(nameof(Index));
                 }
-                else
-                {
-                    return BadRequest("Failed to check out all balls.");
-                }
+
+                TempData["SuccessMessage"] = BallCheckoutSuccessful;
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error checking out all balls: {ex.Message}");
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = UnableToCheckoutErrorMessage;
+                return RedirectToAction(nameof(Index));
             }
         }
     }

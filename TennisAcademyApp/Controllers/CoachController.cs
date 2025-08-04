@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Coach;
+using static TennisAcademyApp.GCommon.Validations.ErrorMessages;
 using static TennisAcademyApp.GCommon.Validations.SuccessfulMessages.Coach;
+using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Coach;
 
 namespace TennisAcademyApp.Controllers
 {
@@ -39,16 +41,15 @@ namespace TennisAcademyApp.Controllers
             {
                 string userId = GetUserId()!;
 
-                CoachDetailsViewModel model = await this.coachService
-                    .GetCoachDetailsAsync(userId, id);
+                var details = await this.coachService.GetCoachDetailsAsync(userId, id);
 
-                return View(model);
+                return View(details);
             }
-            catch (Exception ex)
+            catch (ArgumentException)
             {
-                Console.WriteLine(ex.Message);
+                TempData["ErrorMessage"] = CoachNotFoundErrorMessage;
 
-                return RedirectToAction(nameof(Index), "Home");
+                return RedirectToAction(nameof(Index));
             }
         }
         [HttpGet]
@@ -73,21 +74,17 @@ namespace TennisAcademyApp.Controllers
                 string userId = GetUserId()!;
                 if (ModelState.IsValid == false)
                 {
+                    TempData["ErrorMessage"] = InvalidData;
                     return View(inputModel);
                 }
-                bool result = await this.coachService.AddCoachAsync(userId, inputModel);
-
-                if (result == false)
-                {
-                    return View(inputModel);
-                }
+                await this.coachService.AddCoachAsync(userId, inputModel);
                 TempData["SuccessMessage"] = CoachAddedSuccessfully;
 
                 return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
+                TempData["ErrorMessage"] = CoachAddErrorMessage;
                 return RedirectToAction(nameof(Index));
             }
         }
@@ -97,17 +94,13 @@ namespace TennisAcademyApp.Controllers
             try
             {
                 string user = GetUserId()!;
-                var coachEdit = await this.coachService.GetCoachForEdittingAsync(user, id);
+                var coach = await this.coachService.GetCoachForEdittingAsync(user, id);
 
-                if (coachEdit == null)
-                {
-                    return RedirectToAction(nameof(Index));
-                }
-                return View(coachEdit);
+                return View(coach);
             }
-            catch (Exception ex)
+            catch (ArgumentException)
             {
-                Console.WriteLine(ex.Message);
+                TempData["ErrorMessage"] = CoachNotFoundErrorMessage;
                 return RedirectToAction(nameof(Index));
             }
         }
@@ -119,21 +112,18 @@ namespace TennisAcademyApp.Controllers
                 string userId = GetUserId()!;
                 if (ModelState.IsValid == false)
                 {
+                    TempData["ErrorMessage"] = InvalidData;
                     return RedirectToAction(nameof(Edit), new { id = model.CoachId });
                 }
-                bool result = await this.coachService.EdittedCoachAsync(userId, model);
+                await this.coachService.EdittedCoachAsync(userId, model);
 
-                if (result == false)
-                {
-                    ModelState.AddModelError(string.Empty, "An error occured, please try again");
-                    return RedirectToAction(nameof(Edit), new { id = model.CoachId });
-                }
+                TempData["SuccessMessage"] = CoachUpdatedSuccessfully;
 
-                return RedirectToAction(nameof(Details), new {id = model.CoachId});
+                return RedirectToAction(nameof(Index));
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
+                TempData["ErrorMessage"] = CoachEditErrorMessage;
                 return RedirectToAction(nameof(Index));
             }
         }
@@ -147,13 +137,14 @@ namespace TennisAcademyApp.Controllers
 
                 if (delete == null)
                 {
+                    TempData["ErrorMessage"] = CoachNotFoundErrorMessage;
                     return RedirectToAction(nameof(Index));
                 }
                 return View(delete);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
+                TempData["ErrorMessage"] = CoachNotFoundErrorMessage;
                 return RedirectToAction(nameof(Index));
             }
         }
@@ -168,15 +159,16 @@ namespace TennisAcademyApp.Controllers
 
                 if (result == false)
                 {
-                    ModelState.AddModelError(string.Empty, "An error occured, please try again");
+                    TempData["ErrorMessage"] = CoachDeleteErrorMessage;
                     return RedirectToAction(nameof(Delete), new { id = model.CoachId });
                 }
+                TempData["SuccessMessage"] = CoachDeletedSuccessfully;
 
                 return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
+                TempData["ErrorMessage"] = CoachDeleteErrorMessage;
                 return RedirectToAction(nameof(Index), "Home");
             }
         }

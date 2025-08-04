@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Ball;
+using static TennisAcademyApp.GCommon.Validations.SuccessfulMessages.Ball;
+using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Ball;
+using static TennisAcademyApp.GCommon.Validations.ErrorMessages;
 
 namespace TennisAcademyApp.Controllers
 {
@@ -22,9 +25,9 @@ namespace TennisAcademyApp.Controllers
                 var balls = await this.ballService.GetAllBallsAsync();
                 return View(balls);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
+                TempData["ErrorMessage"] = UnexpectedError;
                 return RedirectToAction(nameof(Index), "Home");
             }
         }
@@ -37,10 +40,10 @@ namespace TennisAcademyApp.Controllers
                 await Task.CompletedTask;
                 return View();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = UnexpectedError;
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -51,24 +54,26 @@ namespace TennisAcademyApp.Controllers
             {
                 if (!ModelState.IsValid)
                 {
+                    TempData["ErrorMessage"] = InvalidData;
                     return View(inputModel);
                 }
 
                 string userId = GetUserId()!;
-
                 bool isAdded = await this.ballService.AddBallAsync(userId, inputModel);
-                if (isAdded)
+
+                if (!isAdded)
                 {
-                    return RedirectToAction(nameof(Index));
+                    TempData["ErrorMessage"] = BallAddErrorMessage;
+                    return View(inputModel);
                 }
 
-                ModelState.AddModelError(string.Empty, "Failed to add ball.");
-                return View(inputModel);
+                TempData["SuccessMessage"] = BallAddedSuccessfully;
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = BallAddErrorMessage;
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -80,17 +85,17 @@ namespace TennisAcademyApp.Controllers
                 string userId = GetUserId()!;
                 var ball = await this.ballService.GetBallForEditingAsync(userId, id);
 
-                if (ball == null)
-                {
-                    return RedirectToAction(nameof(Index));
-                }
-
                 return View(ball);
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                Console.WriteLine(ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = BallNotFoundErrorMessage;
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = UnexpectedError;
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -101,22 +106,25 @@ namespace TennisAcademyApp.Controllers
             {
                 if (!ModelState.IsValid)
                 {
+                    TempData["ErrorMessage"] = InvalidData;
                     return RedirectToAction(nameof(Edit), new { id = editModel.Id });
                 }
 
                 bool isEdited = await this.ballService.EditBallAsync(editModel);
-                if (isEdited)
+
+                if (!isEdited)
                 {
-                    return RedirectToAction(nameof(Index));
+                    TempData["ErrorMessage"] = BallEditErrorMessage;
+                    return RedirectToAction(nameof(Edit), new { id = editModel.Id });
                 }
 
-                ModelState.AddModelError(string.Empty, "Failed to edit ball.");
-                return RedirectToAction(nameof(Edit), new { id = editModel.Id });
+                TempData["SuccessMessage"] = BallUpdatedSuccessfully;
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = BallEditErrorMessage;
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -128,17 +136,17 @@ namespace TennisAcademyApp.Controllers
                 string userId = GetUserId()!;
                 var ball = await this.ballService.GetBallForDeletingAsync(userId, id);
 
-                if (ball == null)
-                {
-                    return RedirectToAction(nameof(Index));
-                }
-
                 return View(ball);
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                Console.WriteLine(ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = BallNotFoundErrorMessage;
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = UnexpectedError;
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -149,18 +157,19 @@ namespace TennisAcademyApp.Controllers
             {
                 bool isDeleted = await this.ballService.DeleteBallAsync(GetUserId()!, deleteModel);
 
-                if (isDeleted)
+                if (!isDeleted)
                 {
-                    return RedirectToAction(nameof(Index));
+                    TempData["ErrorMessage"] = BallDeleteErrorMessage;
+                    return RedirectToAction(nameof(Delete), new { id = deleteModel.Id });
                 }
 
-                ModelState.AddModelError(string.Empty, "Failed to delete ball.");
-                return RedirectToAction(nameof(Delete), new { id = deleteModel.Id });
+                TempData["SuccessMessage"] = BallDeletedSuccessfully;
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = BallDeleteErrorMessage;
+                return RedirectToAction(nameof(Index));
             }
         }
     }

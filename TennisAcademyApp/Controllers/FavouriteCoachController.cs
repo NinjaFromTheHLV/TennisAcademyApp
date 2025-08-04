@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TennisAcademyApp.Services.Core;
+using static TennisAcademyApp.GCommon.Validations.SuccessfulMessages.Coach;
+using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Coach;
 using TennisAcademyApp.Services.Core.Contracts;
 
 namespace TennisAcademyApp.Controllers
@@ -35,19 +36,15 @@ namespace TennisAcademyApp.Controllers
             {
                 string userId = GetUserId()!;
 
-                bool result = await favouriteCoachService.AddFavouriteCoachAsync(userId, id);
-
-                if (result == false)
-                {
-                    return RedirectToAction(nameof(Index));
-                }
+                await favouriteCoachService.AddFavouriteCoachAsync(userId, id);
+                TempData["SuccessMessage"] = CoachFavouriteAddedSuccessfully;
 
                 return RedirectToAction(nameof(Favourite));
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return RedirectToAction(nameof(Index));
+                TempData["ErrorMessage"] = CoachAlreadyAddedToFavouritesErrorMessage;
+                return RedirectToAction(nameof(Index), "Coach");
             }
         }
         [HttpPost]
@@ -57,19 +54,15 @@ namespace TennisAcademyApp.Controllers
             {
                 var userId = GetUserId()!;
 
-                bool result = await favouriteCoachService.RemoveFromFavouritesAsync(userId, id);
-
-                if (result == false)
-                {
-                    return RedirectToAction(nameof(Index));
-                }
+                await favouriteCoachService.RemoveFromFavouritesAsync(userId, id);
+                TempData["SuccessMessage"] = CoachFavouriteRemovedSuccessfully;
 
                 return RedirectToAction(nameof(Favourite));
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return RedirectToAction(nameof(Index));
+                TempData["ErrorMessage"] = CoachNotFoundErrorMessage;
+                return RedirectToAction(nameof(Favourite));
             }
         }
     }

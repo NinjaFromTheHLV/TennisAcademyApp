@@ -1,15 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TennisAcademyApp.Services.Core.Contracts;
+using static TennisAcademyApp.GCommon.Validations.SuccessfulMessages.RacketCart;
+using static TennisAcademyApp.GCommon.Validations.ErrorMessages.RacketCart;
 
 namespace TennisAcademyApp.Controllers
 {
     public class RacketCartController : BaseController
     {
         private readonly IRacketCartService cartService;
+
         public RacketCartController(IRacketCartService cartService)
         {
             this.cartService = cartService;
         }
+
         public async Task<IActionResult> Index()
         {
             try
@@ -18,68 +22,86 @@ namespace TennisAcademyApp.Controllers
                 var racketsInCart = await this.cartService.GetAllRacketsInCartAsync(userId);
                 return View(racketsInCart);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error retrieving rackets in cart: {ex.Message}");
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = CannotLoadRacketCartErrorMessage;
+                return RedirectToAction("Index", "Home");
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> AddRacketToCart(int racketid, int quantity)
         {
             try
             {
                 string userId = GetUserId()!;
-                await this.cartService.AddRacketToCartAsync(userId, racketid, quantity);
+                bool isAdded = await this.cartService.AddRacketToCartAsync(userId, racketid, quantity);
+
+                if (!isAdded)
+                {
+                    TempData["ErrorMessage"] = InvalidQuantityErrorMessage;
+                    return RedirectToAction(nameof(Index), "Racket");
+                }
+
+                TempData["SuccessMessage"] = RacketAddedToCartSuccessfully;
                 return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error adding racket to cart: {ex.Message}");
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = InvalidQuantityErrorMessage;
+                return RedirectToAction(nameof(Index), "Racket");
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> RemoveRacketFromCart(int id)
         {
             try
             {
                 string userId = GetUserId()!;
-                bool result = await cartService.RemoveRacketFromCartAsync(userId, id);
-                if (result)
+                bool isRemoved = await cartService.RemoveRacketFromCartAsync(userId, id);
+
+                if (!isRemoved)
                 {
+                    TempData["ErrorMessage"] = RacketFailedToRemoveFromCartErrorMessage;
                     return RedirectToAction(nameof(Index));
                 }
-                else
-                {
-                    return BadRequest("Failed to remove racket from cart.");
-                }
+
+                TempData["SuccessMessage"] = RacketRemovedFromCartSuccessfully;
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (ArgumentException)
             {
-                Console.WriteLine($"Error removing racket from cart: {ex.Message}");
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = RacketFailedToRemoveFromCartErrorMessage;
+                return RedirectToAction(nameof(Index));
+            }
+            catch (InvalidOperationException)
+            {
+                TempData["ErrorMessage"] = RacketNotFoundInCartErrorMessage;
+                return RedirectToAction(nameof(Index));
             }
         }
+
         public async Task<IActionResult> RacketCheckout()
         {
             try
             {
                 string userId = GetUserId()!;
-                bool result = await cartService.CheckOutAllRacketsAsync(userId);
-                if (result)
+                bool isCheckedOut = await cartService.CheckOutAllRacketsAsync(userId);
+
+                if (!isCheckedOut)
                 {
+                    TempData["ErrorMessage"] = UnableToCheckoutErrorMessage;
                     return RedirectToAction(nameof(Index));
                 }
-                else
-                {
-                    return BadRequest("Failed to check out all rackets.");
-                }
+
+                TempData["SuccessMessage"] = RacketCheckoutSuccessful;
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error checking out all rackets: {ex.Message}");
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = UnableToCheckoutErrorMessage;
+                return RedirectToAction(nameof(Index));
             }
         }
     }

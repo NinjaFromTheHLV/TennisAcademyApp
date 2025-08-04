@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Reservation;
+using static TennisAcademyApp.GCommon.Validations.ErrorMessages;
+using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Reservation;
+using static TennisAcademyApp.GCommon.Validations.SuccessfulMessages.Reservation;
 
 namespace TennisAcademyApp.Controllers
 {
@@ -72,16 +75,13 @@ namespace TennisAcademyApp.Controllers
             {
                 if (ModelState.IsValid == false)
                 {
+                    TempData["ErrorMessage"] = InvalidData;
                     return View(model);
                 }
                 string userId = GetUserId()!;
 
-                bool isCreated = await reservationService.CreateReservationAsync(userId, model);
-                if (isCreated == false)
-                {
-                    ModelState.AddModelError(string.Empty, "Failed to create a reservation. Please try again.");
-                    return View(model);
-                }
+                await reservationService.CreateReservationAsync(userId, model);
+                TempData["SuccessMessage"] = ReservationCreatedSuccessfully;
                 return RedirectToAction(nameof(Index));
             }
             catch (ArgumentException ex)
@@ -104,10 +104,10 @@ namespace TennisAcademyApp.Controllers
 
                 return View(reservationDetails);
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = ReservationNotFoundErrorMessage;
+                return RedirectToAction(nameof(Index));
             }
         }
         [HttpGet]
@@ -121,10 +121,10 @@ namespace TennisAcademyApp.Controllers
 
                 return View(reservationToDelete);
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = ReservationNotFoundErrorMessage;
+                return RedirectToAction(nameof(Index));
             }
         }
         [HttpPost]
@@ -134,19 +134,14 @@ namespace TennisAcademyApp.Controllers
             {
                 string userId = GetUserId()!;
 
-                bool isDeleted = await reservationService.DeleteReservationAsync(userId, model);
-                if (isDeleted == false)
-                {
-                    ModelState.AddModelError(string.Empty, "Failed to delete the reservation. Please try again.");
-                    return View(model);
-                }
-
+                await reservationService.DeleteReservationAsync(userId, model);
+                TempData["SuccessMessage"] = ReservationDeletedSuccessfully;
                 return RedirectToAction(nameof(Index));
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = ReservationDeleteErrorMessage;
+                return RedirectToAction(nameof(Index));
             }
         }
         public async Task<IActionResult> ReservationHistory()

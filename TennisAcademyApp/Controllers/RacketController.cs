@@ -2,31 +2,36 @@
 using Microsoft.AspNetCore.Mvc;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Racket;
+using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Racket;
+using static TennisAcademyApp.GCommon.Validations.ErrorMessages;
+using static TennisAcademyApp.GCommon.Validations.SuccessfulMessages.Racket;
 
 namespace TennisAcademyApp.Controllers
 {
     public class RacketController : BaseController
     {
         private readonly IRacketService racketService;
+
         public RacketController(IRacketService racketService)
         {
             this.racketService = racketService;
         }
+
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             try
             {
                 var rackets = await this.racketService.GetAllRacketsAsync();
-
                 return View(rackets);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
+                TempData["ErrorMessage"] = UnexpectedError;
                 return RedirectToAction(nameof(Index), "Home");
             }
         }
+
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -35,40 +40,43 @@ namespace TennisAcademyApp.Controllers
                 await Task.CompletedTask;
                 return View();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = UnexpectedError;
+                return RedirectToAction(nameof(Index));
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> Create(RacketCreateInputModel inputModel)
         {
             try
             {
-                if (ModelState.IsValid == false)
+                if (!ModelState.IsValid)
                 {
+                    TempData["ErrorMessage"] = InvalidData;
                     return View(inputModel);
                 }
-                string userId = GetUserId()!;
 
+                string userId = GetUserId()!;
                 bool isAdded = await this.racketService.AddRacketAsync(userId, inputModel);
-                if (isAdded)
+
+                if (!isAdded)
                 {
-                    return RedirectToAction(nameof(Index));
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Failed to add racket.");
+                    TempData["ErrorMessage"] = RacketAddErrorMessage;
                     return View(inputModel);
                 }
+
+                TempData["SuccessMessage"] = RacketAddedSuccessfully;
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = RacketAddErrorMessage;
+                return RedirectToAction(nameof(Index));
             }
         }
+
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -76,44 +84,50 @@ namespace TennisAcademyApp.Controllers
             {
                 string userId = GetUserId()!;
                 var racket = await this.racketService.GetRacketForEdittingAsync(userId, id);
-                if (racket == null)
-                {
-                    return RedirectToAction(nameof(Index));
-                }
+
                 return View(racket);
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                Console.WriteLine(ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = RacketNotFoundErrorMessage;
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = UnexpectedError;
+                return RedirectToAction(nameof(Index));
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> Edit(RacketEditFormModel editModel)
         {
             try
             {
-                if (ModelState.IsValid == false)
+                if (!ModelState.IsValid)
                 {
+                    TempData["ErrorMessage"] = InvalidData;
                     return RedirectToAction(nameof(Edit), new { id = editModel.Id });
                 }
+
                 bool isEdited = await this.racketService.EditRacketAsync(editModel);
-                if (isEdited)
+
+                if (!isEdited)
                 {
-                    return RedirectToAction(nameof(Index));
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Failed to edit racket.");
+                    TempData["ErrorMessage"] = RacketEditErrorMessage;
                     return RedirectToAction(nameof(Edit), new { id = editModel.Id });
                 }
+
+                TempData["SuccessMessage"] = RacketUpdatedSuccessfully;
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = RacketEditErrorMessage;
+                return RedirectToAction(nameof(Index));
             }
         }
+
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
@@ -121,38 +135,41 @@ namespace TennisAcademyApp.Controllers
             {
                 string userId = GetUserId()!;
                 var racket = await this.racketService.GetRacketForDeletingAsync(userId, id);
-                if (racket == null)
-                {
-                    return RedirectToAction(nameof(Index));
-                }
+
                 return View(racket);
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                Console.WriteLine(ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = RacketNotFoundErrorMessage;
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = UnexpectedError;
+                return RedirectToAction(nameof(Index));
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> Delete(RacketDeleteViewModel deleteModel)
         {
             try
             {
                 bool isDeleted = await this.racketService.DeleteRacketAsync(GetUserId()!, deleteModel);
-                if (isDeleted)
+
+                if (!isDeleted)
                 {
-                    return RedirectToAction(nameof(Index));
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Failed to delete racket.");
+                    TempData["ErrorMessage"] = RacketDeleteErrorMessage;
                     return RedirectToAction(nameof(Delete), new { id = deleteModel.Id });
                 }
+
+                TempData["SuccessMessage"] = RacketDeletedSuccessfully;
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = RacketDeleteErrorMessage;
+                return RedirectToAction(nameof(Index));
             }
         }
     }

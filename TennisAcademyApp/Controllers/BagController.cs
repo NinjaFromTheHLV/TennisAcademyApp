@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Bag;
+using static TennisAcademyApp.GCommon.Validations.SuccessfulMessages.Bag;
+using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Bag;
+using static TennisAcademyApp.GCommon.Validations.ErrorMessages;
 
 namespace TennisAcademyApp.Controllers
 {
@@ -22,9 +25,9 @@ namespace TennisAcademyApp.Controllers
                 var bags = await this.bagService.GetAllBagsAsync();
                 return View(bags);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
+                TempData["ErrorMessage"] = UnexpectedError;
                 return RedirectToAction(nameof(Index), "Home");
             }
         }
@@ -37,10 +40,10 @@ namespace TennisAcademyApp.Controllers
                 await Task.CompletedTask;
                 return View();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = UnexpectedError;
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -51,24 +54,26 @@ namespace TennisAcademyApp.Controllers
             {
                 if (!ModelState.IsValid)
                 {
+                    TempData["ErrorMessage"] = InvalidData;
                     return View(inputModel);
                 }
 
                 string userId = GetUserId()!;
-
                 bool isAdded = await this.bagService.AddBagAsync(userId, inputModel);
-                if (isAdded)
+
+                if (!isAdded)
                 {
-                    return RedirectToAction(nameof(Index));
+                    TempData["ErrorMessage"] = BagAddErrorMessage;
+                    return View(inputModel);
                 }
 
-                ModelState.AddModelError(string.Empty, "Failed to add bag.");
-                return View(inputModel);
+                TempData["SuccessMessage"] = BagAddedSuccessfully;
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = BagAddErrorMessage;
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -80,17 +85,17 @@ namespace TennisAcademyApp.Controllers
                 string userId = GetUserId()!;
                 var bag = await this.bagService.GetBagForEditingAsync(userId, id);
 
-                if (bag == null)
-                {
-                    return RedirectToAction(nameof(Index));
-                }
-
                 return View(bag);
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                Console.WriteLine(ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = BagNotFoundErrorMessage;
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = UnexpectedError;
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -101,22 +106,25 @@ namespace TennisAcademyApp.Controllers
             {
                 if (!ModelState.IsValid)
                 {
+                    TempData["ErrorMessage"] = InvalidData;
                     return RedirectToAction(nameof(Edit), new { id = editModel.Id });
                 }
 
                 bool isEdited = await this.bagService.EditBagAsync(editModel);
-                if (isEdited)
+
+                if (!isEdited)
                 {
-                    return RedirectToAction(nameof(Index));
+                    TempData["ErrorMessage"] = BagEditErrorMessage;
+                    return RedirectToAction(nameof(Edit), new { id = editModel.Id });
                 }
 
-                ModelState.AddModelError(string.Empty, "Failed to edit bag.");
-                return RedirectToAction(nameof(Edit), new { id = editModel.Id });
+                TempData["SuccessMessage"] = BagUpdatedSuccessfully;
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = BagEditErrorMessage;
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -128,17 +136,17 @@ namespace TennisAcademyApp.Controllers
                 string userId = GetUserId()!;
                 var bag = await this.bagService.GetBagForDeletingAsync(userId, id);
 
-                if (bag == null)
-                {
-                    return RedirectToAction(nameof(Index));
-                }
-
                 return View(bag);
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                Console.WriteLine(ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = BagNotFoundErrorMessage;
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = UnexpectedError;
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -149,18 +157,19 @@ namespace TennisAcademyApp.Controllers
             {
                 bool isDeleted = await this.bagService.DeleteBagAsync(GetUserId()!, deleteModel);
 
-                if (isDeleted)
+                if (!isDeleted)
                 {
-                    return RedirectToAction(nameof(Index));
+                    TempData["ErrorMessage"] = BagDeleteErrorMessage;
+                    return RedirectToAction(nameof(Delete), new { id = deleteModel.Id });
                 }
 
-                ModelState.AddModelError(string.Empty, "Failed to delete bag.");
-                return RedirectToAction(nameof(Delete), new { id = deleteModel.Id });
+                TempData["SuccessMessage"] = BagDeletedSuccessfully;
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
+                TempData["ErrorMessage"] = BagDeleteErrorMessage;
+                return RedirectToAction(nameof(Index));
             }
         }
     }
