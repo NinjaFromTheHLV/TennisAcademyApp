@@ -62,11 +62,16 @@ namespace TennisAcademyApp.Services.Core
         }
         public async Task<CoachDetailsViewModel> GetCoachDetailsAsync(string userId, int id)
         {
-            CoachDetailsViewModel coachDetails = null!;
+            CoachDetailsViewModel? coachDetails = null;
 
             var user = await userManager.FindByIdAsync(userId);
 
             var coach = await GetCoachByIdAsync(id);
+
+            if (coach == null)
+            {
+                throw new ArgumentException(CoachNotFoundErrorMessage);
+            }
 
             coachDetails = new CoachDetailsViewModel
             {
@@ -90,7 +95,7 @@ namespace TennisAcademyApp.Services.Core
 
             if (user == null)
             {
-                throw new ArgumentException(UserNotFoundErrorMessage);
+                throw new ArgumentException(UserCannotBeNull);
             }
 
             var coach = new Coach
@@ -116,7 +121,7 @@ namespace TennisAcademyApp.Services.Core
 
             if (user == null)
             {
-                throw new ArgumentException(UserNotFoundErrorMessage);
+                throw new ArgumentException(UserCannotBeNull);
             }
             var coach = await GetCoachByIdAsync(id);
 
@@ -141,7 +146,7 @@ namespace TennisAcademyApp.Services.Core
 
             if (user == null) 
             {
-                throw new ArgumentException(UserNotFoundErrorMessage);
+                throw new ArgumentException(UserCannotBeNull);
             }
             if (coach == null)
             {
@@ -165,7 +170,7 @@ namespace TennisAcademyApp.Services.Core
             var user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                throw new ArgumentException(UserNotFoundErrorMessage);
+                throw new ArgumentException(UserCannotBeNull);
             }
 
             var coach = await GetCoachByIdAsync(id);
@@ -190,7 +195,7 @@ namespace TennisAcademyApp.Services.Core
 
             if (userId == null)
             {
-                throw new ArgumentException(UserNotFoundErrorMessage);
+                throw new ArgumentException(UserCannotBeNull);
             }
             if (coach == null)
             {
@@ -219,8 +224,9 @@ namespace TennisAcademyApp.Services.Core
             }
             else
             {
-                throw new ArgumentException(CoachNotFoundErrorMessage);
+                throw new ArgumentException(CoachCannotBeNullErrorMessage);
             }
+
         }
     }
 }

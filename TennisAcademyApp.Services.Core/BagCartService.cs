@@ -4,6 +4,7 @@ using TennisAcademyApp.Data;
 using TennisAcademyApp.Data.Models;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Cart;
+using static TennisAcademyApp.GCommon.Validations.ErrorMessages.BagCart;
 
 namespace TennisAcademyApp.Services.Core
 {
@@ -46,7 +47,7 @@ namespace TennisAcademyApp.Services.Core
             var bag = await dbContext.Bags.FindAsync(bagId);
             if (bag == null || quantity <= 0 || quantity > bag.Quantity)
             {
-                throw new InvalidOperationException("Invalid quantity or bag not found.");
+                throw new InvalidOperationException(InvalidQuantityErrorMessage);
             }
 
             var existingItem = await dbContext.BagCart
@@ -85,7 +86,7 @@ namespace TennisAcademyApp.Services.Core
 
             if (cartItem == null)
             {
-                return false;
+                throw new InvalidOperationException(BagNotFoundInCartErrorMessage);
             }
 
             dbContext.BagCart.Remove(cartItem);

@@ -4,6 +4,7 @@ using TennisAcademyApp.Data;
 using TennisAcademyApp.Data.Models;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Reservation;
+using static TennisAcademyApp.GCommon.Validations.ErrorMessages.User;
 using static TennisAcademyApp.GCommon.Validations.ValidationConstants.Reservation;
 using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Reservation;
 
@@ -48,7 +49,7 @@ namespace TennisAcademyApp.Services.Core
             var user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return false;
+                throw new ArgumentException(UserCannotBeNull);
             }
 
             var surface = await dbContext.Surfaces.FindAsync(model.SurfaceId);
@@ -138,8 +139,12 @@ namespace TennisAcademyApp.Services.Core
         {
             ReservationDetailsViewModel details = null!;
             var user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                throw new ArgumentException(UserCannotBeNull);
+            }
 
-            if (id.HasValue && user != null)
+            if (id.HasValue)
             {
                 var reservationDetails = await dbContext.Reservations
                     .AsNoTracking()
@@ -148,10 +153,6 @@ namespace TennisAcademyApp.Services.Core
                     .Include(r => r.TrainingType)
                     .FirstOrDefaultAsync(r => r.Id == id && r.PlayerId == userId);
 
-                if (reservationDetails!.PlayerId != userId)
-                {
-                    throw new ArgumentException(YouCannotSeeOthersReservationsErrorMessage);
-                }
 
                 if (reservationDetails == null)
                 {
@@ -179,7 +180,12 @@ namespace TennisAcademyApp.Services.Core
 
             var user = await userManager.FindByIdAsync(userId);
 
-            if (id.HasValue && user != null)
+            if (user == null)
+            {
+                throw new ArgumentException(UserCannotBeNull);
+            }
+
+            if (id.HasValue)
             {
                 var reservation = await dbContext.Reservations
                     .AsNoTracking()
@@ -213,7 +219,7 @@ namespace TennisAcademyApp.Services.Core
             var reservation = await dbContext.Reservations.FindAsync(model.Id);
             if (user == null)
             {
-                return false;
+                throw new ArgumentException(UserCannotBeNull);
             }
             if (reservation == null)
             {

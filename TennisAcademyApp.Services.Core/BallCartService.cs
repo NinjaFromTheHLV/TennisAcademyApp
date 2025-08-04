@@ -89,7 +89,7 @@ namespace TennisAcademyApp.Services.Core
 
             if (cartItem == null)
             {
-                return false;
+                throw new InvalidOperationException(BallNotFoundInCartErrorMessage);
             }
 
             dbContext.BallCart.Remove(cartItem);

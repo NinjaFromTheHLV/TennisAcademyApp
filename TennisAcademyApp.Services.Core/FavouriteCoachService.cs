@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.Design;
 using TennisAcademyApp.Data;
 using TennisAcademyApp.Data.Models;
 using TennisAcademyApp.Services.Core.Contracts;
@@ -59,12 +60,16 @@ namespace TennisAcademyApp.Services.Core
                         UserId = userId,
                         CoachId = id,
                     };
+                }
+                else
+                {
+                    throw new ArgumentException(CoachAlreadyAddedToFavouritesErrorMessage);
+                }
                     await dbContext.UserFavourites.AddAsync(favouriteCoach);
                     await dbContext.SaveChangesAsync();
 
                     result = true;
                 }
-            }
             return result;
         }
 
