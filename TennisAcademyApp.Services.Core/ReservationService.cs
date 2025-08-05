@@ -58,7 +58,7 @@ namespace TennisAcademyApp.Services.Core
             var coach = await dbContext.Coaches.FindAsync(model.CoachId);
 
             await IsCoachAvailableAtTheTimeAsync(model);
-            await IsDateValidAsync(model);
+            await DateValidationAsync(model);
 
             if (model.Duration != 60 && model.Duration != 120)
             {
@@ -99,9 +99,9 @@ namespace TennisAcademyApp.Services.Core
             return result;
         }
 
-        public async Task<ReservationDetailsViewModel> GetUserReservationDetailsAsync(string userId, int? id)
+        public async Task<ReservationDetailsViewModel?> GetUserReservationDetailsAsync(string userId, int? id)
         {
-            ReservationDetailsViewModel details = null!;
+            ReservationDetailsViewModel? details = null;
             var user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
@@ -138,9 +138,9 @@ namespace TennisAcademyApp.Services.Core
             return details;
         }
 
-        public async Task<ReservationDeleteViewModel> GetUserReservationForDeletingAsync(string userId, int? id)
+        public async Task<ReservationDeleteViewModel?> GetUserReservationForDeletingAsync(string userId, int? id)
         {
-            ReservationDeleteViewModel reservationToDelete = null!;
+            ReservationDeleteViewModel? reservationToDelete = null;
 
             var user = await userManager.FindByIdAsync(userId);
 
@@ -223,7 +223,7 @@ namespace TennisAcademyApp.Services.Core
 
             return pastReservations;
         }
-        public async Task IsDateValidAsync(ReservationCreateInputModel model)
+        public async Task DateValidationAsync(ReservationCreateInputModel model)
         {
             if (model.Date < DateTime.Now)
             {
