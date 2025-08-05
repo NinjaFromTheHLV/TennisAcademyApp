@@ -18,11 +18,10 @@ namespace TennisAcademyApp.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Index(string? searchQuery = null, int page = 1)
+        public async Task<IActionResult> Index(string? searchQuery = null, int page = 1, int pageSize = 3)
         {
             try
             {
-                int pageSize = 3;
                 var model = await coachService.GetCoachesByPageAsync(searchQuery, page, pageSize);
 
                 return View(model);
