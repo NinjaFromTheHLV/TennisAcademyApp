@@ -6,6 +6,7 @@ namespace TennisAcademyApp.Services.Core.Contracts
 {
     public interface ICoachService
     {
+        Task<PaginatedCoachesViewModel> GetCoachesByPageAsync(string? searchQuery, int page, int pageSize);
         Task<IEnumerable<AllCoachesViewModel>?> GetAllCoachesAsync();
         Task<IEnumerable<CoachDropDownModel>> GetGoachesForDropDownAsync();
         Task<Coach> GetCoachByIdAsync(int? id);

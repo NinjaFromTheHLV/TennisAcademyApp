@@ -21,6 +21,41 @@ namespace TennisAcademyApp.Services.Core
             this.dbContext = dbContext;
             this.userManager = userManager;
         }
+        public async Task<PaginatedCoachesViewModel> GetCoachesByPageAsync(string? searchQuery, int page, int pageSize)
+        {
+            var query = this.dbContext.Coaches.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                query = query.Where(c => c.Name.Contains(searchQuery));
+            }
+
+            var totalCoaches = await query.CountAsync();
+
+            var coaches = await query
+                .OrderBy(c => c.CoachId)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(c => new AllCoachesViewModel
+                {
+                    CoachId = c.CoachId,
+                    CoachName = c.Name,
+                    CoachAge = c.Age,
+                    Description = c.Description,
+                    ImageUrl = c.ImageUrl ?? NoImageUrl
+                })
+                .ToListAsync();
+
+            var totalPages = (int)Math.Ceiling(totalCoaches / (double)pageSize);
+
+            return new PaginatedCoachesViewModel
+            {
+                Coaches = coaches,
+                PageNumber = page,
+                TotalPages = totalPages,
+                SearchQuery = searchQuery
+            };
+        }
 
         public async Task<IEnumerable<AllCoachesViewModel>?> GetAllCoachesAsync()
         {
