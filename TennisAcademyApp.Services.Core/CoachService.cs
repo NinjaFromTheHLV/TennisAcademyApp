@@ -23,7 +23,7 @@ namespace TennisAcademyApp.Services.Core
         }
         public async Task<PaginatedCoachesViewModel> GetCoachesByPageAsync(string? searchQuery, int page, int pageSize)
         {
-            var query = this.dbContext.Coaches.AsQueryable();
+            var query = dbContext.Coaches.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchQuery))
             {
@@ -48,13 +48,15 @@ namespace TennisAcademyApp.Services.Core
 
             var totalPages = (int)Math.Ceiling(totalCoaches / (double)pageSize);
 
-            return new PaginatedCoachesViewModel
+            var model = new PaginatedCoachesViewModel
             {
                 Coaches = coaches,
                 PageNumber = page,
                 TotalPages = totalPages,
                 SearchQuery = searchQuery
             };
+
+            return model;
         }
 
         public async Task<IEnumerable<AllCoachesViewModel>?> GetAllCoachesAsync()
