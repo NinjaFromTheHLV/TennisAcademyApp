@@ -7,6 +7,7 @@ using TennisAcademyApp.ViewModels.Reservation;
 using static TennisAcademyApp.GCommon.Validations.ErrorMessages.User;
 using static TennisAcademyApp.GCommon.Validations.ValidationConstants.Reservation;
 using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Reservation;
+using System.Runtime.CompilerServices;
 
 namespace TennisAcademyApp.Services.Core
 {
@@ -56,49 +57,12 @@ namespace TennisAcademyApp.Services.Core
             var trainingType = await dbContext.Trainings.FindAsync(model.TrainingTypeId);
             var coach = await dbContext.Coaches.FindAsync(model.CoachId);
 
-            if (surface == null || trainingType == null || coach == null)
-            {
-                return false;
-            }
+            await IsCoachAvailableAtTheTimeAsync(model);
+            await IsDateValidAsync(model);
 
-            var endDate = model.Date.AddMinutes(model.Duration);
-
-            bool existingReservation = await dbContext.Reservations
-                .AsNoTracking()
-                .AnyAsync(r =>
-                    r.CoachId == model.CoachId &&
-                    r.Date < endDate &&
-                    r.Date.AddMinutes(r.Duration) > model.Date);
-
-            if (existingReservation)
-            {
-                throw new ArgumentException(CoachNotAvailableErrorMessage);
-            }
-
-            if (model.Date < DateTime.Now)
-            {
-                throw new ArgumentException(PastDateErrorMessage);
-            }
-            if (model.Date < DateTime.Now.AddHours(2))
-            {
-                throw new ArgumentException(TwoHoursErrorMessage);
-            }
-            if (model.Date > DateTime.Now.AddDays(14))
-            {
-                throw new ArgumentException(FutureDateErrorMessage);
-            }
-            if (model.Date.DayOfWeek == DayOfWeek.Sunday)
-            {
-                throw new ArgumentException(SundayErrorMessage);
-            }
             if (model.Duration != 60 && model.Duration != 120)
             {
                 throw new ArgumentException(DurationErrorMessage);
-            }
-            if (model.Date.TimeOfDay < TimeSpan.FromHours(8) 
-               || model.Date.AddMinutes(model.Duration).TimeOfDay > TimeSpan.FromHours(20))
-            {
-                throw new ArgumentException(SelectedTimeErrorMessage);
             }
 
             var newReservation = new Reservation()
@@ -258,6 +222,47 @@ namespace TennisAcademyApp.Services.Core
                 .ToListAsync();
 
             return pastReservations;
+        }
+        public async Task IsDateValidAsync(ReservationCreateInputModel model)
+        {
+            if (model.Date < DateTime.Now)
+            {
+                throw new ArgumentException(PastDateErrorMessage);
+            }
+            if (model.Date < DateTime.Now.AddHours(2))
+            {
+                throw new ArgumentException(TwoHoursErrorMessage);
+            }
+            if (model.Date > DateTime.Now.AddDays(14))
+            {
+                throw new ArgumentException(FutureDateErrorMessage);
+            }
+            if (model.Date.DayOfWeek == DayOfWeek.Sunday)
+            {
+                throw new ArgumentException(SundayErrorMessage);
+            }
+            if (model.Date.TimeOfDay < TimeSpan.FromHours(8)
+               || model.Date.AddMinutes(model.Duration).TimeOfDay > TimeSpan.FromHours(20))
+            {
+                throw new ArgumentException(SelectedTimeErrorMessage);
+            }
+            await Task.CompletedTask;
+        }
+        public async Task IsCoachAvailableAtTheTimeAsync(ReservationCreateInputModel model)
+        {
+            var endDate = model.Date.AddMinutes(model.Duration);
+
+            bool existingReservation = await dbContext.Reservations
+                .AsNoTracking()
+                .AnyAsync(r =>
+                    r.CoachId == model.CoachId &&
+                    r.Date < endDate &&
+                    r.Date.AddMinutes(r.Duration) > model.Date);
+
+            if (existingReservation)
+            {
+                throw new ArgumentException(CoachNotAvailableErrorMessage);
+            }
         }
     }
 }

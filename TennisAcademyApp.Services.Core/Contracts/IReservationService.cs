@@ -1,4 +1,5 @@
-﻿using TennisAcademyApp.ViewModels.Reservation;
+﻿using System.Runtime.CompilerServices;
+using TennisAcademyApp.ViewModels.Reservation;
 
 namespace TennisAcademyApp.Services.Core.Contracts
 {
@@ -11,5 +12,7 @@ namespace TennisAcademyApp.Services.Core.Contracts
         Task<ReservationDeleteViewModel> GetUserReservationForDeletingAsync(string userId, int? id);
         Task<bool> DeleteReservationAsync(string userId, ReservationDeleteViewModel model);
         Task<IEnumerable<ReservationHistoryViewModel>?> GetUserReservationHistoryAsync(string userId);
+        Task IsCoachAvailableAtTheTimeAsync(ReservationCreateInputModel model);
+        Task IsDateValidAsync(ReservationCreateInputModel model);
     }
 }
