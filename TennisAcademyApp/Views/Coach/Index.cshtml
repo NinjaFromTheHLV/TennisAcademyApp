@@ -45,25 +45,15 @@
     {
         <div class="col">
             <div class="card h-100 shadow-sm">
-                @if (!string.IsNullOrEmpty(coach.ImageUrl))
-                {
-                    <img src="@Url.Content(coach.ImageUrl)"
-                         class="img-fluid"
-                         alt="@coach.CoachName"
-                         style="height: 380px; object-fit: cover; width: 100%;" />
-                }
-                else
-                {
-                    <img src="https://via.placeholder.com/600x250?text=No+Image"
-                         class="card-img-top mx-auto d-block"
-                         alt="No image" />
-                }
+                <img src="@Url.Content(coach.ImageUrl)"
+                     class="img-fluid"
+                     alt="@coach.CoachName"
+                     style="height: 380px; object-fit: cover; width: 100%;" />
+
                 <div class="card-body">
                     <h5 class="card-title">@coach.CoachName</h5>
                     <p class="card-text">
                         <strong>Age:</strong> @coach.CoachAge<br/>
-                        <strong>Description:</strong><br />
-                        @coach.Description
                     </p>
                 </div>
                 <div class="card-footer text-end">

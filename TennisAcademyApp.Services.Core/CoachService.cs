@@ -41,7 +41,6 @@ namespace TennisAcademyApp.Services.Core
                     CoachId = c.CoachId,
                     CoachName = c.Name,
                     CoachAge = c.Age,
-                    Description = c.Description,
                     ImageUrl = c.ImageUrl ?? NoImageUrl
                 })
                 .ToListAsync();
@@ -69,7 +68,6 @@ namespace TennisAcademyApp.Services.Core
                     CoachName = c.Name,
                     ImageUrl = c.ImageUrl,
                     CoachAge = c.Age,
-                    Description = c.Description,
                 })
                 .ToListAsync();
 
