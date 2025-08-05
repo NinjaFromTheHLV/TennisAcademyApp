@@ -18,13 +18,14 @@ namespace TennisAcademyApp.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? searchQuery = null, int page = 1)
         {
             try
             {
-                var allCoaches = await this.coachService.GetAllCoachesAsync();
+                int pageSize = 3;
+                var model = await coachService.GetCoachesByPageAsync(searchQuery, page, pageSize);
 
-                return View(allCoaches);
+                return View(model);
             }
             catch (Exception ex)
             {
@@ -47,9 +48,7 @@ namespace TennisAcademyApp.Controllers
             }
             catch (ArgumentException)
             {
-                TempData["ErrorMessage"] = CoachNotFoundErrorMessage;
-
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
         }
         [HttpGet]
@@ -100,8 +99,7 @@ namespace TennisAcademyApp.Controllers
             }
             catch (ArgumentException)
             {
-                TempData["ErrorMessage"] = CoachNotFoundErrorMessage;
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
         }
         [HttpPost]
@@ -144,8 +142,7 @@ namespace TennisAcademyApp.Controllers
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = CoachNotFoundErrorMessage;
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
         }
         [HttpPost]

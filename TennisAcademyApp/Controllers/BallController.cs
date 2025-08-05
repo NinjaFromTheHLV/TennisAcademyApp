@@ -87,15 +87,9 @@ namespace TennisAcademyApp.Controllers
 
                 return View(ball);
             }
-            catch (ArgumentException)
-            {
-                TempData["ErrorMessage"] = BallNotFoundErrorMessage;
-                return RedirectToAction(nameof(Index));
-            }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = UnexpectedError;
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
         }
 
@@ -138,15 +132,9 @@ namespace TennisAcademyApp.Controllers
 
                 return View(ball);
             }
-            catch (ArgumentException)
-            {
-                TempData["ErrorMessage"] = BallNotFoundErrorMessage;
-                return RedirectToAction(nameof(Index));
-            }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = UnexpectedError;
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
         }
 

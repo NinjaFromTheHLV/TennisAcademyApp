@@ -8,14 +8,7 @@
 <div class="coach-card mb-5 mt-4">
     <div class="row g-0">
         <div class="col-md-5">
-            @if (!string.IsNullOrEmpty(Model.ImageUrl))
-            {
-                <img src="@Model.ImageUrl" class="img-fluid h-100" alt="@Model.CoachName" />
-            }
-            else
-            {
-                <img src="https://via.placeholder.com/300x400?text=No+Image" class="img-fluid h-100" alt="No image" />
-            }
+            <img src="@Url.Content(Model.ImageUrl)" alt="Coach image" class="img-fluid" />
         </div>
         <div class="col-md-7">
             <div class="card-body d-flex flex-column justify-content-between h-100">

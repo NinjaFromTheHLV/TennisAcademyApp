@@ -1,6 +1,8 @@
-using System.Diagnostics;
+using AspNetCoreGeneratedDocument;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using TennisAcademyApp.Models;
 
 namespace TennisAcademyApp.Controllers
@@ -20,10 +22,15 @@ namespace TennisAcademyApp.Controllers
             return View();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        [Route("Home/Error/{statusCode}")]
+        public IActionResult Error(int? statusCode)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            if (statusCode == 404)
+            {
+                return View("Error404");
+            }
+
+            return View("Error500");
         }
     }
 }

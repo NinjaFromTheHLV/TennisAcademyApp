@@ -1,5 +1,5 @@
 ﻿@using TennisAcademyApp.ViewModels.Coach;
-@model IEnumerable<AllCoachesViewModel>
+@model PaginatedCoachesViewModel
 
 @{
     ViewData["Title"] = "Coaches";
@@ -32,8 +32,16 @@
     }
 </div>
 
+<form asp-action="Index" method="get" class="mb-4">
+    <div class="input-group">
+        <input type="text" name="searchQuery" class="form-control" placeholder="Search for a coach by name..." value="@Model.SearchQuery" />
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a asp-action="Index" class="btn btn-secondary">Clear</a>
+    </div>
+</form>
+
 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-    @foreach (var coach in Model)
+    @foreach (var coach in Model.Coaches)
     {
         <div class="col">
             <div class="card h-100 shadow-sm">
@@ -65,3 +73,21 @@
         </div>
     }
 </div>
+@if (Model.TotalPages > 1)
+{
+    <nav class="d-flex justify-content-center mt-4">
+        <ul class="pagination">
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@i"
+                       asp-route-search="@Model.SearchQuery">
+                        @i
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

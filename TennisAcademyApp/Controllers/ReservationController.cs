@@ -51,7 +51,6 @@ namespace TennisAcademyApp.Controllers
         {
             try
             {
-                string userId = GetUserId()!;
 
                 var model = new ReservationCreateInputModel
                 {
@@ -106,8 +105,7 @@ namespace TennisAcademyApp.Controllers
             }
             catch (ArgumentException)
             {
-                TempData["ErrorMessage"] = ReservationNotFoundErrorMessage;
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
         }
         [HttpGet]
@@ -123,8 +121,7 @@ namespace TennisAcademyApp.Controllers
             }
             catch (ArgumentException)
             {
-                TempData["ErrorMessage"] = ReservationNotFoundErrorMessage;
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
         }
         [HttpPost]
