@@ -41,9 +41,17 @@ namespace TennisAcademyApp.Services.Core
                     CoachId = c.CoachId,
                     CoachName = c.Name,
                     CoachAge = c.Age,
-                    ImageUrl = c.ImageUrl ?? NoImageUrl
+                    ImageUrl = c.ImageUrl
                 })
                 .ToListAsync();
+
+            foreach(var coach in coaches)
+            {
+                if (coach.ImageUrl.IsNullOrEmpty())
+                {
+                    coach.ImageUrl = NoImageUrl;
+                }
+            }
 
             var totalPages = (int)Math.Ceiling(totalCoaches / (double)pageSize);
 
@@ -56,30 +64,6 @@ namespace TennisAcademyApp.Services.Core
             };
 
             return model;
-        }
-
-        public async Task<IEnumerable<AllCoachesViewModel>?> GetAllCoachesAsync()
-        {
-            var allCoaches = await dbContext.Coaches
-                .AsNoTracking()
-                .Select(c => new AllCoachesViewModel
-                {
-                    CoachId = c.CoachId,
-                    CoachName = c.Name,
-                    ImageUrl = c.ImageUrl,
-                    CoachAge = c.Age,
-                })
-                .ToListAsync();
-
-            foreach (var coach in allCoaches)
-            {
-                if (coach.ImageUrl.IsNullOrEmpty())
-                {
-                    coach.ImageUrl = NoImageUrl;
-                }
-            }
-
-            return allCoaches;
         }
 
         public async Task<IEnumerable<CoachDropDownModel>> GetGoachesForDropDownAsync()
