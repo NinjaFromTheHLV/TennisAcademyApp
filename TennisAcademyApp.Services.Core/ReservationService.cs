@@ -57,7 +57,7 @@ namespace TennisAcademyApp.Services.Core
             var trainingType = await dbContext.Trainings.FindAsync(model.TrainingTypeId);
             var coach = await dbContext.Coaches.FindAsync(model.CoachId);
 
-            await IsCoachAvailableAtTheTimeAsync(model);
+            bool IsAvailable = await IsCoachAvailableAtTheTimeAsync(model);
             await DateValidationAsync(model);
 
             if (model.Duration != 60 && model.Duration != 120)
@@ -248,8 +248,9 @@ namespace TennisAcademyApp.Services.Core
             }
             await Task.CompletedTask;
         }
-        public async Task IsCoachAvailableAtTheTimeAsync(ReservationCreateInputModel model)
+        public async Task<bool> IsCoachAvailableAtTheTimeAsync(ReservationCreateInputModel model)
         {
+            bool result = false;
             var endDate = model.Date.AddMinutes(model.Duration);
 
             bool existingReservation = await dbContext.Reservations
@@ -263,6 +264,11 @@ namespace TennisAcademyApp.Services.Core
             {
                 throw new ArgumentException(CoachNotAvailableErrorMessage);
             }
+            else
+            {
+                result = true;
+            }
+            return result;
         }
     }
 }
