@@ -41,17 +41,18 @@ namespace TennisAcademyApp.Services.Core
             return bagsInCart;
         }
 
-        public async Task<bool> AddBagToCartAsync(string userId, int bagId, int quantity)
+        public async Task<bool> AddBagToCartAsync(string userId, int id, int quantity)
         {
             bool result = false;
-            var bag = await dbContext.Bags.FindAsync(bagId);
+            var user = await userManager.FindByIdAsync(userId);
+            var bag = await dbContext.Bags.FindAsync(id);
             if (bag == null || quantity <= 0 || quantity > bag.Quantity)
             {
                 throw new InvalidOperationException(InvalidQuantityErrorMessage);
             }
 
             var existingItem = await dbContext.BagCart
-                .FirstOrDefaultAsync(bc => bc.UserId == userId && bc.BagId == bagId);
+                .FirstOrDefaultAsync(bc => bc.UserId == userId && bc.BagId == id);
 
             if (existingItem != null)
             {
@@ -64,7 +65,7 @@ namespace TennisAcademyApp.Services.Core
                 var cartItem = new BagCart
                 {
                     UserId = userId,
-                    BagId = bagId,
+                    BagId = id,
                     Quantity = quantity
                 };
                 bag.Quantity -= quantity;

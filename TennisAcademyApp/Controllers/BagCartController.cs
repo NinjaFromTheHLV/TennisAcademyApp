@@ -30,12 +30,12 @@ namespace TennisAcademyApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddBagToCart(int bagId, int quantity)
+        public async Task<IActionResult> AddBagToCart(int id, int quantity)
         {
             try
             {
                 string userId = GetUserId()!;
-                bool isAdded = await this.cartService.AddBagToCartAsync(userId, bagId, quantity);
+                bool isAdded = await this.cartService.AddBagToCartAsync(userId, id, quantity);
 
                 if (!isAdded)
                 {

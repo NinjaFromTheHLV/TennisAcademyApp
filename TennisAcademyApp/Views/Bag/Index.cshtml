@@ -66,8 +66,8 @@
                 <div class="card-footer bg-transparent border-0">
                     @if (bag.Quantity > 0)
                     {
-                        <form asp-controller="BallCart" asp-action="AddBallToCart" method="post" class="d-flex flex-column align-items-stretch gap-2">
-                            <input type="hidden" name="ballId" value="@bag.Id" />
+                        <form asp-controller="BagCart" asp-action="AddBagToCart" method="post" class="d-flex flex-column align-items-stretch gap-2">
+                            <input type="hidden" name="id" value="@bag.Id" />
 
                             <div class="input-group">
                                 <input type="number" name="quantity" class="form-control" value="1" min="1" max="@bag.Quantity" />
