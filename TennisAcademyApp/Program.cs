@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
 using TennisAcademyApp.Data;
 using TennisAcademyApp.Services.Core;
 using TennisAcademyApp.Services.Core.Contracts;
+using static TennisAcademyApp.Data.Seeding.RoleSeeding;
 
 namespace TennisAcademyApp
 {
@@ -27,9 +28,15 @@ namespace TennisAcademyApp
                 options.Password.RequireUppercase = false;
                 options.Password.RequireDigit = false;
             }
-                )
-                .AddEntityFrameworkStores<TennisAcademyDbContext>();
-            builder.Services.AddControllersWithViews();
+            )
+            .AddRoles<IdentityRole>()
+            .AddEntityFrameworkStores<TennisAcademyDbContext>()
+            .AddDefaultTokenProviders();
+
+            builder.Services.AddControllersWithViews(cfg =>
+            {
+                cfg.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+            });
 
             builder.Services.AddScoped<ICoachService, CoachService>();
             builder.Services.AddScoped<IReservationService, ReservationService>();
@@ -44,6 +51,13 @@ namespace TennisAcademyApp
             builder.Services.AddScoped<IBagCartService, BagCartService>();
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+
+                SeedIdentityAsync(services).GetAwaiter().GetResult();
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
