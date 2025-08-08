@@ -5,6 +5,7 @@ using TennisAcademyApp.Data;
 using TennisAcademyApp.Data.Models;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Coach;
+using static TennisAcademyApp.GCommon.Validations.ValidationConstants.Coach;
 using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Coach;
 
 namespace TennisAcademyApp.Services.Core
@@ -29,8 +30,8 @@ namespace TennisAcademyApp.Services.Core
                     CoachId = uc.CoachId,
                     CoachName = uc.Coach.Name,
                     CoachAge = uc.Coach.Age,
-                    ImageUrl = uc.Coach.ImageUrl,
-                    Description = uc.Coach.Description,
+                    ImageUrl = uc.Coach.ImageUrl ?? NoImageUrl,
+                    Description = uc.Coach.Description
                 })
                 .ToListAsync();
 
