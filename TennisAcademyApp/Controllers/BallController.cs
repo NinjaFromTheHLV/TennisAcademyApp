@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TennisAcademyApp.Services.Core.Contracts;
-using TennisAcademyApp.ViewModels.Ball;
-using static TennisAcademyApp.GCommon.Validations.SuccessfulMessages.Ball;
-using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Ball;
 using static TennisAcademyApp.GCommon.Validations.ErrorMessages;
 
 namespace TennisAcademyApp.Controllers
