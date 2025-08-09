@@ -1,0 +1,68 @@
+﻿@using TennisAcademyApp.ViewModels.Racket
+@model IEnumerable<RacketIndexViewModel>
+
+@{
+    ViewData["Title"] = "Rackets Shop";
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show w-100 rounded-0 text-center mb-0" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show w-100 rounded-0 text-center mb-0" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<h1 class="text-center display-5 fw-semibold my-4">Tennis Rackets Shop</h1>
+
+<div class="d-flex justify-content-center my-4 gap-4">
+    <a asp-controller="RacketManagement" asp-action="Index" class="btn btn-outline-primary d-flex align-items-center gap-2 px-4 py-2">
+        <i class="bi bi-activity"></i> Rackets
+    </a>
+    <a asp-controller="BallManagement" asp-action="Index" class="btn btn-outline-primary d-flex align-items-center gap-2 px-4 py-2">
+        <i class="bi bi-record-circle"></i> Balls
+    </a>
+    <a asp-controller="BagManagement" asp-action="Index" class="btn btn-outline-primary d-flex align-items-center gap-2 px-4 py-2">
+        <i class="bi bi-backpack2"></i> Bags
+    </a>
+</div>
+
+<div class="text-end mb-4">
+    <a asp-action="Create" class="btn btn-success px-4 py-2">
+        <i class="bi bi-plus-circle"></i> Add a Racket
+    </a>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    @foreach (var racket in Model)
+    {
+        <div class="col">
+            <div class="card h-100 shadow rounded-4 d-flex flex-column">
+                <img src="@racket.ImageUrl" class="card-img-top object-fit-cover rounded-top-4" alt="Racket Image" style="height: 330px;" />
+
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">@racket.Brand - @racket.Model</h5>
+                    <p class="card-text text-muted mb-1">Price: <strong>@racket.Price.ToString("C")</strong></p>
+                    <p class="card-text small">In stock: @racket.Quantity</p>
+
+                    <div class="row mt-auto">
+                        <div class="col-6 pe-1">
+                            <a asp-action="Edit" asp-route-id="@racket.Id" class="btn btn-outline-warning w-100">Edit</a>
+                        </div>
+                        <div class="col-6 ps-1">
+                            <a asp-action="Delete" asp-route-id="@racket.Id" class="btn btn-outline-danger w-100">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
