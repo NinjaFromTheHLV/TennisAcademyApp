@@ -1,0 +1,71 @@
+﻿@using TennisAcademyApp.ViewModels.Coach;
+@model TennisAcademyApp.ViewModels.Coach.AddCoachInputModel;
+
+@{
+    ViewData["Title"] = "Add New Coach";
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show w-100 rounded-0 text-center mb-0" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="container-fluid d-flex justify-content-center align-items-center min-vh-100">
+    <div class="col-12 col-md-8 col-lg-6">
+        <div class="form-wrapper">
+            <h2 class="mb-4 text-center">Add a new coach</h2>
+
+            <form asp-action="Add" method="post" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Age" class="form-label"></label>
+                    <input asp-for="Age" class="form-control" />
+                    <span asp-validation-for="Age" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Nationality" class="form-label"></label>
+                    <input asp-for="Nationality" class="form-control" />
+                    <span asp-validation-for="Nationality" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label"></label>
+                    <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ImageUrl" class="form-label"></label>
+                    <input asp-for="ImageUrl" class="form-control" />
+                    <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="submit" class="btn btn-success px-4 py-2">
+                        <span style="font-weight: bold; font-size: 1.25rem; margin-right: 6px;">&#43;</span>
+                        Add a new coach
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
