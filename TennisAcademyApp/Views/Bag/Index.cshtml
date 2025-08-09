@@ -1,24 +1,9 @@
-﻿@using TennisAcademyApp.ViewModels.Bag
+﻿@using static TennisAcademyApp.GCommon.Validations.ValidationConstants
+@using TennisAcademyApp.ViewModels.Bag
 @model IEnumerable<BagIndexViewModel>
 
 @{
     ViewData["Title"] = "Bags Shop";
-}
-
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show w-100 rounded-0 text-center mb-0" role="alert">
-        @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger alert-dismissible fade show w-100 rounded-0 text-center mb-0" role="alert">
-        @TempData["ErrorMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
 }
 
 <h1 class="text-center display-5 fw-semibold my-4">Tennis Bags Shop</h1>
@@ -35,12 +20,6 @@
     </a>
 </div>
 
-<div class="text-end mb-4">
-    <a asp-controller="Bag" asp-action="Create" class="btn btn-success px-4 py-2">
-        <i class="bi bi-plus-circle"></i> Add a Bag
-    </a>
-</div>
-
 <div class="row row-cols-1 row-cols-md-3 g-4">
     @foreach (var bag in Model)
     {
@@ -52,15 +31,6 @@
                     <h5 class="card-title">@bag.Brand - @bag.Model</h5>
                     <p class="card-text text-muted mb-1">Price: <strong>@bag.Price.ToString("C")</strong></p>
                     <p class="card-text small">In stock: @bag.Quantity</p>
-
-                    <div class="row mt-auto">
-                        <div class="col-6 pe-1">
-                            <a asp-action="Edit" asp-route-id="@bag.Id" class="btn btn-outline-warning w-100">Edit</a>
-                        </div>
-                        <div class="col-6 ps-1">
-                            <a asp-action="Delete" asp-route-id="@bag.Id" class="btn btn-outline-danger w-100">Delete</a>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="card-footer bg-transparent border-0">
