@@ -5,7 +5,7 @@ using TennisAcademyApp.Data.Models;
 
 namespace TennisAcademyApp.Data.Configurations
 {
-    public class UserCoachConfiguration : IEntityTypeConfiguration<UserFavourite>
+    public class UserFavouriteConfiguration : IEntityTypeConfiguration<UserFavourite>
     {
         public void Configure(EntityTypeBuilder<UserFavourite> config)
         {
