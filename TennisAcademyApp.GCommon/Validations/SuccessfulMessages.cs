@@ -52,5 +52,11 @@
             public const string BagRemovedFromCartSuccessfully = "Bag removed from cart successfully.";
             public const string BagCheckoutSuccessful = "Bag checkout successful. Thank you for your purchase!";
         }
+        public static class UserManagement
+        {
+            public const string UserAssignedToRoleSuccessfully = "User assigned to role successfully.";
+            public const string UserRemovedFromRoleSuccessfully = "User removed from role successfully.";
+            public const string UserRemovedSuccessfully = "User removed successfully.";
+        }
     }
 }

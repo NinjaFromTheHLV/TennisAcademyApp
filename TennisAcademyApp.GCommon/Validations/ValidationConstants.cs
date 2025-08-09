@@ -2,8 +2,8 @@
 {
     public static class ValidationConstants
     {
-        public static string Admin = "Admin";
-        public static string User = "User";
+        public const string Admin = "Admin";
+        public const string User = "User";
         public static class Coach
         {
             public const int CoachAgeMinRequirement = 30;

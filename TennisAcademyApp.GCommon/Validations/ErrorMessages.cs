@@ -101,5 +101,11 @@
             public const string CannotLoadBagCartErrorMessage = "An error occurred while loading the bag cart, try again.";
             public const string BagNotFoundInCartErrorMessage = "Bag not found in cart.";
         }
+        public static class UserManagement
+        {
+            public const string UserAlreadyInRoleErrorMessage = "User is already in the specified role.";
+            public const string UserNotInRoleErrorMessage = "User is not in the specified role.";
+            public const string UserFailedToRemoveFromRoleErrorMessage = "An error occurred while removing the user from the role, try again.";
+        }
     }
 }
