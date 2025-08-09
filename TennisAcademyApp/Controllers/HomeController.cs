@@ -1,10 +1,5 @@
-using AspNetCoreGeneratedDocument;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using TennisAcademyApp.Models;
-
 namespace TennisAcademyApp.Controllers
 {
     public class HomeController : BaseController
