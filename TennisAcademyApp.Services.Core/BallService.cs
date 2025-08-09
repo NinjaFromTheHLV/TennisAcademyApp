@@ -63,6 +63,11 @@ namespace TennisAcademyApp.Services.Core
         {
             bool result = false;
             var user = await userManager.FindByIdAsync(userId);
+            bool IsAdmin = await userManager.IsInRoleAsync(user, "Admin");
+            if (!IsAdmin || userId == null)
+            {
+                throw new UnauthorizedAccessException("You do not have permission to add a ball.");
+            }
 
             var ball = new Ball
             {
@@ -84,6 +89,11 @@ namespace TennisAcademyApp.Services.Core
         {
             BallEditFormModel? model = null;
             var user = await userManager.FindByIdAsync(userId);
+            bool IsAdmin = await userManager.IsInRoleAsync(user, "Admin");
+            if (!IsAdmin || userId == null)
+            {
+                throw new UnauthorizedAccessException("You do not have permission to edit a ball.");
+            }
 
             var ball = await FindBallByIdAsync(id);
 
@@ -126,6 +136,11 @@ namespace TennisAcademyApp.Services.Core
         {
             BallDeleteViewModel? model = null;
             var user = await userManager.FindByIdAsync(userId);
+            bool IsAdmin = await userManager.IsInRoleAsync(user, "Admin");
+            if (!IsAdmin || userId == null)
+            {
+                throw new UnauthorizedAccessException("You do not have permission to delete a ball.");
+            }
 
             var ball = await FindBallByIdAsync(id);
 

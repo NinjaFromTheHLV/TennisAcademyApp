@@ -63,20 +63,23 @@ namespace TennisAcademyApp.Services.Core
         {
             bool result = false;
             var user = await userManager.FindByIdAsync(userId);
+            bool IsAdmin = await userManager.IsInRoleAsync(user, "Admin");
 
-            var bag = new Bag
+            if (IsAdmin || userId != null)
             {
-                Brand = model.Brand,
-                Model = model.Model,
-                Price = model.Price,
-                Quantity = model.Quantity,
-                ImageUrl = model.ImageUrl
-            };
+                var bag = new Bag
+                {
+                    Brand = model.Brand,
+                    Model = model.Model,
+                    Price = model.Price,
+                    Quantity = model.Quantity,
+                    ImageUrl = model.ImageUrl
+                };
+                await dbContext.AddAsync(bag);
+                await dbContext.SaveChangesAsync();
 
-            await dbContext.AddAsync(bag);
-            await dbContext.SaveChangesAsync();
-
-            result = true;
+                result = true;
+            }
             return result;
         }
 
@@ -84,6 +87,11 @@ namespace TennisAcademyApp.Services.Core
         {
             BagEditFormModel? model = null;
             var user = await userManager.FindByIdAsync(userId);
+            bool IsAdmin = await userManager.IsInRoleAsync(user, "Admin");
+            if (!IsAdmin || userId == null)
+            {
+                throw new ArgumentException("You do not have permission to edit bags.");
+            }
 
             var bag = await FindBagByIdAsync(id);
 
@@ -126,6 +134,11 @@ namespace TennisAcademyApp.Services.Core
         {
             BagDeleteViewModel? model = null;
             var user = await userManager.FindByIdAsync(userId);
+            bool IsAdmin = await userManager.IsInRoleAsync(user, "Admin");
+            if (!IsAdmin || userId == null)
+            {
+                throw new ArgumentException("You do not have permission to delete bags.");
+            }
 
             var bag = await FindBagByIdAsync(id);
 

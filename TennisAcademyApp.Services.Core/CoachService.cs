@@ -111,10 +111,10 @@ namespace TennisAcademyApp.Services.Core
         {
             bool result = false;
             var user = await userManager.FindByIdAsync(userId);
-
-            if (user == null)
+            bool isAdmin = await userManager.IsInRoleAsync(user, "Admin");
+            if (!isAdmin || userId == null)
             {
-                throw new ArgumentException(UserCannotBeNull);
+                throw new ArgumentException("You must be an admin to add a coach.");
             }
 
             var coach = new Coach
@@ -137,6 +137,11 @@ namespace TennisAcademyApp.Services.Core
         {
             CoachEditInputModel? model = null;
             var user = await userManager.FindByIdAsync(userId);
+            bool isAdmin = await userManager.IsInRoleAsync(user, "Admin");
+            if (!isAdmin || userId == null)
+            {
+                throw new ArgumentException("You must be an admin to edit a coach.");
+            }
 
             if (user == null)
             {
@@ -187,9 +192,10 @@ namespace TennisAcademyApp.Services.Core
         {
             DeleteCoachViewModel? model = null;
             var user = await userManager.FindByIdAsync(userId);
-            if (user == null)
+            bool isAdmin = await userManager.IsInRoleAsync(user, "Admin");
+            if (!isAdmin || userId == null)
             {
-                throw new ArgumentException(UserCannotBeNull);
+                throw new ArgumentException("You must be an admin to delete a coach.");
             }
 
             var coach = await GetCoachByIdAsync(id);

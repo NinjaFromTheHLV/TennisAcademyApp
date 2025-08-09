@@ -57,11 +57,11 @@ namespace TennisAcademyApp.Services.Core
         {
             bool result = false;
             var user = await userManager.FindByIdAsync(userId);
-            // check for admin role
-            //if (user == null || !await userManager.IsInRoleAsync(user, "Admin"))
-            //{
-            //    return false; // User not found or not an admin
-            //}
+            bool isAdmin = await userManager.IsInRoleAsync(user, "Admin");
+            if (user == null || !isAdmin)
+            {
+                throw new ArgumentException("You have to be an Admin to add rackets");
+            }
 
             var racket = new Racket
             {
@@ -82,8 +82,11 @@ namespace TennisAcademyApp.Services.Core
         {
             RacketEditFormModel? model = null;
             var user = await userManager.FindByIdAsync(userId);
-            // check for admin role
-            //if (user == null || !await userManager.IsInRoleAsync(user, "Admin"))
+            bool isAdmin = await userManager.IsInRoleAsync(user, "Admin");
+            if (user == null || !isAdmin)
+            {
+                throw new ArgumentException("You have to be an Admin to edit rackets");
+            }
             var racket = await FindRacketByIdAsync(id);
 
             model = new RacketEditFormModel
@@ -125,8 +128,11 @@ namespace TennisAcademyApp.Services.Core
         {
             RacketDeleteViewModel? model = null;
             var user = await userManager.FindByIdAsync(userId);
-            // check for admin role
-            //if (user == null || !await userManager.IsInRoleAsync(user, "Admin"))
+            bool isAdmin = await userManager.IsInRoleAsync(user, "Admin");
+            if (user == null || !isAdmin)
+            {
+                throw new ArgumentException("You have to be an Admin to delete rackets");
+            }
 
             var racket = await FindRacketByIdAsync(id);
 
@@ -144,7 +150,6 @@ namespace TennisAcademyApp.Services.Core
         {
             bool result = false;
             var user = await userManager.FindByIdAsync(userId);
-            // check for admin role
             var racket = await dbContext.Rackets.FindAsync(model.Id);
 
             if (racket == null)
