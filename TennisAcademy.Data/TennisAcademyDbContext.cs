@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using TennisAcademyApp.Data.Models;
 
 namespace TennisAcademyApp.Data
 {
-    public class TennisAcademyDbContext : IdentityDbContext
+    public class TennisAcademyDbContext : IdentityDbContext<IdentityUser>
     {
         public TennisAcademyDbContext(DbContextOptions<TennisAcademyDbContext> options)
             : base(options)
