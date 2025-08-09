@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using static TennisAcademyApp.GCommon.Validations.ValidationConstants;
 
@@ -31,9 +32,10 @@ namespace TennisAcademyApp.Data.Seeding
         private static async Task SeedAdminAsync(IServiceProvider serviceProvider)
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+            var adminConfiguration = serviceProvider.GetRequiredService<IConfiguration>();
 
-            string adminUserEmail = "admin@abv.bg";
-            string adminUserPassword = "admin123!";
+            string adminUserEmail = adminConfiguration["AdminSettings:Username"];
+            string adminUserPassword = adminConfiguration["AdminSettings:Password"];
 
             var adminUser = await userManager.FindByEmailAsync(adminUserEmail);
             if (adminUser == null)
