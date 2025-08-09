@@ -23,8 +23,7 @@ namespace TennisAcademyApp.Data.Seeding
                     var result = await roleManager.CreateAsync(new IdentityRole(role));
                     if (!result.Succeeded)
                     {
-                        throw new Exception($"Failed to create role {role}: " +
-                            string.Join(", ", result.Errors.Select(e => e.Description)));
+                        throw new Exception($"Failed to create role {role}");
                     }
                 }
             }
@@ -49,8 +48,7 @@ namespace TennisAcademyApp.Data.Seeding
                 var result = await userManager.CreateAsync(adminUser, adminUserPassword);
                 if (!result.Succeeded)
                 {
-                    throw new Exception($"Failed to create user {adminUserEmail}: " +
-                        string.Join(", ", result.Errors.Select(e => e.Description)));
+                    throw new Exception($"Failed to create user {adminUserEmail}");
                 }
             }
 
@@ -59,8 +57,7 @@ namespace TennisAcademyApp.Data.Seeding
                 var result = await userManager.AddToRoleAsync(adminUser, Admin);
                 if (!result.Succeeded)
                 {
-                    throw new Exception($"Failed to add {adminUserEmail} to Admin role: " +
-                        string.Join(", ", result.Errors.Select(e => e.Description)));
+                    throw new Exception($"Failed to add {adminUserEmail} to Admin role");
                 }
             }
         }
