@@ -40,7 +40,7 @@ namespace TennisAcademyApp.Services.Core
                     Id = u.Id,
                     Email = u.Email,
                     Roles = await userManager.GetRolesAsync(u),
-                    RolesDropDown = roles
+                    AllExistingRoles = roles
                 });
             }
 
