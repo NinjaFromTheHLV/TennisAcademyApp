@@ -2,46 +2,46 @@
     ViewData["Title"] = "Home";
 }
 
-<style>
-    .hero {
-        position: relative;
-        min-height: 100vh;
-        background: linear-gradient( rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6) ), url('https://media.istockphoto.com/id/181100251/photo/tennis-racket-and-ball-on-dark-background.jpg?s=612x612&w=0&k=20&c=6OV76oya4MGVZiUQ2gBZC77Ix9r49Qt6pVOObgbMCrQ=') no-repeat center center;
-        background-size: cover;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: white;
-    }
-
-    .hero-container {
-        position: relative;
-        z-index: 1;
-        max-width: 900px;
-        width: 100%;
-        padding: 2rem;
-        text-align: center;
-        text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
-    }
-    .hero-container h1 {
-        font-weight: 700;
-        font-size: 3.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .hero-container p {
-        font-size: 1.25rem;
-        margin-bottom: 2rem;
-    }
-
-</style>
-
 <div class="hero">
-    <div class="hero-container">
+    <div>
         <h1>Welcome to Tennis Academy</h1>
-        <p>Train with the best coaches and become the champion you aspire to be.</p>
-        <a asp-controller="Coach" asp-action="Index" class="btn btn-lg btn-success px-5">
+        <p>Train with the best coaches, gear up with top equipment, and book your next match easily.</p>
+        <a asp-controller="Coach" asp-action="Index" class="btn btn-lg btn-success px-5 me-2">
             Meet Our Coaches
+        </a>
+        <a asp-controller="Reservation" asp-action="Create" class="btn btn-lg btn-outline-light px-5">
+            Book a Court
         </a>
     </div>
 </div>
+
+<section class="features">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <img src="https://cdn-icons-png.flaticon.com/512/147/147142.png" alt="Coaches">
+                    <h3>World-Class Coaches</h3>
+                    <p>Learn from experienced professionals who have trained champions.</p>
+                    <a asp-controller="Coach" asp-action="Index" class="btn btn-primary btn-sm mt-2">Explore Coaches</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <img src="https://cdn-icons-png.flaticon.com/512/1164/1164954.png" alt="Shop">
+                    <h3>Tennis Pro Shop</h3>
+                    <p>Get the best tennis gear, rackets, balls, and apparel at great prices.</p>
+                    <a asp-controller="Racket" asp-action="Index" class="btn btn-primary btn-sm mt-2">Visit Shop</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3176/3176364.png" alt="Reservations">
+                    <h3>Easy Reservations</h3>
+                    <p>Book your court online in just a few clicks and enjoy the game.</p>
+                    <a asp-controller="Reservation" asp-action="Create" class="btn btn-primary btn-sm mt-2">Book Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
