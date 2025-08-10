@@ -5,5 +5,6 @@
         public string Id { get; set; } = null!;
         public string? Email { get; set; }
         public IEnumerable<string> Roles { get; set; } = null!;
+        public IEnumerable<string> RolesDropDown { get; set; } = new List<string>();
     }
 }
