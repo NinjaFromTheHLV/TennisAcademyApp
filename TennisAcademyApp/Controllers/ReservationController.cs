@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Reservation;
 using static TennisAcademyApp.GCommon.Validations.ErrorMessages;
@@ -7,6 +8,7 @@ using static TennisAcademyApp.GCommon.Validations.SuccessfulMessages.Reservation
 
 namespace TennisAcademyApp.Controllers
 {
+    [Authorize(Roles = "User")]
     public class ReservationController : BaseController
     {
         private readonly IReservationService reservationService;
