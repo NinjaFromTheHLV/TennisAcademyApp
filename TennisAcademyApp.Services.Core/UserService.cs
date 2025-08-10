@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TennisAcademyApp.Data;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Admin.UserManagement;
+using TennisAcademyApp.ViewModels.DropDown;
 using static TennisAcademyApp.GCommon.Validations.ErrorMessages.UserManagement;
 
 namespace TennisAcademyApp.Services.Core
@@ -23,20 +24,23 @@ namespace TennisAcademyApp.Services.Core
         public async Task<IEnumerable<UserIndexViewModel>> GetUserManagementDataAsync(string userId)
         {
             var usersList = await userManager.Users
-            .Where(u => u.Id != userId)
-            .ToListAsync();
+                 .Where(u => u.Id != userId)
+                 .ToListAsync();
 
             var result = new List<UserIndexViewModel>();
 
             foreach (var u in usersList)
             {
-                var roles = await userManager.GetRolesAsync(u);
+                var roles = await roleManager.Roles
+                    .Select(r => r.Name)
+                    .ToListAsync();
 
                 result.Add(new UserIndexViewModel
                 {
                     Id = u.Id,
                     Email = u.Email,
-                    Roles = roles
+                    Roles = await userManager.GetRolesAsync(u),
+                    RolesDropDown = roles
                 });
             }
 
