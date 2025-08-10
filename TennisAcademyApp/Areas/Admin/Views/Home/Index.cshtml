@@ -1,48 +1,31 @@
 ﻿@{
-    ViewData["Title"] = "Home";
+    ViewData["Title"] = "Admin Dashboard";
 }
 
-<style>
-    .hero {
-        position: relative;
-        min-height: 100vh;
-        background: linear-gradient( rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6) ), url('https://media.istockphoto.com/id/181100251/photo/tennis-racket-and-ball-on-dark-background.jpg?s=612x612&w=0&k=20&c=6OV76oya4MGVZiUQ2gBZC77Ix9r49Qt6pVOObgbMCrQ=') no-repeat center center;
-        background-size: cover;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: white;
-    }
+<div class="admin-hero">
+    <h1>Admin Dashboard</h1>
+    <p>Manage your store, coaches, and users in one place</p>
 
-    .hero-container {
-        position: relative;
-        z-index: 1;
-        max-width: 900px;
-        width: 100%;
-        padding: 2rem;
-        text-align: center;
-        text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
-    }
-
-        .hero-container h1 {
-            font-weight: 700;
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .hero-container p {
-            font-size: 1.25rem;
-            margin-bottom: 2rem;
-        }
-
-</style>
-
-<div class="hero">
-    <div class="hero-container">
-        <h1>Welcome to Tennis Academy</h1>
-        <p>Train with the best coaches and become the champion you aspire to be.</p>
-        <a asp-controller="Coach" asp-action="Index" class="btn btn-lg btn-success px-5">
-            Meet Our Coaches
+    <div class="admin-actions">
+        <a asp-controller="RacketManagement" asp-action="Create" class="admin-card">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIi0DXtVY5MaZyb78SgFX9VpIIBalMnjBGhQ&s" alt="Add Racket">
+            <h5>Add Racket</h5>
+        </a>
+        <a asp-controller="BallManagement" asp-action="Create" class="admin-card">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQi11QNgLJ_ED14I2R_XRVirbWZUcgF-rAv8Q&s" alt="Add Ball">
+            <h5>Add Balls</h5>
+        </a>
+        <a asp-controller="BagManagement" asp-action="Create" class="admin-card">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHnFZqNnxCpfKocfQjiH0uDZsvBvvN9PezWg&s" alt="Add Bag">
+            <h5>Add Bag</h5>
+        </a>
+        <a asp-controller="CoachManagement" asp-action="Add" class="admin-card">
+            <img src="https://cdn-icons-png.flaticon.com/512/147/147142.png" alt="Add Coach">
+            <h5>Add Coach</h5>
+        </a>
+        <a asp-controller="UserManagement" asp-action="Index" class="admin-card">
+            <img src="https://cdn-icons-png.flaticon.com/512/1256/1256650.png" alt="Manage Users">
+            <h5>Manage Users</h5>
         </a>
     </div>
 </div>
