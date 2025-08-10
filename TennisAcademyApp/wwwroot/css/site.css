@@ -94,3 +94,107 @@ body {
 .delete-actions .btn {
     min-width: 120px;
 }
+/* Home page css */
+.hero {
+    position: relative;
+    min-height: 90vh;
+    background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url('https://media.istockphoto.com/id/181100251/photo/tennis-racket-and-ball-on-dark-background.jpg?s=612x612&w=0&k=20&c=6OV76oya4MGVZiUQ2gBZC77Ix9r49Qt6pVOObgbMCrQ=') no-repeat center center;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    padding: 2rem;
+}
+
+    .hero h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+        margin-bottom: 1rem;
+    }
+
+    .hero p {
+        font-size: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+.features {
+    padding: 4rem 0;
+    background-color: #f8f9fa;
+}
+
+.feature-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 2rem;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    .feature-card img {
+        max-width: 100px;
+        margin-bottom: 1rem;
+    }
+
+/* Admin Dashboard */
+.admin-hero {
+    position: relative;
+    min-height: 100vh;
+    background: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url('https://images.unsplash.com/photo-1600373564975-e355c50cb9bb') center/cover no-repeat;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+    padding: 2rem;
+}
+
+    .admin-hero h1 {
+        font-weight: 800;
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .admin-hero p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+    }
+
+.admin-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    width: 100%;
+    max-width: 900px;
+}
+
+.admin-card {
+    background: rgba(255,255,255,0.15);
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    color: white;
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.25);
+    backdrop-filter: blur(5px);
+    transition: background 0.3s, transform 0.3s;
+}
+
+    .admin-card:hover {
+        background: rgba(255,255,255,0.25);
+        transform: translateY(-3px);
+    }
+
+    .admin-card img {
+        max-width: 60px;
+        margin-bottom: 0.8rem;
+    }
