@@ -6,7 +6,6 @@ using TennisAcademyApp.Data;
 using TennisAcademyApp.Data.Models;
 using TennisAcademyApp.Services.Core;
 using TennisAcademyApp.ViewModels.Racket;
-using Assert = NUnit.Framework.Assert;
 using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Racket;
 
 namespace TennisAcademyApp.Tests
@@ -201,6 +200,7 @@ namespace TennisAcademyApp.Tests
             // Assert
             Assert.That(result, Is.True);
             Assert.That(dbContext.Rackets.First().ImageUrl, Is.EqualTo("http://image.com/new.jpg"));
+            Assert.That(editModel.Model, Is.EqualTo("V100"));
         }
 
         [Test]
