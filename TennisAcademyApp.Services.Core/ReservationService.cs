@@ -7,7 +7,6 @@ using TennisAcademyApp.ViewModels.Reservation;
 using static TennisAcademyApp.GCommon.Validations.ErrorMessages.User;
 using static TennisAcademyApp.GCommon.Validations.ValidationConstants.Reservation;
 using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Reservation;
-using System.Runtime.CompilerServices;
 
 namespace TennisAcademyApp.Services.Core
 {

@@ -168,10 +168,6 @@ namespace TennisAcademyApp.Services.Core
 
             var coach = await dbContext.Coaches.FindAsync(model.CoachId);
 
-            if (user == null) 
-            {
-                throw new ArgumentException(UserCannotBeNull);
-            }
             if (coach == null)
             {
                 throw new ArgumentException(CoachNotFoundErrorMessage);
@@ -217,11 +213,6 @@ namespace TennisAcademyApp.Services.Core
             var user = await userManager.FindByIdAsync(userId);
 
             var coach = await dbContext.Coaches.FindAsync(model.CoachId);
-
-            if (userId == null)
-            {
-                throw new ArgumentException(UserCannotBeNull);
-            }
             if (coach == null)
             {
                 throw new ArgumentException(CoachNotFoundErrorMessage);
