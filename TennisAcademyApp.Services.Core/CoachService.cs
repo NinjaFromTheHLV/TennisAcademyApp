@@ -112,7 +112,7 @@ namespace TennisAcademyApp.Services.Core
             bool result = false;
             var user = await userManager.FindByIdAsync(userId);
             bool isAdmin = await userManager.IsInRoleAsync(user, "Admin");
-            if (!isAdmin || userId == null)
+            if (!isAdmin)
             {
                 throw new ArgumentException("You must be an admin to add a coach.");
             }

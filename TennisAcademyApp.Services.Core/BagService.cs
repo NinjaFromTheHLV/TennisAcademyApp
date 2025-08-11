@@ -62,10 +62,10 @@ namespace TennisAcademyApp.Services.Core
         public async Task<bool> AddBagAsync(string userId, BagCreateInputModel model)
         {
             bool result = false;
-            var user = await userManager.FindByIdAsync(userId);
-            bool IsAdmin = await userManager.IsInRoleAsync(user, "Admin");
+            var loggedUser = await userManager.FindByIdAsync(userId);
+            bool IsAdmin = await userManager.IsInRoleAsync(loggedUser, "Admin");
 
-            if (IsAdmin || userId != null)
+            if (IsAdmin)
             {
                 var bag = new Bag
                 {

@@ -64,24 +64,23 @@ namespace TennisAcademyApp.Services.Core
             bool result = false;
             var user = await userManager.FindByIdAsync(userId);
             bool IsAdmin = await userManager.IsInRoleAsync(user, "Admin");
-            if (!IsAdmin || userId == null)
+            if (IsAdmin)
             {
-                throw new UnauthorizedAccessException("You do not have permission to add a ball.");
+                var ball = new Ball
+                {
+                    Brand = model.Brand,
+                    Model = model.Model,
+                    Price = model.Price,
+                    Quantity = model.Quantity,
+                    ImageUrl = model.ImageUrl
+                };
+
+                await dbContext.AddAsync(ball);
+                await dbContext.SaveChangesAsync();
+
+                result = true;
             }
 
-            var ball = new Ball
-            {
-                Brand = model.Brand,
-                Model = model.Model,
-                Price = model.Price,
-                Quantity = model.Quantity,
-                ImageUrl = model.ImageUrl
-            };
-
-            await dbContext.AddAsync(ball);
-            await dbContext.SaveChangesAsync();
-
-            result = true;
             return result;
         }
 
@@ -90,7 +89,7 @@ namespace TennisAcademyApp.Services.Core
             BallEditFormModel? model = null;
             var user = await userManager.FindByIdAsync(userId);
             bool IsAdmin = await userManager.IsInRoleAsync(user, "Admin");
-            if (!IsAdmin || userId == null)
+            if (!IsAdmin)
             {
                 throw new UnauthorizedAccessException("You do not have permission to edit a ball.");
             }
@@ -137,7 +136,7 @@ namespace TennisAcademyApp.Services.Core
             BallDeleteViewModel? model = null;
             var user = await userManager.FindByIdAsync(userId);
             bool IsAdmin = await userManager.IsInRoleAsync(user, "Admin");
-            if (!IsAdmin || userId == null)
+            if (!IsAdmin)
             {
                 throw new UnauthorizedAccessException("You do not have permission to delete a ball.");
             }
