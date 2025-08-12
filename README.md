@@ -13,7 +13,7 @@ Tennis Academy is an web app which provides separate interfaces for User and Adm
 ### Tennis academy shop
 
 - Browse and add rackets, balls, and bags to your cart.
-- Checkout cart items (deleting items from database).
+- Checkout cart items (deleting items in cart from database).
 - Add to cart multiple times within the item's stock limit.
 
 ### Shop management
