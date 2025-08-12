@@ -33,18 +33,18 @@ Tennis Academy is an web app which provides separate interfaces for User and Adm
 
 ## Technologies
 #### Backend
-* 🛠 Entity Framework Core for database interactions.
-* 📋 Model-View-Controller architecture pattern.
+* Entity Framework Core for database interactions.
+* Model-View-Controller architecture pattern.
 #### Frontend
-* 🎨 Razor Views with HTML, CSS, JavaScript and Bootstrap for responsive design.
+* Razor Views with HTML, CSS, JavaScript and Bootstrap for responsive design.
 #### Database
-* 💾 SQL Server Management Studio for secure and efficient data storage.
+* SQL Server Management Studio for secure and efficient data storage.
 
 ### Testing
 - NUnit: Comprehensive testing framework.
 - Moq: Mocking framework for unit testing.
 
-## 🚀 How to Run the Project
+## How to Run the Project
 
 1. Clone the repository:
    ```bash
