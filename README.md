@@ -7,6 +7,7 @@ Tennis Academy is an web app which provides separate interfaces for User and Adm
 ### Reservations
 
 - Make court reservations within academy hours.
+- View reservation details.
 - View reservation history.
 - Admins do not have reservation privileges.
 
@@ -15,6 +16,7 @@ Tennis Academy is an web app which provides separate interfaces for User and Adm
 - Browse and add rackets, balls, and bags to your cart.
 - Checkout cart items (deleting items in cart from database).
 - Add to cart multiple times within the item's stock limit.
+- Remove items from cart.
 
 ### Shop management
 - Admin feature: add, edit and delete items if nessecarry.
@@ -23,6 +25,7 @@ Tennis Academy is an web app which provides separate interfaces for User and Adm
 
 - Search and view coach details with pagination.
 - Add coaches to favorites.
+- Remove coaches from favourites.
 - Admin-sided only: Manage coaches by adding, updating, or deleting.
 
 ### User management (Admin-sided)
