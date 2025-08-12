@@ -46,7 +46,7 @@ namespace TennisAcademyApp.Tests.Services
         [Test]
         public async Task GetFavouritesAsync_WhenCoachHasNoImageUrl_UsesDefault()
         {
-            var coach = new Coach { CoachId = 1, Name = "Coach1", Age = 30, ImageUrl = null, Description = "desc" };
+            var coach = new Coach { CoachId = 1, Name = "Coach1", Age = 30, ImageUrl = null, Description = "null", Nationality = "a" };
             var fav = new UserFavourite { UserId = "user1", CoachId = 1, Coach = coach };
 
             dbContext.Coaches.Add(coach);
@@ -73,7 +73,7 @@ namespace TennisAcademyApp.Tests.Services
         {
             userManagerMock.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((IdentityUser)null);
 
-            var coach = new Coach { CoachId = 1, Name = "Coach1" };
+            var coach = new Coach {CoachId = 1, Name = "Coach1", Description = "null", Nationality = "null", };
             dbContext.Coaches.Add(coach);
             await dbContext.SaveChangesAsync();
 
@@ -87,7 +87,7 @@ namespace TennisAcademyApp.Tests.Services
         {
             userManagerMock.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(testUser);
 
-            var coach = new Coach { CoachId = 1, Name = "Coach1" };
+            var coach = new Coach { CoachId = 1, Name = "Coach1", Description = "null", Nationality = "a" };
             dbContext.Coaches.Add(coach);
             dbContext.UserFavourites.Add(new UserFavourite { UserId = "user1", CoachId = 1 });
             await dbContext.SaveChangesAsync();
@@ -102,7 +102,7 @@ namespace TennisAcademyApp.Tests.Services
         {
             userManagerMock.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(testUser);
 
-            var coach = new Coach { CoachId = 1, Name = "Coach1" };
+            var coach = new Coach {CoachId = 1, Name = "Coach1", Description = "null", Nationality = "null" };
             dbContext.Coaches.Add(coach);
             await dbContext.SaveChangesAsync();
 
@@ -137,7 +137,7 @@ namespace TennisAcademyApp.Tests.Services
         {
             userManagerMock.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(testUser);
 
-            var coach = new Coach { CoachId = 1, Name = "Coach1" };
+            var coach = new Coach {CoachId = 1, Name = "Coach1", Description = "null", Nationality = "null" };
             dbContext.Coaches.Add(coach);
             await dbContext.SaveChangesAsync();
 
@@ -151,7 +151,7 @@ namespace TennisAcademyApp.Tests.Services
         {
             userManagerMock.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(testUser);
 
-            var coach = new Coach { CoachId = 1, Name = "Coach1" };
+            var coach = new Coach { CoachId = 1, Name = "Coach1", Description = "null", Nationality = "a" };
             dbContext.Coaches.Add(coach);
             dbContext.UserFavourites.Add(new UserFavourite { UserId = "user1", CoachId = 1 });
             await dbContext.SaveChangesAsync();

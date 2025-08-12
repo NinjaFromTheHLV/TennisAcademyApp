@@ -336,7 +336,7 @@ namespace TennisAcademyApp.Tests.Services
 
 
         [Test]
-        public async Task GetUserReservationDetailsAsync_UserNull_Throws()
+        public void GetUserReservationDetailsAsync_UserNull_Throws()
         {
             // arrange
             userManagerMock.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((IdentityUser)null);
@@ -360,7 +360,7 @@ namespace TennisAcademyApp.Tests.Services
         }
 
         [Test]
-        public async Task GetUserReservationDetailsAsync_ReservationNotFound_Throws()
+        public void GetUserReservationDetailsAsync_ReservationNotFound_Throws()
         {
             // arrange
             userManagerMock.Setup(u => u.FindByIdAsync(existingUser.Id)).ReturnsAsync(existingUser);
@@ -405,7 +405,7 @@ namespace TennisAcademyApp.Tests.Services
 
 
         [Test]
-        public async Task GetUserReservationForDeletingAsync_UserNull_Throws()
+        public void GetUserReservationForDeletingAsync_UserNull_Throws()
         {
             // arrange
             userManagerMock.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((IdentityUser)null);
@@ -429,7 +429,7 @@ namespace TennisAcademyApp.Tests.Services
         }
 
         [Test]
-        public async Task GetUserReservationForDeletingAsync_ReservationNotFound_Throws()
+        public void GetUserReservationForDeletingAsync_ReservationNotFound_Throws()
         {
             // arrange
             userManagerMock.Setup(u => u.FindByIdAsync(existingUser.Id)).ReturnsAsync(existingUser);
@@ -471,7 +471,7 @@ namespace TennisAcademyApp.Tests.Services
 
 
         [Test]
-        public async Task DeleteReservationAsync_UserNull_Throws()
+        public void DeleteReservationAsync_UserNull_Throws()
         {
             // arrange
             userManagerMock.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((IdentityUser)null);
@@ -484,7 +484,7 @@ namespace TennisAcademyApp.Tests.Services
         }
 
         [Test]
-        public async Task DeleteReservationAsync_ReservationNull_Throws()
+        public void DeleteReservationAsync_ReservationNull_Throws()
         {
             // arrange
             userManagerMock.Setup(u => u.FindByIdAsync(existingUser.Id)).ReturnsAsync(existingUser);
@@ -677,7 +677,7 @@ namespace TennisAcademyApp.Tests.Services
         }
 
         [Test]
-        public async Task DateValidationAsync_ValidDate_DoesNotThrow()
+        public void DateValidationAsync_ValidDate_DoesNotThrow()
         {
             // arrange - valid date: >2 hours, within 14 days, not sunday, between 8 and 20
             var target = DateTime.Now.AddDays(3).Date.AddHours(10);
