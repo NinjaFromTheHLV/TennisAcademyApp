@@ -38,7 +38,6 @@ namespace TennisAcademyApp.Tests.Services
             existingUser = new IdentityUser { Id = "user-1", UserName = "tester" };
         }
 
-        #region Helpers
 
         private async Task SeedBasicEntitiesAsync()
         {
@@ -57,9 +56,8 @@ namespace TennisAcademyApp.Tests.Services
             await dbContext.SaveChangesAsync();
         }
 
-        #endregion
 
-        #region GetUserReservationsAsync
+
 
         [Test]
         public async Task GetUserReservationsAsync_WhenUserHasReservations_ReturnsListMapped()
@@ -152,9 +150,7 @@ namespace TennisAcademyApp.Tests.Services
             Assert.That(expired.IsDeleted, Is.True);
         }
 
-        #endregion
 
-        #region CreateReservationAsync
 
         [Test]
         public void CreateReservationAsync_UserNull_ThrowsArgumentException()
@@ -293,9 +289,6 @@ namespace TennisAcademyApp.Tests.Services
             Assert.That(created.Note, Is.EqualTo("ok"));
         }
 
-        #endregion
-
-        #region AutoReservationDeleteAsync
 
         [Test]
         public async Task AutoReservationDeleteAsync_WhenNoExpired_ReturnsFalse()
@@ -341,9 +334,6 @@ namespace TennisAcademyApp.Tests.Services
             Assert.That(r.IsDeleted, Is.True);
         }
 
-        #endregion
-
-        #region GetUserReservationDetailsAsync
 
         [Test]
         public async Task GetUserReservationDetailsAsync_UserNull_Throws()
@@ -413,9 +403,6 @@ namespace TennisAcademyApp.Tests.Services
             Assert.That(details.Note, Is.EqualTo("hello"));
         }
 
-        #endregion
-
-        #region GetUserReservationForDeletingAsync
 
         [Test]
         public async Task GetUserReservationForDeletingAsync_UserNull_Throws()
@@ -482,9 +469,6 @@ namespace TennisAcademyApp.Tests.Services
             Assert.That(model.ImageUrl, Is.EqualTo("img"));
         }
 
-        #endregion
-
-        #region DeleteReservationAsync
 
         [Test]
         public async Task DeleteReservationAsync_UserNull_Throws()
@@ -566,9 +550,7 @@ namespace TennisAcademyApp.Tests.Services
             Assert.That(r.IsDeleted, Is.False);
         }
 
-        #endregion
 
-        #region GetUserReservationHistoryAsync
 
         [Test]
         public async Task GetUserReservationHistoryAsync_ReturnsOnlyDeletedReservations()
@@ -607,9 +589,6 @@ namespace TennisAcademyApp.Tests.Services
             Assert.That(history.First().CoachName, Is.EqualTo("Coach1"));
         }
 
-        #endregion
-
-        #region DateValidationAsync
 
         [Test]
         public void DateValidationAsync_PastDate_Throws()
@@ -708,9 +687,6 @@ namespace TennisAcademyApp.Tests.Services
             Assert.That(async () => await service.DateValidationAsync(model), Throws.Nothing);
         }
 
-        #endregion
-
-        #region IsCoachAvailableAtTheTimeAsync
 
         [Test]
         public async Task IsCoachAvailableAtTheTimeAsync_WhenFree_ReturnsTrue()
@@ -767,6 +743,5 @@ namespace TennisAcademyApp.Tests.Services
             userManagerMock = null;
             service = null;
         }
-        #endregion
     }
 }
