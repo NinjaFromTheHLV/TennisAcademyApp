@@ -243,7 +243,7 @@ namespace TennisAcademyApp.Tests
             };
 
             // Act
-            var result = await service.DeleteRacketAsync("admin4", deleteModel);
+            var result = await service.DeleteRacketAsync("admin4", racket.Id);
 
             // Assert
             Assert.That(result, Is.True);
