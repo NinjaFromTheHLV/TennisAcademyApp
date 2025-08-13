@@ -12,7 +12,7 @@ using TennisAcademyApp.Data;
 namespace TennisAcademyApp.Data.Migrations
 {
     [DbContext(typeof(TennisAcademyDbContext))]
-    [Migration("20250810060232_InitialMigration")]
+    [Migration("20250812173329_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
