@@ -8,6 +8,11 @@ using TennisAcademyApp.Services.Core;
 using TennisAcademyApp.ViewModels.Reservation;
 using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Reservation;
 
+//<!!!>
+// Important note for these specific tests: They may throw exceptions due to the different time they are being run,
+// especially if the current time is close to the reservation date/time.
+//<!!!>
+
 namespace TennisAcademyApp.Tests.Services
 {
     [TestFixture]
