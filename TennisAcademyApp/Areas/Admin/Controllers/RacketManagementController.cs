@@ -116,11 +116,11 @@ namespace TennisAcademyApp.Areas.Admin.Controllers
             }
         }
         [HttpGet]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(string userId, int id)
         {
             try
             {
-                string userId = GetUserId()!;
+                userId = GetUserId()!;
                 var racket = await this.racketService.GetRacketForDeletingAsync(userId, id);
 
                 return View(racket);
@@ -132,16 +132,16 @@ namespace TennisAcademyApp.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(RacketDeleteViewModel deleteModel)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                bool isDeleted = await this.racketService.DeleteRacketAsync(GetUserId()!, deleteModel);
+                bool isDeleted = await this.racketService.DeleteRacketAsync(GetUserId()!, id);
 
                 if (!isDeleted)
                 {
                     TempData["ErrorMessage"] = RacketDeleteErrorMessage;
-                    return RedirectToAction(nameof(Delete), new { id = deleteModel.Id });
+                    return RedirectToAction(nameof(Delete), new { id = id });
                 }
 
                 TempData["SuccessMessage"] = RacketDeletedSuccessfully;
