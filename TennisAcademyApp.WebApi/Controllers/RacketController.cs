@@ -65,7 +65,7 @@ namespace TennisAcademyApp.WebApi.Controllers
             {
                 return BadRequest("Failed to create racket.");
             }
-            return Ok(model);
+            return StatusCode(StatusCodes.Status201Created);
         }
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
