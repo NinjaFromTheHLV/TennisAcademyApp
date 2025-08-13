@@ -10,6 +10,6 @@ namespace TennisAcademyApp.Services.Core.Contracts
         Task<RacketEditFormModel> GetRacketForEdittingAsync(string userId, int? id);
         Task<bool> EditRacketAsync(RacketEditFormModel model);
         Task<RacketDeleteViewModel> GetRacketForDeletingAsync(string userId, int? id);
-        Task<bool> DeleteRacketAsync(string userId, RacketDeleteViewModel model);
+        Task<bool> DeleteRacketAsync(string userId, int id);
     }
 }

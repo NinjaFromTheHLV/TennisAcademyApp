@@ -146,11 +146,11 @@ namespace TennisAcademyApp.Services.Core
 
             return model;
         }
-        public async Task<bool> DeleteRacketAsync(string userId, RacketDeleteViewModel model)
+        public async Task<bool> DeleteRacketAsync(string userId, int id)
         {
             bool result = false;
             var user = await userManager.FindByIdAsync(userId);
-            var racket = await dbContext.Rackets.FindAsync(model.Id);
+            var racket = await dbContext.Rackets.FindAsync(id);
 
             if (racket == null)
             {
