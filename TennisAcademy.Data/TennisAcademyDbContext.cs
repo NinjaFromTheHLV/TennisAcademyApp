@@ -6,7 +6,7 @@ using TennisAcademyApp.Data.Models;
 
 namespace TennisAcademyApp.Data
 {
-    public class TennisAcademyDbContext : IdentityDbContext<IdentityUser>
+    public class TennisAcademyDbContext : IdentityDbContext
     {
         public TennisAcademyDbContext(DbContextOptions<TennisAcademyDbContext> options)
             : base(options)
