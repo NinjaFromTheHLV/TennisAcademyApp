@@ -23,14 +23,17 @@ namespace TennisAcademyApp.Services.Core
         {
             var user = await userManager.FindByIdAsync(userId);
 
+            var currentCulture = System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+            bool isBg = currentCulture == "bg";
+
             var bagsInCart = await dbContext.BagCart
                 .Include(bc => bc.Bag)
                 .Where(bc => bc.UserId == userId)
                 .Select(bc => new BagCartIndexViewModel
                 {
                     Id = bc.BagId,
-                    Brand = bc.Bag.Brand,
-                    Model = bc.Bag.Model,
+                    Brand = isBg ? bc.Bag.BrandBg : bc.Bag.Brand,
+                    Model = isBg ? bc.Bag.ModelBg : bc.Bag.Model,
                     Price = bc.Bag.Price,
                     Quantity = bc.Quantity,
                     TotalPrice = bc.Quantity * bc.Bag.Price,

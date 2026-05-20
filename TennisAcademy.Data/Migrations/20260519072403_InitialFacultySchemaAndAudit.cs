@@ -8,13 +8,17 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TennisAcademyApp.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitialFacultySchemaAndAudit : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.EnsureSchema(
+                name: "22180021");
+
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
+                schema: "22180021",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -29,6 +33,7 @@ namespace TennisAcademyApp.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "AspNetUsers",
+                schema: "22180021",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -54,6 +59,7 @@ namespace TennisAcademyApp.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Bags",
+                schema: "22180021",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false, comment: "Bag Identifier")
@@ -62,7 +68,8 @@ namespace TennisAcademyApp.Data.Migrations
                     Model = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Bag Model"),
                     Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false, comment: "Bag Price"),
                     Quantity = table.Column<int>(type: "int", nullable: false, comment: "Available in stock"),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Bag Image")
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Bag Image"),
+                    LastModified_22180021 = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
                 },
                 constraints: table =>
                 {
@@ -72,6 +79,7 @@ namespace TennisAcademyApp.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Balls",
+                schema: "22180021",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false, comment: "Ball Identifier")
@@ -80,7 +88,8 @@ namespace TennisAcademyApp.Data.Migrations
                     Model = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Ball Model"),
                     Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false, comment: "Ball Price"),
                     Quantity = table.Column<int>(type: "int", nullable: false, comment: "Available in stock"),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Racket Image")
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Racket Image"),
+                    LastModified_22180021 = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
                 },
                 constraints: table =>
                 {
@@ -90,6 +99,7 @@ namespace TennisAcademyApp.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Coaches",
+                schema: "22180021",
                 columns: table => new
                 {
                     CoachId = table.Column<int>(type: "int", nullable: false, comment: "Coach Identifier")
@@ -98,7 +108,8 @@ namespace TennisAcademyApp.Data.Migrations
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true, comment: "Coach Image"),
                     Age = table.Column<int>(type: "int", nullable: false, comment: "Coach Age"),
                     Description = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false, comment: "Coach Description"),
-                    Nationality = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Coach Nationality")
+                    Nationality = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Coach Nationality"),
+                    LastModified_22180021 = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
                 },
                 constraints: table =>
                 {
@@ -108,6 +119,7 @@ namespace TennisAcademyApp.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Rackets",
+                schema: "22180021",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false, comment: "Racket Identifier")
@@ -116,7 +128,8 @@ namespace TennisAcademyApp.Data.Migrations
                     Model = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Racket Model"),
                     Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false, comment: "Racket Price"),
                     Quantity = table.Column<int>(type: "int", nullable: false, comment: "Available in stock"),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Racket Image")
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Racket Image"),
+                    LastModified_22180021 = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
                 },
                 constraints: table =>
                 {
@@ -126,12 +139,14 @@ namespace TennisAcademyApp.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Surfaces",
+                schema: "22180021",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false, comment: "Surface Identifier")
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Surface Name"),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Ïmage of the surface")
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Ïmage of the surface"),
+                    LastModified_22180021 = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
                 },
                 constraints: table =>
                 {
@@ -141,11 +156,13 @@ namespace TennisAcademyApp.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Trainings",
+                schema: "22180021",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false, comment: "Training Type Identifier")
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Training Type Name")
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Training Type Name"),
+                    LastModified_22180021 = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
                 },
                 constraints: table =>
                 {
@@ -155,6 +172,7 @@ namespace TennisAcademyApp.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
+                schema: "22180021",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -169,6 +187,7 @@ namespace TennisAcademyApp.Data.Migrations
                     table.ForeignKey(
                         name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
                         column: x => x.RoleId,
+                        principalSchema: "22180021",
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -176,6 +195,7 @@ namespace TennisAcademyApp.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserClaims",
+                schema: "22180021",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -190,6 +210,7 @@ namespace TennisAcademyApp.Data.Migrations
                     table.ForeignKey(
                         name: "FK_AspNetUserClaims_AspNetUsers_UserId",
                         column: x => x.UserId,
+                        principalSchema: "22180021",
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -197,6 +218,7 @@ namespace TennisAcademyApp.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserLogins",
+                schema: "22180021",
                 columns: table => new
                 {
                     LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
@@ -210,6 +232,7 @@ namespace TennisAcademyApp.Data.Migrations
                     table.ForeignKey(
                         name: "FK_AspNetUserLogins_AspNetUsers_UserId",
                         column: x => x.UserId,
+                        principalSchema: "22180021",
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -217,6 +240,7 @@ namespace TennisAcademyApp.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserRoles",
+                schema: "22180021",
                 columns: table => new
                 {
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -228,12 +252,14 @@ namespace TennisAcademyApp.Data.Migrations
                     table.ForeignKey(
                         name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
                         column: x => x.RoleId,
+                        principalSchema: "22180021",
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_AspNetUserRoles_AspNetUsers_UserId",
                         column: x => x.UserId,
+                        principalSchema: "22180021",
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -241,6 +267,7 @@ namespace TennisAcademyApp.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserTokens",
+                schema: "22180021",
                 columns: table => new
                 {
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -254,6 +281,7 @@ namespace TennisAcademyApp.Data.Migrations
                     table.ForeignKey(
                         name: "FK_AspNetUserTokens_AspNetUsers_UserId",
                         column: x => x.UserId,
+                        principalSchema: "22180021",
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -261,11 +289,13 @@ namespace TennisAcademyApp.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "BagCart",
+                schema: "22180021",
                 columns: table => new
                 {
                     BagId = table.Column<int>(type: "int", nullable: false, comment: "Foreign Key of Bag"),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false, comment: "Foreign Key of IdentityUser"),
-                    Quantity = table.Column<int>(type: "int", nullable: false, comment: "Quantity of Bags in Cart")
+                    Quantity = table.Column<int>(type: "int", nullable: false, comment: "Quantity of Bags in Cart"),
+                    LastModified_22180021 = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
                 },
                 constraints: table =>
                 {
@@ -273,12 +303,14 @@ namespace TennisAcademyApp.Data.Migrations
                     table.ForeignKey(
                         name: "FK_BagCart_AspNetUsers_UserId",
                         column: x => x.UserId,
+                        principalSchema: "22180021",
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_BagCart_Bags_BagId",
                         column: x => x.BagId,
+                        principalSchema: "22180021",
                         principalTable: "Bags",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -286,11 +318,13 @@ namespace TennisAcademyApp.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "BallCart",
+                schema: "22180021",
                 columns: table => new
                 {
                     BallId = table.Column<int>(type: "int", nullable: false, comment: "Foreign Key of Ball"),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false, comment: "Foreign Key of IdentityUser"),
-                    Quantity = table.Column<int>(type: "int", nullable: false, comment: "Quantity of Balls in Cart")
+                    Quantity = table.Column<int>(type: "int", nullable: false, comment: "Quantity of Balls in Cart"),
+                    LastModified_22180021 = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
                 },
                 constraints: table =>
                 {
@@ -298,12 +332,14 @@ namespace TennisAcademyApp.Data.Migrations
                     table.ForeignKey(
                         name: "FK_BallCart_AspNetUsers_UserId",
                         column: x => x.UserId,
+                        principalSchema: "22180021",
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_BallCart_Balls_BallId",
                         column: x => x.BallId,
+                        principalSchema: "22180021",
                         principalTable: "Balls",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -312,10 +348,12 @@ namespace TennisAcademyApp.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "UserFavourites",
+                schema: "22180021",
                 columns: table => new
                 {
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false, comment: "Foreign Key which references to IdentityUser"),
-                    CoachId = table.Column<int>(type: "int", nullable: false, comment: "Foreign Key which references to Coach")
+                    CoachId = table.Column<int>(type: "int", nullable: false, comment: "Foreign Key which references to Coach"),
+                    LastModified_22180021 = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
                 },
                 constraints: table =>
                 {
@@ -323,11 +361,13 @@ namespace TennisAcademyApp.Data.Migrations
                     table.ForeignKey(
                         name: "FK_UserFavourites_AspNetUsers_UserId",
                         column: x => x.UserId,
+                        principalSchema: "22180021",
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_UserFavourites_Coaches_CoachId",
                         column: x => x.CoachId,
+                        principalSchema: "22180021",
                         principalTable: "Coaches",
                         principalColumn: "CoachId");
                 },
@@ -335,12 +375,14 @@ namespace TennisAcademyApp.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "RacketCart",
+                schema: "22180021",
                 columns: table => new
                 {
                     RacketId = table.Column<int>(type: "int", nullable: false, comment: "Foreign Key of Racket"),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false, comment: "Foreign Key of IdentityUser"),
                     Quantity = table.Column<int>(type: "int", nullable: false, comment: "Quantity of Rackets in Cart"),
-                    BallId = table.Column<int>(type: "int", nullable: true)
+                    BallId = table.Column<int>(type: "int", nullable: true),
+                    LastModified_22180021 = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
                 },
                 constraints: table =>
                 {
@@ -348,17 +390,20 @@ namespace TennisAcademyApp.Data.Migrations
                     table.ForeignKey(
                         name: "FK_RacketCart_AspNetUsers_UserId",
                         column: x => x.UserId,
+                        principalSchema: "22180021",
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_RacketCart_Balls_BallId",
                         column: x => x.BallId,
+                        principalSchema: "22180021",
                         principalTable: "Balls",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_RacketCart_Rackets_RacketId",
                         column: x => x.RacketId,
+                        principalSchema: "22180021",
                         principalTable: "Rackets",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -367,6 +412,7 @@ namespace TennisAcademyApp.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Reservations",
+                schema: "22180021",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false, comment: "Reservation Identifier")
@@ -378,7 +424,8 @@ namespace TennisAcademyApp.Data.Migrations
                     PlayerId = table.Column<string>(type: "nvarchar(450)", nullable: false, comment: "Player Identifer"),
                     Duration = table.Column<int>(type: "int", nullable: false, comment: "Duration of the session"),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false, comment: "Date Select"),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    LastModified_22180021 = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
                 },
                 constraints: table =>
                 {
@@ -386,23 +433,27 @@ namespace TennisAcademyApp.Data.Migrations
                     table.ForeignKey(
                         name: "FK_Reservations_AspNetUsers_PlayerId",
                         column: x => x.PlayerId,
+                        principalSchema: "22180021",
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Reservations_Coaches_CoachId",
                         column: x => x.CoachId,
+                        principalSchema: "22180021",
                         principalTable: "Coaches",
                         principalColumn: "CoachId");
                     table.ForeignKey(
                         name: "FK_Reservations_Surfaces_SurfaceId",
                         column: x => x.SurfaceId,
+                        principalSchema: "22180021",
                         principalTable: "Surfaces",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Reservations_Trainings_TrainingTypeId",
                         column: x => x.TrainingTypeId,
+                        principalSchema: "22180021",
                         principalTable: "Trainings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -410,6 +461,7 @@ namespace TennisAcademyApp.Data.Migrations
                 comment: "Player Reservations");
 
             migrationBuilder.InsertData(
+                schema: "22180021",
                 table: "Bags",
                 columns: new[] { "Id", "Brand", "ImageUrl", "Model", "Price", "Quantity" },
                 values: new object[,]
@@ -421,6 +473,7 @@ namespace TennisAcademyApp.Data.Migrations
                 });
 
             migrationBuilder.InsertData(
+                schema: "22180021",
                 table: "Balls",
                 columns: new[] { "Id", "Brand", "ImageUrl", "Model", "Price", "Quantity" },
                 values: new object[,]
@@ -431,6 +484,7 @@ namespace TennisAcademyApp.Data.Migrations
                 });
 
             migrationBuilder.InsertData(
+                schema: "22180021",
                 table: "Coaches",
                 columns: new[] { "CoachId", "Age", "Description", "ImageUrl", "Name", "Nationality" },
                 values: new object[,]
@@ -443,6 +497,7 @@ namespace TennisAcademyApp.Data.Migrations
                 });
 
             migrationBuilder.InsertData(
+                schema: "22180021",
                 table: "Rackets",
                 columns: new[] { "Id", "Brand", "ImageUrl", "Model", "Price", "Quantity" },
                 values: new object[,]
@@ -456,6 +511,7 @@ namespace TennisAcademyApp.Data.Migrations
                 });
 
             migrationBuilder.InsertData(
+                schema: "22180021",
                 table: "Surfaces",
                 columns: new[] { "Id", "ImageUrl", "Name" },
                 values: new object[,]
@@ -466,6 +522,7 @@ namespace TennisAcademyApp.Data.Migrations
                 });
 
             migrationBuilder.InsertData(
+                schema: "22180021",
                 table: "Trainings",
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
@@ -478,11 +535,13 @@ namespace TennisAcademyApp.Data.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
+                schema: "22180021",
                 table: "AspNetRoleClaims",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
+                schema: "22180021",
                 table: "AspNetRoles",
                 column: "NormalizedName",
                 unique: true,
@@ -490,26 +549,31 @@ namespace TennisAcademyApp.Data.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserClaims_UserId",
+                schema: "22180021",
                 table: "AspNetUserClaims",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserLogins_UserId",
+                schema: "22180021",
                 table: "AspNetUserLogins",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserRoles_RoleId",
+                schema: "22180021",
                 table: "AspNetUserRoles",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
+                schema: "22180021",
                 table: "AspNetUsers",
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
+                schema: "22180021",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true,
@@ -517,46 +581,55 @@ namespace TennisAcademyApp.Data.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_BagCart_UserId",
+                schema: "22180021",
                 table: "BagCart",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BallCart_UserId",
+                schema: "22180021",
                 table: "BallCart",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RacketCart_BallId",
+                schema: "22180021",
                 table: "RacketCart",
                 column: "BallId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RacketCart_UserId",
+                schema: "22180021",
                 table: "RacketCart",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservations_CoachId",
+                schema: "22180021",
                 table: "Reservations",
                 column: "CoachId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservations_PlayerId",
+                schema: "22180021",
                 table: "Reservations",
                 column: "PlayerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservations_SurfaceId",
+                schema: "22180021",
                 table: "Reservations",
                 column: "SurfaceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservations_TrainingTypeId",
+                schema: "22180021",
                 table: "Reservations",
                 column: "TrainingTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserFavourites_CoachId",
+                schema: "22180021",
                 table: "UserFavourites",
                 column: "CoachId");
         }
@@ -565,58 +638,76 @@ namespace TennisAcademyApp.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AspNetRoleClaims");
+                name: "AspNetRoleClaims",
+                schema: "22180021");
 
             migrationBuilder.DropTable(
-                name: "AspNetUserClaims");
+                name: "AspNetUserClaims",
+                schema: "22180021");
 
             migrationBuilder.DropTable(
-                name: "AspNetUserLogins");
+                name: "AspNetUserLogins",
+                schema: "22180021");
 
             migrationBuilder.DropTable(
-                name: "AspNetUserRoles");
+                name: "AspNetUserRoles",
+                schema: "22180021");
 
             migrationBuilder.DropTable(
-                name: "AspNetUserTokens");
+                name: "AspNetUserTokens",
+                schema: "22180021");
 
             migrationBuilder.DropTable(
-                name: "BagCart");
+                name: "BagCart",
+                schema: "22180021");
 
             migrationBuilder.DropTable(
-                name: "BallCart");
+                name: "BallCart",
+                schema: "22180021");
 
             migrationBuilder.DropTable(
-                name: "RacketCart");
+                name: "RacketCart",
+                schema: "22180021");
 
             migrationBuilder.DropTable(
-                name: "Reservations");
+                name: "Reservations",
+                schema: "22180021");
 
             migrationBuilder.DropTable(
-                name: "UserFavourites");
+                name: "UserFavourites",
+                schema: "22180021");
 
             migrationBuilder.DropTable(
-                name: "AspNetRoles");
+                name: "AspNetRoles",
+                schema: "22180021");
 
             migrationBuilder.DropTable(
-                name: "Bags");
+                name: "Bags",
+                schema: "22180021");
 
             migrationBuilder.DropTable(
-                name: "Balls");
+                name: "Balls",
+                schema: "22180021");
 
             migrationBuilder.DropTable(
-                name: "Rackets");
+                name: "Rackets",
+                schema: "22180021");
 
             migrationBuilder.DropTable(
-                name: "Surfaces");
+                name: "Surfaces",
+                schema: "22180021");
 
             migrationBuilder.DropTable(
-                name: "Trainings");
+                name: "Trainings",
+                schema: "22180021");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "AspNetUsers",
+                schema: "22180021");
 
             migrationBuilder.DropTable(
-                name: "Coaches");
+                name: "Coaches",
+                schema: "22180021");
         }
     }
 }

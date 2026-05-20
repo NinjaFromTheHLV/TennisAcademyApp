@@ -18,7 +18,8 @@ namespace TennisAcademyApp.Services.Core
                 .Select(s => new SurfaceDropDownModel
                 {
                     Id = s.Id,
-                    Name = s.Name
+                    Name = s.Name,
+                    NameBg = s.NameBg
                 })
                 .ToListAsync();
 

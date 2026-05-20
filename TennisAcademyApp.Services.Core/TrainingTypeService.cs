@@ -19,7 +19,8 @@ namespace TennisAcademyApp.Services.Core
                 .Select(tt => new TrainingTypeDropDownModel
                 {
                     Id = tt.Id,
-                    Name = tt.Name
+                    Name = tt.Name,
+                    NameBg = tt.NameBg
                 })
                 .ToListAsync();
 

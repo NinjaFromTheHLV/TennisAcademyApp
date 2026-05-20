@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using GTranslate.Translators;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TennisAcademyApp.Data;
 using TennisAcademyApp.Data.Models;
@@ -21,14 +22,17 @@ namespace TennisAcademyApp.Services.Core
 
         public async Task<IEnumerable<BagIndexViewModel>> GetAllBagsAsync()
         {
+            var currentCulture = System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+            bool isBg = currentCulture == "bg";
+
             var bags = await dbContext.Bags
                 .AsNoTracking()
                 .Include(b => b.BagCarts)
                 .Select(b => new BagIndexViewModel
                 {
                     Id = b.Id,
-                    Brand = b.Brand,
-                    Model = b.Model,
+                    Brand = isBg ? b.BrandBg : b.Brand,
+                    Model = isBg ? b.ModelBg : b.Model,
                     Price = b.Price,
                     Quantity = b.Quantity,
                     ImageUrl = b.ImageUrl,
@@ -67,15 +71,26 @@ namespace TennisAcademyApp.Services.Core
 
             if (IsAdmin)
             {
+                var translator = new GoogleTranslator();
+
+                var brandTranslation = await translator.TranslateAsync(model.Brand, "bg", "en");
+                string brandBgResult = brandTranslation.Translation;
+
+                var modelTranslation = await translator.TranslateAsync(model.Model, "bg", "en");
+                string modelBgResult = modelTranslation.Translation;
+
                 var bag = new Bag
                 {
                     Brand = model.Brand,
+                    BrandBg = brandBgResult,
                     Model = model.Model,
+                    ModelBg = modelBgResult,
                     Price = model.Price,
                     Quantity = model.Quantity,
-                    ImageUrl = model.ImageUrl
+                    ImageUrl = model.ImageUrl ?? "~/pictures/DefaultBagImage.webp",
                 };
-                await dbContext.AddAsync(bag);
+
+                await dbContext.Bags.AddAsync(bag);
                 await dbContext.SaveChangesAsync();
 
                 result = true;
@@ -111,18 +126,31 @@ namespace TennisAcademyApp.Services.Core
         public async Task<bool> EditBagAsync(BagEditFormModel model)
         {
             bool result = false;
-            var bag = await dbContext.Bags.FindAsync(model.Id);
+
+            var bag = await dbContext.Bags.FirstOrDefaultAsync(b => b.Id == model.Id);
 
             if (bag == null)
             {
                 throw new ArgumentException(BagNotFoundErrorMessage);
             }
 
+            var translator = new GoogleTranslator();
+
+            var brandTranslation = await translator.TranslateAsync(model.Brand, "bg", "en");
+            string brandBgResult = brandTranslation.Translation;
+
+            var modelTranslation = await translator.TranslateAsync(model.Model, "bg", "en");
+            string modelBgResult = modelTranslation.Translation;
+
             bag.Brand = model.Brand;
+            bag.BrandBg = brandBgResult;
             bag.Model = model.Model;
+            bag.ModelBg = modelBgResult;
             bag.Price = model.Price;
             bag.Quantity = model.Quantity;
             bag.ImageUrl = model.ImageUrl;
+
+            dbContext.Entry(bag).State = EntityState.Modified;
 
             await dbContext.SaveChangesAsync();
 
@@ -132,7 +160,6 @@ namespace TennisAcademyApp.Services.Core
 
         public async Task<BagDeleteViewModel> GetBagForDeletingAsync(string userId, int? id)
         {
-            BagDeleteViewModel? model = null;
             var user = await userManager.FindByIdAsync(userId);
             bool IsAdmin = await userManager.IsInRoleAsync(user, "Admin");
             if (!IsAdmin || userId == null)
@@ -142,11 +169,14 @@ namespace TennisAcademyApp.Services.Core
 
             var bag = await FindBagByIdAsync(id);
 
-            model = new BagDeleteViewModel
+            var currentCulture = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+            bool isBg = currentCulture.Equals("bg", StringComparison.OrdinalIgnoreCase);
+
+            var model = new BagDeleteViewModel
             {
                 Id = bag.Id,
-                Brand = bag.Brand,
-                Model = bag.Model,
+                Brand = isBg ? bag.BrandBg : bag.Brand,
+                Model = isBg ? bag.ModelBg : bag.Model,
                 ImageUrl = bag.ImageUrl
             };
 

@@ -8,6 +8,10 @@ namespace TennisAcademyApp.Controllers
         [AllowAnonymous]
         public IActionResult Index()
         {
+            if (User.IsInRole("Admin"))
+            {
+                return RedirectToAction(nameof(Index), "Home", new { area = "Admin" });
+            }
             return View();
         }
 

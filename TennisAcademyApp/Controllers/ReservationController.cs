@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TennisAcademyApp.Services.Core.Contracts;
+using TennisAcademyApp.ViewModels.DropDown;
 using TennisAcademyApp.ViewModels.Reservation;
 using static TennisAcademyApp.GCommon.Validations.ErrorMessages;
 using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Reservation;
@@ -28,19 +29,50 @@ namespace TennisAcademyApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> ExportToJson(string? searchTerm, DateTime? fromDate, DateTime? toDate)
+        {
+            try
+            {
+                var dataToExport = await this.reservationService.GetAllReservationsForExportAsync(searchTerm, fromDate, toDate);
+
+                var jsonOptions = new System.Text.Json.JsonSerializerOptions { WriteIndented = true };
+                string jsonString = System.Text.Json.JsonSerializer.Serialize(dataToExport, jsonOptions);
+
+                byte[] fileBytes = System.Text.Encoding.UTF8.GetBytes(jsonString);
+                string fileName = $"Reservations_Export_{DateTime.Now:yyyyMMdd_HHmmss}.json";
+
+                return File(fileBytes, "application/json", fileName);
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Грешка при генериране на JSON експортния файл.";
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Index(string? searchTerm, DateTime? fromDate, DateTime? toDate, string? sortOrder)
         {
             try
             {
                 string? userId = GetUserId();
+
+                ViewData["CurrentSearch"] = searchTerm;
+                ViewData["FromDate"] = fromDate?.ToString("yyyy-MM-dd");
+                ViewData["ToDate"] = toDate?.ToString("yyyy-MM-dd");
+
+                ViewData["CurrentSort"] = sortOrder;
+                ViewData["DateSortParam"] = string.IsNullOrEmpty(sortOrder) ? "date_desc" : "";
+                ViewData["DurationSortParam"] = sortOrder == "Duration" ? "duration_desc" : "Duration";
+
                 if (userId == null)
                 {
                     return RedirectToAction(nameof(Index), "Home");
                 }
 
-                var reservations = await reservationService.GetUserReservationsAsync(userId);
+                var model = await this.reservationService.GetFilteredUserReservationsAsync(userId, searchTerm, fromDate, toDate, sortOrder);
 
-                return View(reservations);
+                return View(model);
             }
             catch (Exception ex)
             {
@@ -51,22 +83,36 @@ namespace TennisAcademyApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
+            // 1. Инициализираме модела с празни списъци по подразбиране
+            var model = new ReservationCreateInputModel
+            {
+                Date = DateTime.Now,
+                Coaches = new List<CoachDropDownModel>(),
+                Surfaces = new List<SurfaceDropDownModel>(),
+                TrainingTypes = new List<TrainingTypeDropDownModel>()
+            };
+
             try
             {
+                // 2. Пълним списъците един по един. Ако някой гръмне, ще разберем точно кой е в конзолата
+                var coachesData = await coachService.GetGoachesForDropDownAsync();
+                if (coachesData != null) model.Coaches = coachesData;
 
-                var model = new ReservationCreateInputModel
-                {
-                    Coaches = await coachService.GetGoachesForDropDownAsync(),
-                    Surfaces = await surfaceService.GetSurfacesForDropDownAsync(),
-                    TrainingTypes = await trainingTypeService.GetAllTrainingTypesForDropDownAsync()
-                };
+                var surfacesData = await surfaceService.GetSurfacesForDropDownAsync();
+                if (surfacesData != null) model.Surfaces = surfacesData;
+
+                var trainingTypesData = await trainingTypeService.GetAllTrainingTypesForDropDownAsync();
+                if (trainingTypesData != null) model.TrainingTypes = trainingTypesData;
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                return RedirectToAction(nameof(Index), "Home");
+                // Отпечатва точната грешка от Service слоя в Output прозореца на Visual Studio
+                Console.WriteLine($"[CREATE RESERVATION ERROR]: {ex.Message}");
+
+                // Връщаме празен модел към View-то, за да НЕ гърми "line 27", а просто падащите менюта да останат празни
+                return View(model);
             }
         }
         [HttpPost]
@@ -77,8 +123,13 @@ namespace TennisAcademyApp.Controllers
                 if (ModelState.IsValid == false)
                 {
                     TempData["ErrorMessage"] = InvalidData;
+                    model.Coaches = await coachService.GetGoachesForDropDownAsync();
+                    model.Surfaces = await surfaceService.GetSurfacesForDropDownAsync();
+                    model.TrainingTypes = await trainingTypeService.GetAllTrainingTypesForDropDownAsync();
+
                     return View(model);
                 }
+
                 string userId = GetUserId()!;
 
                 await reservationService.CreateReservationAsync(userId, model);

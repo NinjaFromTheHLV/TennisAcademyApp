@@ -21,6 +21,9 @@ namespace TennisAcademyApp.Services.Core
         }
         public async Task<IEnumerable<FavouriteCoachViewModel>> GetFavouritesAsync(string? userId)
         {
+            var currentCulture = System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+            bool isBg = currentCulture == "bg";
+
             var favourites = await dbContext.UserFavourites
                 .Include(c => c.Coach)
                 .AsNoTracking()
@@ -28,10 +31,10 @@ namespace TennisAcademyApp.Services.Core
                 .Select(uc => new FavouriteCoachViewModel
                 {
                     CoachId = uc.CoachId,
-                    CoachName = uc.Coach.Name,
+                    CoachName = isBg ? uc.Coach.NameBg : uc.Coach.Name,
                     CoachAge = uc.Coach.Age,
                     ImageUrl = uc.Coach.ImageUrl ?? NoImageUrl,
-                    Description = uc.Coach.Description
+                    Description = isBg ? uc.Coach.DescriptionBg : uc.Coach.Description
                 })
                 .ToListAsync();
 

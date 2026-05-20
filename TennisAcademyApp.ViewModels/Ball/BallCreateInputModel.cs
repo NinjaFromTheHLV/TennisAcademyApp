@@ -1,22 +1,25 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using static TennisAcademyApp.GCommon.Validations.RequiredMessages.Ball;
-using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Ball;
+using TennisAcademyApp.GCommon.Validations; // Добавяме узинга за custom атрибутите
 
 namespace TennisAcademyApp.ViewModels.Ball
 {
     public class BallCreateInputModel
     {
-        [Required(ErrorMessage = BrandRequiredErrorMessage)]
+        [RequiredLocalized(nameof(RequiredMessages.Ball.BrandRequiredErrorMessage), typeof(RequiredMessages.Ball))]
         public string Brand { get; set; } = null!;
-        [Required(ErrorMessage = ModelRequiredErrorMessage)]
+
+        [RequiredLocalized(nameof(RequiredMessages.Ball.ModelRequiredErrorMessage), typeof(RequiredMessages.Ball))]
         public string Model { get; set; } = null!;
-        [Required(ErrorMessage = PriceRequiredErrorMessage)]
-        [Range(17.00, 80.00, ErrorMessage = PriceRangeErrorMessage)]
+
+        [RequiredLocalized(nameof(RequiredMessages.Ball.PriceRequiredErrorMessage), typeof(RequiredMessages.Ball))]
+        [RangeLocalized(17.00, 80.00, nameof(ErrorMessages.Ball.PriceRangeErrorMessage), typeof(ErrorMessages.Ball))]
         public decimal Price { get; set; }
-        [Required(ErrorMessage = QuantityRequiredErrorMessage)]
-        [Range(1, int.MaxValue, ErrorMessage = QuantityRangeErrorMessage)]
+
+        [RequiredLocalized(nameof(RequiredMessages.Ball.QuantityRequiredErrorMessage), typeof(RequiredMessages.Ball))]
+        [RangeLocalized(1, int.MaxValue, nameof(ErrorMessages.Ball.QuantityRangeErrorMessage), typeof(ErrorMessages.Ball))]
         public int Quantity { get; set; }
-        [Required(ErrorMessage = ImageUrlRequiredErrorMessage)]
+
+        [RequiredLocalized(nameof(RequiredMessages.Ball.ImageUrlRequiredErrorMessage), typeof(RequiredMessages.Ball))]
         public string ImageUrl { get; set; } = null!;
     }
 }

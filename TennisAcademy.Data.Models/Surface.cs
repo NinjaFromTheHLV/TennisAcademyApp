@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace TennisAcademyApp.Data.Models
@@ -11,10 +12,16 @@ namespace TennisAcademyApp.Data.Models
         public int Id { get; set; }
 
         [Required]
-        [Comment("Surface Name")]
+        [Comment("Surface Name in English")]
         public string Name { get; set; } = null!;
-        [Comment("Ïmage of the surface")]
+
+        [Required]
+        [Comment("Surface Name in Bulgarian")]
+        public string NameBg { get; set; } = null!;
+
+        [Comment("Image of the surface")]
         public string ImageUrl { get; set; } = null!;
+
         public virtual ICollection<Reservation> Reservations { get; set; } = new HashSet<Reservation>();
     }
 }

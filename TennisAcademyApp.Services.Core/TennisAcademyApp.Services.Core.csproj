@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="GTranslate" Version="2.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TennisAcademy.Data.Models\TennisAcademyApp.Data.Models.csproj" />
     <ProjectReference Include="..\TennisAcademy.Data\TennisAcademyApp.Data.csproj" />
     <ProjectReference Include="..\TennisAcademyApp.ViewModels\TennisAcademyApp.ViewModels.csproj" />

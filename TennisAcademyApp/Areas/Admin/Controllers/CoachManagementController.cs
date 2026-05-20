@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Coach;
 using static TennisAcademyApp.GCommon.Validations.ErrorMessages;
@@ -14,6 +15,7 @@ namespace TennisAcademyApp.Areas.Admin.Controllers
         {
             this.coachService = coachService;
         }
+
         public async Task<IActionResult> Index(string? searchQuery = null, int page = 1, int pageSize = 3)
         {
             try
@@ -29,6 +31,7 @@ namespace TennisAcademyApp.Areas.Admin.Controllers
                 return this.RedirectToAction(nameof(Index), "Home");
             }
         }
+
         [HttpGet]
         public async Task<IActionResult> Add()
         {
@@ -43,6 +46,7 @@ namespace TennisAcademyApp.Areas.Admin.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> Add(AddCoachInputModel inputModel)
         {
@@ -65,6 +69,7 @@ namespace TennisAcademyApp.Areas.Admin.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
+
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -80,29 +85,44 @@ namespace TennisAcademyApp.Areas.Admin.Controllers
                 return NotFound();
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> Edit(CoachEditInputModel model)
         {
+            string userId = GetUserId()!;
+
+            if (ModelState.IsValid == false)
+            {
+                TempData["ErrorMessage"] = InvalidData;
+                return View(model);
+            }
+
             try
             {
-                string userId = GetUserId()!;
-                if (ModelState.IsValid == false)
-                {
-                    TempData["ErrorMessage"] = InvalidData;
-                    return RedirectToAction(nameof(Edit), new { id = model.CoachId });
-                }
                 await this.coachService.EdittedCoachAsync(userId, model);
-
                 TempData["SuccessMessage"] = CoachUpdatedSuccessfully;
 
                 return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                ModelState.AddModelError(string.Empty, "Внимание: Записът беше променен от друг потребител, докато го редактирахте. Вашите промени не бяха запазени. Моля, заредете страницата наново и опитайте отново.");
+                TempData["ErrorMessage"] = "Грешка при дублиран достъп (Concurrency Error).";
+
+                return View(model);
             }
             catch (ArgumentException)
             {
                 TempData["ErrorMessage"] = CoachEditErrorMessage;
                 return RedirectToAction(nameof(Index));
             }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Възникна неочаквана грешка при запис на данните.";
+                return View(model);
+            }
         }
+
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
@@ -123,6 +143,7 @@ namespace TennisAcademyApp.Areas.Admin.Controllers
                 return NotFound();
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> Delete(DeleteCoachViewModel model)
         {

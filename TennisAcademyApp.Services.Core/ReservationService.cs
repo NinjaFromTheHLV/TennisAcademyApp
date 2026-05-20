@@ -19,7 +19,92 @@ namespace TennisAcademyApp.Services.Core
             this.dbContext = dbContext;
             this.userManager = userManager;
         }
+        public async Task<IEnumerable<ReservationIndexViewModel>?> GetFilteredUserReservationsAsync(string userId, string? searchTerm, DateTime? fromDate, DateTime? toDate, string? sortOrder)
+        {
+            await AutoReservationDeleteAsync();
 
+            var currentCulture = System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+            bool isBg = currentCulture == "bg";
+
+            var query = dbContext.Reservations
+                .Where(r => r.PlayerId == userId && r.IsDeleted == false)
+                .AsQueryable();
+
+            if (fromDate.HasValue)
+            {
+                query = query.Where(r => r.Date >= fromDate.Value);
+            }
+
+            if (toDate.HasValue)
+            {
+                query = query.Where(r => r.Date <= toDate.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                string term = searchTerm.ToLower();
+                query = query.Where(r => r.Coach.Name.ToLower().Contains(term) ||
+                                         r.Coach.NameBg.ToLower().Contains(term) ||
+                                         r.TrainingType.Name.ToLower().Contains(term) ||
+                                         r.TrainingType.NameBg.ToLower().Contains(term));
+            }
+
+            query = sortOrder switch
+            {
+                "date_desc" => query.OrderByDescending(r => r.Date),
+                "Duration" => query.OrderBy(r => r.Duration),
+                "duration_desc" => query.OrderByDescending(r => r.Duration),
+                _ => query.OrderBy(r => r.Date)
+            };
+
+            return await query
+                .AsNoTracking()
+                .Select(r => new ReservationIndexViewModel
+                {
+                    ReservationId = r.Id,
+                    CoachName = isBg ? r.Coach.NameBg : r.Coach.Name,
+                    TrainingTypeName = isBg ? r.TrainingType.NameBg : r.TrainingType.Name,
+                    Date = r.Date.ToString(DateFormat)
+                })
+                .ToListAsync();
+        }
+        public async Task<IEnumerable<ReservationExportViewModel>> GetAllReservationsForExportAsync(string? searchTerm, DateTime? fromDate, DateTime? toDate)
+        {
+            var query = this.dbContext.Reservations
+                .Where(r => r.IsDeleted == false)
+                .AsQueryable();
+
+            if (fromDate.HasValue)
+            {
+                query = query.Where(r => r.Date >= fromDate.Value);
+            }
+
+            if (toDate.HasValue)
+            {
+                query = query.Where(r => r.Date <= toDate.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                string term = searchTerm.ToLower();
+                query = query.Where(r =>
+                    r.Player.Email.ToLower().Contains(term) ||
+                    r.Coach.Name.ToLower().Contains(term));
+            }
+
+            return await query
+                .OrderBy(r => r.Date)
+                .Select(r => new ReservationExportViewModel
+                {
+                    Id = r.Id,
+                    DateTime = r.Date.ToString("dd.MM.yyyy HH:mm"),
+                    UserEmail = r.Player.Email,
+                    CoachName = r.Coach.Name,
+                    TrainingType = r.TrainingType.Name,
+                    SurfaceName = r.Surface.Name
+                })
+                .ToListAsync();
+        }
         public async Task<IEnumerable<ReservationIndexViewModel>?> GetUserReservationsAsync(string userId)
         {
             var autoDelete = await AutoReservationDeleteAsync();
@@ -64,6 +149,9 @@ namespace TennisAcademyApp.Services.Core
                 throw new ArgumentException(DurationErrorMessage);
             }
 
+            var currentCulture = System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+            bool isBg = currentCulture == "bg";
+
             var newReservation = new Reservation()
             {
                 PlayerId = userId,
@@ -72,8 +160,10 @@ namespace TennisAcademyApp.Services.Core
                 CoachId = model.CoachId,
                 Date = model.Date,
                 Duration = model.Duration,
-                Note = model.Note
+                Note = model.Note,
+                NoteBg = isBg ? model.Note : null
             };
+
             await dbContext.Reservations.AddAsync(newReservation);
             await dbContext.SaveChangesAsync();
 
@@ -100,6 +190,9 @@ namespace TennisAcademyApp.Services.Core
 
         public async Task<ReservationDetailsViewModel?> GetUserReservationDetailsAsync(string userId, int? id)
         {
+            var currentCulture = System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+            bool isBg = currentCulture == "bg";
+
             ReservationDetailsViewModel? details = null;
             var user = await userManager.FindByIdAsync(userId);
             if (user == null)
@@ -126,12 +219,13 @@ namespace TennisAcademyApp.Services.Core
                 {
                     Id = reservationDetails.Id,
                     ImageUrl = reservationDetails.Surface.ImageUrl,
-                    CoachName = reservationDetails.Coach.Name,
-                    SurfaceName = reservationDetails.Surface.Name,
-                    TrainingTypeName = reservationDetails.TrainingType.Name,
-                    Date = reservationDetails.Date,
                     Duration = reservationDetails.Duration,
-                    Note = reservationDetails.Note
+                    Date = reservationDetails.Date,
+                    CoachName = isBg ? reservationDetails.Coach.NameBg : reservationDetails.Coach.Name,
+                    SurfaceName = isBg ? reservationDetails.Surface.NameBg : reservationDetails.Surface.Name,
+                    TrainingTypeName = isBg ? reservationDetails.TrainingType.NameBg : reservationDetails.TrainingType.Name,
+                    Note = reservationDetails.Note,
+                    NoteBg = reservationDetails.NoteBg
                 };
             }
             return details;
@@ -159,13 +253,14 @@ namespace TennisAcademyApp.Services.Core
                 {
                     throw new ArgumentException(ReservationNotFoundErrorMessage);
                 }
-
+                var currentCulture = System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+                bool isBg = currentCulture == "bg";
                 if (reservation.PlayerId == userId)
                 {
                     reservationToDelete = new ReservationDeleteViewModel
                     {
                         Id = reservation.Id,
-                        SurfaceName = reservation.Surface.Name,
+                        SurfaceName = isBg ? reservation.Surface.NameBg : reservation.Surface.Name,
                         Date = reservation.Date,
                         ImageUrl = reservation.Surface.ImageUrl
                     };
@@ -203,6 +298,9 @@ namespace TennisAcademyApp.Services.Core
         {
             var user = await userManager.FindByIdAsync(userId);
 
+            var currentCulture = System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+            bool isBg = currentCulture == "bg";
+
             var pastReservations = await dbContext.Reservations
                 .AsNoTracking()
                 .IgnoreQueryFilters()
@@ -213,10 +311,11 @@ namespace TennisAcademyApp.Services.Core
                 .Select(r => new ReservationHistoryViewModel
                 {
                     ReservationId = r.Id,
-                    CoachName = r.Coach.Name,
-                    TrainingTypeName = r.TrainingType.Name,
+                    CoachName = isBg ? r.Coach.NameBg : r.Coach.Name,
+                    TrainingTypeName = isBg ? r.TrainingType.NameBg : r.TrainingType.Name,
+                    SurfaceName = isBg ? r.Surface.NameBg : r.Surface.Name,
                     SurfaceImageUrl = r.Surface.ImageUrl,
-                    SurfaceName = r.Surface.Name
+                    IsCanceled = r.Date > DateTime.Now
                 })
                 .ToListAsync();
 

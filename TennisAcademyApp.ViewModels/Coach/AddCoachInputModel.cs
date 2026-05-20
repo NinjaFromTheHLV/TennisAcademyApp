@@ -1,30 +1,30 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using static TennisAcademyApp.GCommon.Validations.RequiredMessages.Coach;
+using TennisAcademyApp.GCommon.Validations; // Добавяме узинга за custom атрибутите
 using static TennisAcademyApp.GCommon.Validations.ValidationConstants.Coach;
-using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Coach;
 
 namespace TennisAcademyApp.ViewModels.Coach
 {
     public class AddCoachInputModel
     {
-        [Required(ErrorMessage = RequiredNameMessage)]
+        [RequiredLocalized(nameof(RequiredMessages.Coach.RequiredNameMessage), typeof(RequiredMessages.Coach))]
         [Display(Name = "Coach Name")]
         public string Name { get; set; } = null!;
-        [Required(ErrorMessage = AgeRequiredMessage)]
+
+        [RequiredLocalized(nameof(RequiredMessages.Coach.AgeRequiredMessage), typeof(RequiredMessages.Coach))]
+        [RangeLocalized(CoachAgeMinRequirement, CoachAgeMaxRequirement, nameof(ErrorMessages.Coach.AgeErrorMessage), typeof(ErrorMessages.Coach))]
         [Display(Name = "Coach Age")]
-        [Range(CoachAgeMinRequirement, CoachAgeMaxRequirement, ErrorMessage = AgeErrorMessage)]
         public int Age { get; set; }
 
-        [Required(ErrorMessage = DescriptionRequiredMessage)]
+        [RequiredLocalized(nameof(RequiredMessages.Coach.DescriptionRequiredMessage), typeof(RequiredMessages.Coach))]
+        [StringLengthLocalized(CoachDescriptionMaxLenght, nameof(ErrorMessages.Coach.DescriptionMinLengthMessage), typeof(ErrorMessages.Coach), MinimumLength = CoachDescriptionMinLenght)]
         [Display(Name = "Coach Description")]
-        [MinLength(CoachDescriptionMinLenght, ErrorMessage = DescriptionMinLengthMessage)]
-        [MaxLength(CoachDescriptionMaxLenght, ErrorMessage = DescriptionMaxLengthMessage)]
         public string Description { get; set; } = null!;
+
         [Required(ErrorMessage = "Nationality is required!")]
         [Display(Name = "Coach Nationality")]
         public string Nationality { get; set; } = null!;
+
         [Display(Name = "Coach Image")]
         public string? ImageUrl { get; set; }
-
     }
 }

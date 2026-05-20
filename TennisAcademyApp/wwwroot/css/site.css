@@ -198,3 +198,122 @@ body {
         max-width: 60px;
         margin-bottom: 0.8rem;
     }
+
+:root {
+    --bg-main: #0B0F19;
+    --bg-card: #151D30;
+    --text-main: #F3F4F6;
+    --text-muted: #9CA3AF;
+    --accent: #CCFF00;
+    --accent-hover: #B3E600;
+    --border-color: #24324F; 
+    --border-radius: 12px; 
+}
+
+body {
+    background-color: var(--bg-main) !important;
+    color: var(--text-main) !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar {
+    background-color: var(--bg-card) !important;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.navbar-brand, .nav-link {
+    color: var(--text-main) !important;
+}
+
+    .nav-link:hover {
+        color: var(--accent) !important;
+    }
+
+.card {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--border-radius) !important;
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(204, 255, 0, 0.15) !important;
+        border-color: var(--accent) !important;
+    }
+
+.card-title {
+    color: var(--text-main) !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.btn-success, .btn-primary {
+    background-color: var(--accent) !important;
+    border-color: var(--accent) !important;
+    color: #0B0F19 !important;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+    .btn-success:hover, .btn-primary:hover {
+        background-color: var(--accent-hover) !important;
+        border-color: var(--accent-hover) !important;
+        transform: scale(1.02);
+    }
+
+.btn-outline-primary {
+    color: var(--text-main) !important;
+    border-color: var(--border-color) !important;
+    background-color: transparent !important;
+}
+
+    .btn-outline-primary:hover {
+        background-color: var(--bg-card) !important;
+        border-color: var(--accent) !important;
+        color: var(--accent) !important;
+    }
+
+.table {
+    color: var(--text-main) !important;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(204, 255, 0, 0.05) !important;
+}
+
+.card-header {
+    background-color: #1A243D !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+.form-control {
+    background-color: #0F1524 !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-main) !important;
+    border-radius: 8px;
+}
+
+    .form-control:focus {
+        border-color: var(--accent) !important;
+        box-shadow: 0 0 0 0.25rem rgba(204, 255, 0, 0.25) !important;
+    }
+
+.form-label {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.alert-success {
+    background-color: rgba(204, 255, 0, 0.1) !important;
+    border: 1px solid var(--accent) !important;
+    color: var(--accent) !important;
+}

@@ -10,5 +10,6 @@
         public DateTime Date { get; set; }
         public int Duration { get; set; }
         public string? Note { get; set; }
+        public string? NoteBg { get; set; }
     }
 }

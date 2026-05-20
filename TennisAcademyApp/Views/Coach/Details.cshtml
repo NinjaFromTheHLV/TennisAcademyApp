@@ -2,33 +2,99 @@
 @model CoachDetailsViewModel;
 
 @{
-    ViewData["Title"] = "Coach Details";
+    var requestCulture = ViewContext.HttpContext.Features.Get<Microsoft.AspNetCore.Localization.IRequestCultureFeature>();
+    var currentCulture = requestCulture?.RequestCulture.UICulture.Name ?? "en";
+    var isBg = currentCulture == "bg";
+
+    ViewData["Title"] = isBg ? "Детайли за треньора" : "Coach Details";
 }
 
-<div class="coach-card mb-5 mt-4">
-    <div class="row g-0">
-        <div class="col-md-5">
-            <img src="@Url.Content(Model.ImageUrl)" alt="Coach image" class="img-fluid" />
-        </div>
-        <div class="col-md-7">
-            <div class="card-body d-flex flex-column justify-content-between h-100">
-                <div>
-                    <h3 class="card-title mb-3">@Model.CoachName</h3>
-                    <p class="mb-2"><strong>Age:</strong> @Model.CoachAge</p>
-                    <p><strong>Description:</strong><br />@Model.Description</p>
-                    <p class="mb-2"><strong>Nationality:</strong> @Model.Nationality</p>
-                </div>
+<div class="container mt-4">
+    <div class="card shadow border-0 rounded-4 overflow-hidden mb-5">
+        <div class="row g-0">
+            <div class="col-md-5">
+                <img src="@Url.Content(Model.ImageUrl)" alt="Coach image" class="img-fluid h-100 object-fit-cover" style="min-height: 400px; width: 100%;" />
+            </div>
+            <div class="col-md-7">
+                <div class="card-body p-4 d-flex flex-column justify-content-between h-100">
+                    <div>
+                        <h2 class="fw-bold mb-3">@(isBg ? (Model.CoachNameBg ?? Model.CoachName) : Model.CoachName)</h2>
+                        <hr class="border-secondary opacity-25 mb-4" />
 
-                <div class="mt-4 d-flex flex-wrap gap-2">
-                    @if (User?.Identity?.IsAuthenticated == true && Model.IsInUserFavorites == false)
-                    {
-                        <form asp-controller="FavouriteCoach" asp-action="AddToFavourites" asp-route-id="@Model.CoachId" method="post" class="d-inline">
-                            <button type="submit" class="btn btn-warning">Add to favourites</button>
-                        </form>
-                    }
-                    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                        <div class="d-flex flex-column gap-3">
+                            <p class="mb-0">
+                                <i class="bi bi-calendar3 text-primary me-2"></i>
+                                <strong>@(isBg ? "Възраст:" : "Age:")</strong> @Model.CoachAge @(isBg ? "години" : "years old")
+                            </p>
+                            <p class="mb-0">
+                                <i class="bi bi-globe text-primary me-2"></i>
+                                <strong>@(isBg ? "Националност:" : "Nationality:")</strong> @(isBg ? (Model.NationalityBg ?? Model.Nationality) : Model.Nationality)
+                            </p>
+                            <p class="mb-0">
+                                <i class="bi bi-file-text text-primary me-2"></i>
+                                <strong>@(isBg ? "Описание:" : "Description:")</strong>
+                                <span class="d-block text-muted mt-1 ps-4">@(isBg ? (Model.DescriptionBg ?? Model.Description) : Model.Description)</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 d-flex flex-wrap gap-3">
+                        @if (User?.Identity?.IsAuthenticated == true && Model.IsInUserFavorites == false)
+                        {
+                            <form asp-controller="FavouriteCoach" asp-action="AddToFavourites" asp-route-id="@Model.CoachId" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-warning px-4 py-2 fw-semibold">
+                                    <i class="bi bi-star-fill me-2"></i>@(isBg ? "Добави в любими" : "Add to favourites")
+                                </button>
+                            </form>
+                        }
+                        <a asp-action="Index" class="btn btn-outline-primary px-4 py-2">
+                            <i class="bi bi-arrow-left me-2"></i>@(isBg ? "Назад към списъка" : "Back to List")
+                        </a>
+                    </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="card shadow border-0 rounded-4 overflow-hidden mb-5">
+        <div class="card-header bg-card border-bottom p-3">
+            <h4 class="mb-0 fw-semibold"><i class="bi bi-calendar-week text-primary me-2"></i>@(isBg ? "Предстоящ график" : "Upcoming Schedule")</h4>
+        </div>
+        <div class="card-body p-4">
+            @if (Model.CoachReservations == null || !Model.CoachReservations.Any())
+            {
+                <div class="alert alert-info text-center border-0 mb-0 rounded-3">
+                    <i class="bi bi-info-circle me-2"></i>@(isBg ? "Този треньор в момента няма насрочени уроци." : "This coach currently has no scheduled lessons.")
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="text-center px-3">@(isBg ? "Дата и час" : "Date & Time")</th>
+                                <th class="text-start px-3">@(isBg ? "Тип тренировка" : "Training Type")</th>
+                                <th class="text-center px-3">@(isBg ? "Действие" : "Action")</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var res in Model.CoachReservations)
+                            {
+                                <tr>
+                                    <td class="text-center fw-semibold px-3">@res.Date</td>
+                                    <td class="text-start text-muted px-3">@(isBg ? (res.TrainingTypeNameBg ?? res.TrainingTypeName) : res.TrainingTypeName)</td>
+                                    <td class="text-center px-3">
+                                        <a asp-controller="Reservation" asp-action="Details" asp-route-id="@res.ReservationId" class="btn btn-outline-primary btn-sm px-3 rounded-2">
+                                            <i class="bi bi-eye me-1"></i>@(isBg ? "Преглед" : "View Booking")
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
         </div>
     </div>
 </div>

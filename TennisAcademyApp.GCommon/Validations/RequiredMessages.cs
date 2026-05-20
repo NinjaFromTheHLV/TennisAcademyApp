@@ -2,44 +2,60 @@
 {
     public static class RequiredMessages
     {
+        private static bool IsBg => System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "bg";
+
         public static class Coach
         {
-            public const string RequiredNameMessage = "Name is required.";
-            public const string DescriptionRequiredMessage = "Description is required.";
-            public const string AgeRequiredMessage = "Age is required.";
+            private static bool IsBg => System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "bg";
+
+            public static string RequiredNameMessage => IsBg ? "Името е задължително." : "Name is required.";
+            public static string DescriptionRequiredMessage => IsBg ? "Описанието е задължително." : "Description is required.";
+            public static string AgeRequiredMessage => IsBg ? "Възрастта е задължителна." : "Age is required.";
         }
+
         public static class Reservation
         {
-            public const string RequiredDateMessage = "Please select Date & Time.";
-            public const string RequiredCoachMessage = "Please select a coach.";
-            public const string RequiredSurfaceMessage = "Please select a surface.";
-            public const string RequiredTrainingTypeMessage = "Please select a training type.";
+            private static bool IsBg => System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "bg";
+
+            public static string RequiredDateMessage => IsBg ? "Моля, изберете дата и час." : "Please select Date & Time.";
+            public static string RequiredCoachMessage => IsBg ? "Моля, изберете треньор." : "Please select a coach.";
+            public static string RequiredSurfaceMessage => IsBg ? "Моля, изберете настилка." : "Please select a surface.";
+            public static string RequiredTrainingTypeMessage => IsBg ? "Моля, изберете тип тренировка." : "Please select a training type.";
         }
-        public static class Racket 
+
+        public static class Racket
         {
-            public const string BrandRequiredErrorMessage = "Brand is required.";
-            public const string ModelRequiredErrorMessage = "Model is required.";
-            public const string PriceRequiredErrorMessage = "Price is required.";
-            public const string QuantityRequiredErrorMessage = "Quantity is required.";
-            public const string ImageUrlRequiredErrorMessage = "Image URL is required.";
-            public const string RacketNotFoundErrorMessage = "Racket not found.";
+            private static bool IsBg => System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "bg";
+
+            public static string BrandRequiredErrorMessage => IsBg ? "Марката е задължителна." : "Brand is required.";
+            public static string ModelRequiredErrorMessage => IsBg ? "Моделът е задължителен." : "Model is required.";
+            public static string PriceRequiredErrorMessage => IsBg ? "Цената е задължителна." : "Price is required.";
+            public static string QuantityRequiredErrorMessage => IsBg ? "Количеството е задължително." : "Quantity is required.";
+            public static string ImageUrlRequiredErrorMessage => IsBg ? "URL адресът на изображението е задължителен." : "Image URL is required.";
+            public static string RacketNotFoundErrorMessage => IsBg ? "Ракетата не е намерена." : "Racket not found.";
         }
+
         public static class Ball
         {
-            public const string BrandRequiredErrorMessage = "Brand is required.";
-            public const string ModelRequiredErrorMessage = "Model is required.";
-            public const string PriceRequiredErrorMessage = "Price is required.";
-            public const string QuantityRequiredErrorMessage = "Quantity is required.";
-            public const string ImageUrlRequiredErrorMessage = "Image URL is required.";
-            public const string BallNotFoundErrorMessage = "Ball not found.";
+            private static bool IsBg => System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "bg";
+
+            public static string BrandRequiredErrorMessage => IsBg ? "Марката е задължителна." : "Brand is required.";
+            public static string ModelRequiredErrorMessage => IsBg ? "Моделът е задължителен." : "Model is required.";
+            public static string PriceRequiredErrorMessage => IsBg ? "Цената е задължителна." : "Price is required.";
+            public static string QuantityRequiredErrorMessage => IsBg ? "Количеството е задължително." : "Quantity is required.";
+            public static string ImageUrlRequiredErrorMessage => IsBg ? "URL адресът на изображението е задължителен." : "Image URL is required.";
+            public static string BallNotFoundErrorMessage => IsBg ? "Топките не са намерени." : "Ball not found.";
         }
+
         public static class Bag
         {
-            public const string BrandRequiredErrorMessage = "Brand is required.";
-            public const string ModelRequiredErrorMessage = "Model is required.";
-            public const string PriceRequiredErrorMessage = "Price is required.";
-            public const string QuantityRequiredErrorMessage = "Quantity is required.";
-            public const string ImageUrlRequiredErrorMessage = "Image URL is required.";
+            private static bool IsBg => System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "bg";
+
+            public static string BrandRequiredErrorMessage => IsBg ? "Марката е задължителна." : "Brand is required.";
+            public static string ModelRequiredErrorMessage => IsBg ? "Моделът е задължителен." : "Model is required.";
+            public static string PriceRequiredErrorMessage => IsBg ? "Цената е задължителна." : "Price is required.";
+            public static string QuantityRequiredErrorMessage => IsBg ? "Количеството е задължително." : "Quantity is required.";
+            public static string ImageUrlRequiredErrorMessage => IsBg ? "URL адресът на изображението е задължителен." : "Image URL is required.";
         }
     }
 }

@@ -2,61 +2,88 @@
 {
     public static class SuccessfulMessages
     {
+        private static bool IsBg => System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "bg";
+
         public static class Coach
         {
-            public const string CoachAddedSuccessfully = "Coach added successfully.";
-            public const string CoachUpdatedSuccessfully = "Coach updated successfully.";
-            public const string CoachDeletedSuccessfully = "Coach deleted successfully.";
+            private static bool IsBg => System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "bg";
 
-            public const string CoachFavouriteAddedSuccessfully = "Coach added to favourites successfully.";
-            public const string CoachFavouriteRemovedSuccessfully = "Coach removed from favourites successfully.";
+            public static string CoachAddedSuccessfully => IsBg ? "Треньорът беше добавен успешно." : "Coach added successfully.";
+            public static string CoachUpdatedSuccessfully => IsBg ? "Треньорът беше обновен успешно." : "Coach updated successfully.";
+            public static string CoachDeletedSuccessfully => IsBg ? "Треньорът беше изтрит успешно." : "Coach deleted successfully.";
+            public static string CoachFavouriteAddedSuccessfully => IsBg ? "Треньорът беше добавен в любими успешно." : "Coach added to favourites successfully.";
+            public static string CoachFavouriteRemovedSuccessfully => IsBg ? "Треньорът беше премахнат от любими успешно." : "Coach removed from favourites successfully.";
         }
+
         public static class Reservation
         {
-            public const string ReservationCreatedSuccessfully = "Reservation created successfully.";
-            public const string ReservationDeletedSuccessfully = "Reservation deleted successfully.";
+            private static bool IsBg => System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "bg";
+
+            public static string ReservationCreatedSuccessfully => IsBg ? "Резервацията беше създадена успешно." : "Reservation created successfully.";
+            public static string ReservationDeletedSuccessfully => IsBg ? "Резервацията беше изтрита успешно." : "Reservation deleted successfully.";
         }
+
         public static class Racket
         {
-            public const string RacketAddedSuccessfully = "Racket added successfully.";
-            public const string RacketUpdatedSuccessfully = "Racket updated successfully.";
-            public const string RacketDeletedSuccessfully = "Racket deleted successfully.";
+            private static bool IsBg => System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "bg";
+
+            public static string RacketAddedSuccessfully => IsBg ? "Ракетата беше добавена успешно." : "Racket added successfully.";
+            public static string RacketUpdatedSuccessfully => IsBg ? "Ракетата беше обновена успешно." : "Racket updated successfully.";
+            public static string RacketDeletedSuccessfully => IsBg ? "Ракетата беше изтрита успешно." : "Racket deleted successfully.";
         }
+
         public static class RacketCart
         {
-            public const string RacketAddedToCartSuccessfully = "Racket added to cart successfully.";
-            public const string RacketRemovedFromCartSuccessfully = "Racket removed from cart successfully.";
-            public const string RacketCheckoutSuccessful = "Racket checkout successful. Thank you for your purchase!";
+            private static bool IsBg => System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "bg";
+
+            public static string RacketAddedToCartSuccessfully => IsBg ? "Ракетата беше добавена в количката успешно." : "Racket added to cart successfully.";
+            public static string RacketRemovedFromCartSuccessfully => IsBg ? "Ракетата беше премахната от количката успешно." : "Racket removed from cart successfully.";
+            public static string RacketCheckoutSuccessful => IsBg ? "Поръчката на ракетата е успешна. Благодарим ви за покупката!" : "Racket checkout successful. Thank you for your purchase!";
         }
+
         public static class Ball
         {
-            public const string BallAddedSuccessfully = "Ball added successfully.";
-            public const string BallUpdatedSuccessfully = "Ball updated successfully.";
-            public const string BallDeletedSuccessfully = "Ball deleted successfully.";
+            private static bool IsBg => System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "bg";
+
+            public static string BallAddedSuccessfully => IsBg ? "Топките бяха добавени успешно." : "Ball added successfully.";
+            public static string BallUpdatedSuccessfully => IsBg ? "Топките бяха обновени успешно." : "Ball updated successfully.";
+            public static string BallDeletedSuccessfully => IsBg ? "Топките бяха изтрити успешно." : "Ball deleted successfully.";
         }
+
         public static class BallCart
         {
-            public const string BallAddedToCartSuccessfully = "Ball added to cart successfully.";
-            public const string BallRemovedFromCartSuccessfully = "Ball removed from cart successfully.";
-            public const string BallCheckoutSuccessful = "Ball checkout successful. Thank you for your purchase!";
+            private static bool IsBg => System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "bg";
+
+            public static string BallAddedToCartSuccessfully => IsBg ? "Топките бяха добавени в количката успешно." : "Ball added to cart successfully.";
+            public static string BallRemovedFromCartSuccessfully => IsBg ? "Топките бяха премахнати от количката успешно." : "Ball removed from cart successfully.";
+            public static string BallCheckoutSuccessful => IsBg ? "Поръчката на топките е успешна. Благодарим ви за покупката!" : "Ball checkout successful. Thank you for your purchase!";
         }
+
         public static class Bag
         {
-            public const string BagAddedSuccessfully = "Bag added successfully.";
-            public const string BagUpdatedSuccessfully = "Bag updated successfully.";
-            public const string BagDeletedSuccessfully = "Bag deleted successfully.";
+            private static bool IsBg => System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "bg";
+
+            public static string BagAddedSuccessfully => IsBg ? "Чантата беше добавена успешно." : "Bag added successfully.";
+            public static string BagUpdatedSuccessfully => IsBg ? "Чантата беше обновена успешно." : "Bag updated successfully.";
+            public static string BagDeletedSuccessfully => IsBg ? "Чантата беше изтрита успешно." : "Bag deleted successfully.";
         }
+
         public static class BagCart
         {
-            public const string BagAddedToCartSuccessfully = "Bag added to cart successfully.";
-            public const string BagRemovedFromCartSuccessfully = "Bag removed from cart successfully.";
-            public const string BagCheckoutSuccessful = "Bag checkout successful. Thank you for your purchase!";
+            private static bool IsBg => System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "bg";
+
+            public static string BagAddedToCartSuccessfully => IsBg ? "Чантата беше добавена в количката успешно." : "Bag added to cart successfully.";
+            public static string BagRemovedFromCartSuccessfully => IsBg ? "Чантата беше премахната от количката успешно." : "Bag removed from cart successfully.";
+            public static string BagCheckoutSuccessful => IsBg ? "Поръчката на чантата е успешна. Благодарим ви за покупката!" : "Bag checkout successful. Thank you for your purchase!";
         }
+
         public static class UserManagement
         {
-            public const string UserAssignedToRoleSuccessfully = "User assigned to role successfully.";
-            public const string UserRemovedFromRoleSuccessfully = "User removed from role successfully.";
-            public const string UserRemovedSuccessfully = "User removed successfully.";
+            private static bool IsBg => System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "bg";
+
+            public static string UserAssignedToRoleSuccessfully => IsBg ? "Ролята беше назначена на потребителя успешно." : "User assigned to role successfully.";
+            public static string UserRemovedFromRoleSuccessfully => IsBg ? "Ролята беше премахната от потребителя успешно." : "User removed from role successfully.";
+            public static string UserRemovedSuccessfully => IsBg ? "Потребителят беше премахнат успешно." : "User removed successfully.";
         }
     }
 }

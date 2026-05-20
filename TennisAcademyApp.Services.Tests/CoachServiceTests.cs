@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
 using TennisAcademyApp.Data;
@@ -25,7 +26,6 @@ namespace TennisAcademyApp.Tests
 
             dbContext = new TennisAcademyDbContext(options);
 
-            // Seed test data
             dbContext.Coaches.AddRange(new List<Coach>
             {
                 new Coach { CoachId = 1, Name = "John Doe", Age = 35, Description = "Desc4444444441", ImageUrl = null, Nationality = "USA" },
@@ -38,7 +38,15 @@ namespace TennisAcademyApp.Tests
             userManagerMock = new Mock<UserManager<IdentityUser>>(userStoreMock.Object,
                 null, null, null, null, null, null, null, null);
 
-            coachService = new CoachService(dbContext, userManagerMock.Object);
+            var inMemorySettings = new Dictionary<string, string> {
+            {"CoachSettings:DefaultPassword", "TestCoachPassword123!"}
+            };
+
+            IConfiguration configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(inMemorySettings)
+                .Build();
+
+            coachService = new CoachService(dbContext, userManagerMock.Object, configuration);
         }
 
         [Test]

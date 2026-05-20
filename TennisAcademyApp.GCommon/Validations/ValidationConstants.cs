@@ -4,6 +4,7 @@
     {
         public const string Admin = "Admin";
         public const string User = "User";
+        public const string Trainer = "Coach";
         public static class Coach
         {
             public const int CoachAgeMinRequirement = 30;

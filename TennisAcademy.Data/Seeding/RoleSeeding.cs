@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using static TennisAcademyApp.GCommon.Validations.ValidationConstants;
@@ -11,10 +12,12 @@ namespace TennisAcademyApp.Data.Seeding
         {
             await SeedRolesAsync(serviceProvider);
             await SeedAdminAsync(serviceProvider);
+            await SeedCoachesAsync(serviceProvider);
         }
+
         private static async Task SeedRolesAsync(IServiceProvider serviceProvider)
         {
-            string[] roles = { Admin, User };
+            string[] roles = { Admin, Trainer, User };
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
             foreach (var role in roles)
@@ -29,6 +32,62 @@ namespace TennisAcademyApp.Data.Seeding
                 }
             }
         }
+        private static async Task SeedCoachesAsync(IServiceProvider serviceProvider)
+        {
+            var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+            var dbContext = serviceProvider.GetRequiredService<TennisAcademyDbContext>();
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+
+            var coachesWithoutAccounts = await dbContext.Coaches
+                .Where(c => c.UserId == null)
+                .ToListAsync();
+
+            string defaultPassword = configuration["CoachSettings:DefaultPassword"];
+
+            if (string.IsNullOrEmpty(defaultPassword))
+            {
+                throw new InvalidOperationException("Default coach password is not configured in user secrets.");
+            }
+
+            foreach (var coach in coachesWithoutAccounts)
+            {
+                string coachEmail = $"{coach.Name.Replace(" ", ".").ToLower()}@tennis.com"
+                    .Replace("ö", "o")
+                    .Replace("ä", "a")
+                    .Replace("ü", "u");
+
+                var user = await userManager.FindByEmailAsync(coachEmail);
+
+                if (user == null)
+                {
+                    user = new IdentityUser
+                    {
+                        Email = coachEmail,
+                        UserName = coachEmail,
+                        EmailConfirmed = true
+                    };
+
+                    var result = await userManager.CreateAsync(user, defaultPassword);
+                    if (!result.Succeeded)
+                    {
+                        throw new Exception($"Failed to create Identity User for coach {coach.Name}");
+                    }
+                }
+
+                if (!await userManager.IsInRoleAsync(user, Trainer))
+                {
+                    await userManager.AddToRoleAsync(user, Trainer);
+                }
+
+                coach.UserId = user.Id;
+            }
+
+            if (coachesWithoutAccounts.Any())
+            {
+                await dbContext.SaveChangesAsync();
+            }
+        }
+
         private static async Task SeedAdminAsync(IServiceProvider serviceProvider)
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();

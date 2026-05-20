@@ -27,8 +27,7 @@ namespace TennisAcademyApp
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
                 options.Password.RequireDigit = false;
-            }
-            )
+            })
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<TennisAcademyDbContext>()
             .AddDefaultTokenProviders();
@@ -37,6 +36,8 @@ namespace TennisAcademyApp
             {
                 cfg.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
             });
+
+            builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
             builder.Services.AddScoped<ICoachService, CoachService>();
             builder.Services.AddScoped<IReservationService, ReservationService>();
@@ -51,12 +52,11 @@ namespace TennisAcademyApp
             builder.Services.AddScoped<IBagCartService, BagCartService>();
             builder.Services.AddScoped<IUserService, UserService>();
 
-            var app = builder.Build();
+            var app = builder.Build(); // <--- Container is locked here
 
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-
                 SeedIdentityAsync(services).GetAwaiter().GetResult();
             }
 
@@ -68,7 +68,6 @@ namespace TennisAcademyApp
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
@@ -79,6 +78,15 @@ namespace TennisAcademyApp
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            // Configure Localization Middleware
+            var supportedCultures = new[] { "en", "bg" };
+            var localizationOptions = new RequestLocalizationOptions()
+                .SetDefaultCulture(supportedCultures[0])
+                .AddSupportedCultures(supportedCultures)
+                .AddSupportedUICultures(supportedCultures);
+
+            app.UseRequestLocalization(localizationOptions);
 
             app.UseStatusCodePagesWithRedirects("/Home/Error/{0}");
 

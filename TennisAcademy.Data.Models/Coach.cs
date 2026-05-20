@@ -1,33 +1,54 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TennisAcademyApp.Data.Models
 {
-    [Comment("Tennis Academy Coaches")]
     public class Coach
     {
         [Key]
-        [Comment("Coach Identifier")]
         public int CoachId { get; set; }
-        [Required]
-        [Comment("Coach Name")]
-        public string Name { get; set; } = null!;
-        [Comment("Coach Image")]
-        public string? ImageUrl { get; set; }
 
         [Required]
-        [Comment("Coach Age")]
+        [MaxLength(100)]
+        public string Name { get; set; } = null!;
+
+        [Required]
+        [MaxLength(100)]
+        public string NameBg { get; set; } = null!;
+
+        [Required]
         public int Age { get; set; }
+
         [Required]
-        [Comment("Coach Description")]
         public string Description { get; set; } = null!;
+
         [Required]
-        [Comment("Coach Nationality")]
+        public string DescriptionBg { get; set; } = null!;
+
+        [Required]
+        [MaxLength(50)]
         public string Nationality { get; set; } = null!;
+
         [Required]
-        [Comment("Foreign key of IdentityUser")]
-        public virtual ICollection<Reservation> Reservations { get; set; } = new HashSet<Reservation>();
-        public virtual ICollection<UserFavourite> UsersCoaches { get; set; } = new HashSet<UserFavourite>();
+        [MaxLength(50)]
+        public string NationalityBg { get; set; } = null!;
+
+        [Required]
+        public string ImageUrl { get; set; } = null!;
+        [Comment("Identity User Identifier linked to this coach")]
+        public string? UserId { get; set; }
+
+        [ForeignKey(nameof(UserId))]
+        public virtual IdentityUser? User { get; set; }
+
+        [Required]
+        public bool IsDeleted { get; set; } = false;
+
+        public virtual ICollection<Reservation> Reservations { get; set; }
+
+        public virtual ICollection<UserFavourite> UserFavourites { get; set; }
     }
 }

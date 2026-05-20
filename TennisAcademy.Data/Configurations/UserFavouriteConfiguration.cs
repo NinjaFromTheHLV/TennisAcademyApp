@@ -20,7 +20,7 @@ namespace TennisAcademyApp.Data.Configurations
 
             config
                 .HasOne(uc => uc.Coach)
-                .WithMany(uc => uc.UsersCoaches)
+                .WithMany(uc => uc.UserFavourites)
                 .HasForeignKey(uc => uc.CoachId)
                 .OnDelete(DeleteBehavior.NoAction);
         }

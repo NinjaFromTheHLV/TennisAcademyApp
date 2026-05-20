@@ -2,9 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Coach;
-using static TennisAcademyApp.GCommon.Validations.ErrorMessages;
-using static TennisAcademyApp.GCommon.Validations.SuccessfulMessages.Coach;
-using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Coach;
+
 
 namespace TennisAcademyApp.Controllers
 {

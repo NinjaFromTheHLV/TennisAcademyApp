@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using GTranslate.Translators;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using TennisAcademyApp.Data;
+using TennisAcademyApp.Data.Models;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Ball;
-using TennisAcademyApp.Data.Models;
-using Microsoft.EntityFrameworkCore;
 using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Ball;
 
 namespace TennisAcademyApp.Services.Core
@@ -21,14 +22,17 @@ namespace TennisAcademyApp.Services.Core
 
         public async Task<IEnumerable<BallIndexViewModel>> GetAllBallsAsync()
         {
+            var currentCulture = System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+            bool isBg = currentCulture == "bg";
+
             var balls = await dbContext.Balls
                 .AsNoTracking()
                 .Include(b => b.RacketCarts)
                 .Select(b => new BallIndexViewModel
                 {
                     Id = b.Id,
-                    Brand = b.Brand,
-                    Model = b.Model,
+                    Brand = isBg ? b.BrandBg : b.Brand,
+                    Model = isBg ? b.ModelBg : b.Model,
                     Price = b.Price,
                     Quantity = b.Quantity,
                     ImageUrl = b.ImageUrl,
@@ -64,18 +68,29 @@ namespace TennisAcademyApp.Services.Core
             bool result = false;
             var user = await userManager.FindByIdAsync(userId);
             bool IsAdmin = await userManager.IsInRoleAsync(user, "Admin");
+
             if (IsAdmin)
             {
+                var translator = new GoogleTranslator();
+
+                var brandTranslation = await translator.TranslateAsync(model.Brand, "bg", "en");
+                string brandBgResult = brandTranslation.Translation;
+
+                var modelTranslation = await translator.TranslateAsync(model.Model, "bg", "en");
+                string modelBgResult = modelTranslation.Translation;
+
                 var ball = new Ball
                 {
                     Brand = model.Brand,
+                    BrandBg = brandBgResult,
                     Model = model.Model,
+                    ModelBg = modelBgResult,
                     Price = model.Price,
                     Quantity = model.Quantity,
-                    ImageUrl = model.ImageUrl
+                    ImageUrl = model.ImageUrl ?? "~/pictures/DefaultBallImage.webp",
                 };
 
-                await dbContext.AddAsync(ball);
+                await dbContext.Balls.AddAsync(ball);
                 await dbContext.SaveChangesAsync();
 
                 result = true;
@@ -112,18 +127,30 @@ namespace TennisAcademyApp.Services.Core
         public async Task<bool> EditBallAsync(BallEditFormModel model)
         {
             bool result = false;
-            var ball = await dbContext.Balls.FindAsync(model.Id);
+
+            var ball = await dbContext.Balls.FirstOrDefaultAsync(b => b.Id == model.Id);
 
             if (ball == null)
             {
                 throw new ArgumentException(BallNotFoundErrorMessage);
             }
+            var translator = new GoogleTranslator();
+
+            var brandTranslation = await translator.TranslateAsync(model.Brand, "bg", "en");
+            string brandBgResult = brandTranslation.Translation;
+
+            var modelTranslation = await translator.TranslateAsync(model.Model, "bg", "en");
+            string modelBgResult = modelTranslation.Translation;
 
             ball.Brand = model.Brand;
+            ball.BrandBg = brandBgResult;
             ball.Model = model.Model;
+            ball.ModelBg = modelBgResult;
             ball.Price = model.Price;
             ball.Quantity = model.Quantity;
             ball.ImageUrl = model.ImageUrl;
+
+            dbContext.Entry(ball).State = EntityState.Modified;
 
             await dbContext.SaveChangesAsync();
 
@@ -133,21 +160,23 @@ namespace TennisAcademyApp.Services.Core
 
         public async Task<BallDeleteViewModel> GetBallForDeletingAsync(string userId, int? id)
         {
-            BallDeleteViewModel? model = null;
             var user = await userManager.FindByIdAsync(userId);
             bool IsAdmin = await userManager.IsInRoleAsync(user, "Admin");
-            if (!IsAdmin)
+            if (user == null || !IsAdmin)
             {
                 throw new UnauthorizedAccessException("You do not have permission to delete a ball.");
             }
 
             var ball = await FindBallByIdAsync(id);
 
-            model = new BallDeleteViewModel
+            var currentCulture = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+            bool isBg = currentCulture.Equals("bg", StringComparison.OrdinalIgnoreCase);
+
+            var model = new BallDeleteViewModel
             {
                 Id = ball.Id,
-                Brand = ball.Brand,
-                Model = ball.Model,
+                Brand = isBg ? ball.BrandBg : ball.Brand,
+                Model = isBg ? ball.ModelBg : ball.Model,
                 ImageUrl = ball.ImageUrl
             };
 

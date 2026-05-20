@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using GTranslate.Translators;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System;
 using TennisAcademyApp.Data;
 using TennisAcademyApp.Data.Models;
 using TennisAcademyApp.Services.Core.Contracts;
@@ -19,13 +21,15 @@ namespace TennisAcademyApp.Services.Core
         }
         public async Task<IEnumerable<RacketIndexViewModel>> GetAllRacketsAsync()
         {
+            var currentCulture = System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+            bool isBg = currentCulture == "bg";
             var rackets = await dbContext.Rackets
                 .Include(r => r.RacketCart)
                 .Select(r => new RacketIndexViewModel
                 {
                     Id = r.Id,
-                    Brand = r.Brand,
-                    Model = r.Model,
+                    Brand = isBg ? r.BrandBg : r.Brand,
+                    Model = isBg ? r.ModelBg : r.Model,
                     Price = r.Price,
                     Quantity = r.Quantity,
                     ImageUrl = r.ImageUrl,
@@ -55,7 +59,6 @@ namespace TennisAcademyApp.Services.Core
         }
         public async Task<bool> AddRacketAsync(string userId, RacketCreateInputModel model)
         {
-            bool result = false;
             var user = await userManager.FindByIdAsync(userId);
             bool isAdmin = await userManager.IsInRoleAsync(user, "Admin");
             if (user == null || !isAdmin)
@@ -63,19 +66,29 @@ namespace TennisAcademyApp.Services.Core
                 throw new ArgumentException("You have to be an Admin to add rackets");
             }
 
+            var translator = new GoogleTranslator();
+
+            var brandTranslation = await translator.TranslateAsync(model.Brand, "bg", "en");
+            string brandBgResult = brandTranslation.Translation;
+
+            var modelTranslation = await translator.TranslateAsync(model.Model, "bg", "en");
+            string modelBgResult = modelTranslation.Translation;
+
             var racket = new Racket
             {
                 Brand = model.Brand,
+                BrandBg = brandBgResult,
                 Model = model.Model,
+                ModelBg = modelBgResult,
                 Price = model.Price,
                 Quantity = model.Quantity,
-                ImageUrl = model.ImageUrl
+                ImageUrl = model.ImageUrl ?? "~/pictures/DefaultRacketImage.webp"
             };
-            await dbContext.AddAsync(racket);
+
+            await dbContext.Rackets.AddAsync(racket);
             await dbContext.SaveChangesAsync();
 
-            result = true;
-            return result;
+            return true;
         }
 
         public async Task<RacketEditFormModel> GetRacketForEdittingAsync(string userId, int? id)
@@ -101,32 +114,44 @@ namespace TennisAcademyApp.Services.Core
 
             return model;
         }
+
         public async Task<bool> EditRacketAsync(RacketEditFormModel model)
         {
             bool result = false;
-            var racket = await dbContext.Rackets.FindAsync(model.Id);
+
+            var racket = await dbContext.Rackets.FirstOrDefaultAsync(r => r.Id == model.Id);
 
             if (racket == null)
             {
                 throw new ArgumentException(RacketNotFoundErrorMessage);
             }
 
+            var translator = new GoogleTranslator();
+
+            var brandTranslation = await translator.TranslateAsync(model.Brand, "bg", "en");
+            string brandBgResult = brandTranslation.Translation;
+
+            var modelTranslation = await translator.TranslateAsync(model.Model, "bg", "en");
+            string modelBgResult = modelTranslation.Translation;
+
             racket.Brand = model.Brand;
+            racket.BrandBg = brandBgResult;
             racket.Model = model.Model;
+            racket.ModelBg = modelBgResult;
             racket.Price = model.Price;
             racket.Quantity = model.Quantity;
             racket.ImageUrl = model.ImageUrl;
 
+            dbContext.Entry(racket).State = EntityState.Modified;
+
             await dbContext.SaveChangesAsync();
 
             result = true;
-
             return result;
         }
 
         public async Task<RacketDeleteViewModel> GetRacketForDeletingAsync(string userId, int? id)
         {
-            RacketDeleteViewModel? model = null;
             var user = await userManager.FindByIdAsync(userId);
             bool isAdmin = await userManager.IsInRoleAsync(user, "Admin");
             if (user == null || !isAdmin)
@@ -136,11 +161,14 @@ namespace TennisAcademyApp.Services.Core
 
             var racket = await FindRacketByIdAsync(id);
 
-            model = new RacketDeleteViewModel
+            var currentCulture = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+            bool isBg = currentCulture.Equals("bg", StringComparison.OrdinalIgnoreCase);
+
+            var model = new RacketDeleteViewModel
             {
                 Id = racket.Id,
-                Brand = racket.Brand,
-                Model = racket.Model,
+                Brand = isBg ? racket.BrandBg : racket.Brand,
+                Model = isBg ? racket.ModelBg : racket.Model,
                 ImageUrl = racket.ImageUrl
             };
 

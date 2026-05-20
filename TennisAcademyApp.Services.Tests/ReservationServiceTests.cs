@@ -2,6 +2,9 @@
 using Moq;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using TennisAcademyApp.Data;
 using TennisAcademyApp.Data.Models;
 using TennisAcademyApp.Services.Core;
@@ -43,15 +46,14 @@ namespace TennisAcademyApp.Tests.Services
             existingUser = new IdentityUser { Id = "user-1", UserName = "tester" };
         }
 
-
         private async Task SeedBasicEntitiesAsync()
         {
-            var coach = new Coach 
-            { 
-                CoachId = 1, 
-                Name = "Coach1", 
-                Age = 44, 
-                Description = "ssssssssssssssss", 
+            var coach = new Coach
+            {
+                CoachId = 1,
+                Name = "Coach1",
+                Age = 44,
+                Description = "ssssssssssssssss",
                 Nationality = "pulnaasa",
             };
             var surface = new Surface { Id = 1, Name = "Court1", ImageUrl = "img" };
@@ -60,9 +62,6 @@ namespace TennisAcademyApp.Tests.Services
             await dbContext.AddRangeAsync(coach, surface, training);
             await dbContext.SaveChangesAsync();
         }
-
-
-
 
         [Test]
         public async Task GetUserReservationsAsync_WhenUserHasReservations_ReturnsListMapped()
@@ -154,8 +153,6 @@ namespace TennisAcademyApp.Tests.Services
             var expired = await dbContext.Reservations.FindAsync(21);
             Assert.That(expired.IsDeleted, Is.True);
         }
-
-
 
         [Test]
         public void CreateReservationAsync_UserNull_ThrowsArgumentException()
@@ -294,7 +291,6 @@ namespace TennisAcademyApp.Tests.Services
             Assert.That(created.Note, Is.EqualTo("ok"));
         }
 
-
         [Test]
         public async Task AutoReservationDeleteAsync_WhenNoExpired_ReturnsFalse()
         {
@@ -339,12 +335,11 @@ namespace TennisAcademyApp.Tests.Services
             Assert.That(r.IsDeleted, Is.True);
         }
 
-
         [Test]
         public void GetUserReservationDetailsAsync_UserNull_Throws()
         {
             // arrange
-            userManagerMock.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((IdentityUser)null);
+            userStoreMock.Setup(u => u.FindByIdAsync(It.IsAny<string>(), default)).ReturnsAsync((IdentityUser)null);
 
             // act & assert
             var ex = Assert.ThrowsAsync<ArgumentException>(() => service.GetUserReservationDetailsAsync("no", 1));
@@ -408,12 +403,11 @@ namespace TennisAcademyApp.Tests.Services
             Assert.That(details.Note, Is.EqualTo("hello"));
         }
 
-
         [Test]
         public void GetUserReservationForDeletingAsync_UserNull_Throws()
         {
             // arrange
-            userManagerMock.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((IdentityUser)null);
+            userStoreMock.Setup(u => u.FindByIdAsync(It.IsAny<string>(), default)).ReturnsAsync((IdentityUser)null);
 
             // act & assert
             var ex = Assert.ThrowsAsync<ArgumentException>(() => service.GetUserReservationForDeletingAsync("no", 1));
@@ -474,12 +468,11 @@ namespace TennisAcademyApp.Tests.Services
             Assert.That(model.ImageUrl, Is.EqualTo("img"));
         }
 
-
         [Test]
         public void DeleteReservationAsync_UserNull_Throws()
         {
             // arrange
-            userManagerMock.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((IdentityUser)null);
+            userStoreMock.Setup(u => u.FindByIdAsync(It.IsAny<string>(), default)).ReturnsAsync((IdentityUser)null);
 
             var model = new ReservationDeleteViewModel { Id = 701 };
 
@@ -555,8 +548,6 @@ namespace TennisAcademyApp.Tests.Services
             Assert.That(r.IsDeleted, Is.False);
         }
 
-
-
         [Test]
         public async Task GetUserReservationHistoryAsync_ReturnsOnlyDeletedReservations()
         {
@@ -593,7 +584,6 @@ namespace TennisAcademyApp.Tests.Services
             Assert.That(history.First().ReservationId, Is.EqualTo(801));
             Assert.That(history.First().CoachName, Is.EqualTo("Coach1"));
         }
-
 
         [Test]
         public void DateValidationAsync_PastDate_Throws()
@@ -692,7 +682,6 @@ namespace TennisAcademyApp.Tests.Services
             Assert.That(async () => await service.DateValidationAsync(model), Throws.Nothing);
         }
 
-
         [Test]
         public async Task IsCoachAvailableAtTheTimeAsync_WhenFree_ReturnsTrue()
         {
@@ -738,10 +727,53 @@ namespace TennisAcademyApp.Tests.Services
             var ex = Assert.ThrowsAsync<ArgumentException>(() => service.IsCoachAvailableAtTheTimeAsync(model));
             Assert.That(ex.Message, Does.Contain("not available").IgnoreCase.Or.Contains("Coach").IgnoreCase);
         }
+
+        [Test]
+        public async Task GetAllReservationsForExportAsync_ShouldReturnFilteredData()
+        {
+            // arrange
+            await SeedBasicEntitiesAsync();
+            var targetDate = DateTime.Now.AddDays(3).Date.AddHours(10);
+
+            var activeRes = new Reservation
+            {
+                Id = 901,
+                PlayerId = existingUser.Id,
+                CoachId = 1,
+                SurfaceId = 1,
+                TrainingTypeId = 1,
+                Date = targetDate,
+                IsDeleted = false
+            };
+
+            var deletedRes = new Reservation
+            {
+                Id = 902,
+                PlayerId = existingUser.Id,
+                CoachId = 1,
+                SurfaceId = 1,
+                TrainingTypeId = 1,
+                Date = targetDate,
+                IsDeleted = true
+            };
+
+            await dbContext.Reservations.AddRangeAsync(activeRes, deletedRes);
+            await dbContext.SaveChangesAsync();
+
+            // act
+            var result = await service.GetAllReservationsForExportAsync("Coach1", targetDate.AddDays(-1), targetDate.AddDays(1));
+
+            // assert
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count(), Is.EqualTo(1));
+            Assert.That(result.First().Id, Is.EqualTo(901));
+            Assert.That(result.First().CoachName, Is.EqualTo("Coach1"));
+            Assert.That(result.First().SurfaceName, Is.EqualTo("Court1"));
+        }
+
         [TearDown]
         public void TearDown()
         {
-            // Clean up in-memory database after each test
             dbContext.Database.EnsureDeleted();
             dbContext.Dispose();
             userStoreMock = null;

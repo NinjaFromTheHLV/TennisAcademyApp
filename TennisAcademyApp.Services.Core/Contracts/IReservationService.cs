@@ -14,5 +14,7 @@ namespace TennisAcademyApp.Services.Core.Contracts
         Task<IEnumerable<ReservationHistoryViewModel>?> GetUserReservationHistoryAsync(string userId);
         Task<bool> IsCoachAvailableAtTheTimeAsync(ReservationCreateInputModel model);
         Task DateValidationAsync(ReservationCreateInputModel model);
+        Task<IEnumerable<ReservationExportViewModel>> GetAllReservationsForExportAsync(string? searchTerm, DateTime? fromDate, DateTime? toDate);
+        Task<IEnumerable<ReservationIndexViewModel>?> GetFilteredUserReservationsAsync(string userId, string? searchTerm, DateTime? fromDate, DateTime? toDate, string? sortOrder);
     }
 }

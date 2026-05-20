@@ -12,22 +12,26 @@ namespace TennisAcademyApp.Data.Seeding
                 new TrainingType
                 {
                     Id = 1,
-                    Name = "Physical Conditioning Routine"
+                    Name = "Physical Conditioning Routine",
+                    NameBg = "Физическа подготовка"
                 },
                 new TrainingType
                 {
                     Id = 2,
-                    Name = "Technical Skill Development"
+                    Name = "Technical Skill Development",
+                    NameBg = "Развитие на технически умения"
                 },
                 new TrainingType
                 {
                     Id = 3,
-                    Name = "Tactical Game Strategy"
+                    Name = "Tactical Game Strategy",
+                    NameBg = "Тактическа стратегия за игра"
                 },
                 new TrainingType
                 {
                     Id = 4,
-                    Name = "Mental Toughness Training"
+                    Name = "Mental Toughness Training",
+                    NameBg = "Психологическа устойчивост и ментална тренировка"
                 }
             );
         }
