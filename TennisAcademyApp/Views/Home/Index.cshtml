@@ -16,183 +16,17 @@
     var totalBallStock = balls.Sum(b => b.Quantity);
 }
 
-<style>
-    .home-container {
-        margin-top: -20px;
-    }
-
-    .hero-section {
-        position: relative;
-        padding: 100px 0 80px;
-        background: radial-gradient(circle at top, rgba(204, 255, 0, 0.05) 0%, transparent 50%);
-    }
-
-    .hero-title {
-        font-size: clamp(3rem, 8vw, 6rem);
-        font-weight: 900;
-        line-height: 1.1;
-        letter-spacing: -2px;
-        color: #ffffff;
-        text-transform: uppercase;
-    }
-
-        .hero-title span {
-            color: var(--accent);
-            text-shadow: 0 0 40px rgba(204, 255, 0, 0.4);
-        }
-
-    .hero-subtitle {
-        font-size: 1.2rem;
-        color: rgba(255, 255, 255, 0.6);
-        max-width: 600px;
-        margin: 0 auto;
-    }
-
-    .btn-hero-primary {
-        background-color: var(--accent);
-        color: #000;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        padding: 16px 40px;
-        border-radius: 12px;
-        transition: all 0.3s ease;
-        box-shadow: 0 10px 30px rgba(204, 255, 0, 0.2);
-    }
-
-        .btn-hero-primary:hover {
-            background-color: #fff;
-            color: #000;
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(204, 255, 0, 0.4);
-        }
-
-    .btn-hero-outline {
-        background-color: transparent;
-        color: #fff;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        padding: 16px 40px;
-        border-radius: 12px;
-        border: 2px solid rgba(255, 255, 255, 0.2);
-        transition: all 0.3s ease;
-    }
-
-        .btn-hero-outline:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            background-color: rgba(204, 255, 0, 0.05);
-        }
-
-    .bento-grid {
-        display: grid;
-        grid-template-columns: repeat(12, 1fr);
-        gap: 24px;
-        margin-top: 40px;
-    }
-
-    .bento-card {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 24px;
-        padding: 40px;
-        position: relative;
-        overflow: hidden;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        backdrop-filter: blur(10px);
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    }
-
-        .bento-card:hover {
-            transform: translateY(-10px);
-            border-color: rgba(204, 255, 0, 0.3);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-    .bento-large {
-        grid-column: span 8;
-        min-height: 400px;
-        background: linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(20,20,20,0.9) 100%);
-    }
-
-    .bento-small {
-        grid-column: span 4;
-        min-height: 400px;
-    }
-
-    .bento-wide {
-        grid-column: span 12;
-        min-height: 250px;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .bento-icon {
-        font-size: 3rem;
-        color: var(--accent);
-        margin-bottom: 20px;
-        opacity: 0.8;
-    }
-
-    .bento-card:hover .bento-icon {
-        opacity: 1;
-        text-shadow: 0 0 20px rgba(204, 255, 0, 0.5);
-    }
-
-    .bento-glow {
-        position: absolute;
-        width: 150px;
-        height: 150px;
-        background: var(--accent);
-        filter: blur(80px);
-        opacity: 0;
-        transition: opacity 0.5s ease;
-        border-radius: 50%;
-        z-index: 0;
-    }
-
-    .bento-card:hover .bento-glow {
-        opacity: 0.15;
-    }
-
-    .glow-tr {
-        top: -50px;
-        right: -50px;
-    }
-
-    .glow-bl {
-        bottom: -50px;
-        left: -50px;
-    }
-
-    .bento-content {
-        position: relative;
-        z-index: 1;
-    }
-
-    @@media (max-width: 991px) {
-        .bento-large, .bento-small, .bento-wide {
-            grid-column: span 12;
-        }
-
-        .bento-wide {
-            flex-direction: column;
-            text-align: center;
-            gap: 20px;
-        }
-    }
-</style>
+<link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
 
 <div class="home-container pb-5">
-
     <div class="hero-section text-center">
-        <div class="container">
+        <div class="zigzag-wrapper">
+            <svg class="zigzag-line" viewBox="0 0 1000 100" preserveAspectRatio="none">
+                <polyline points="0,50 40,10 80,90 120,10 160,90 200,10 240,90 280,10 320,90 360,10 400,90 440,10 480,90 520,10 560,90 600,10 640,90 680,10 720,90 760,10 800,90 840,10 880,90 920,10 960,90 1000,50" />
+            </svg>
+        </div>
+
+        <div class="container" style="position: relative; z-index: 1;">
             <span class="badge bg-dark border border-secondary border-opacity-25 text-white-50 px-3 py-2 rounded-pill mb-4 tracking-wider small shadow">
                 <i class="bi bi-circle-fill text-accent me-2" style="font-size: 0.5rem; vertical-align: middle;"></i>
                 @(isBg ? "ТЕНИС АКАДЕМИЯ ОТ НОВО ПОКОЛЕНИЕ" : "NEXT-GEN TENNIS ACADEMY")
@@ -220,7 +54,6 @@
 
     <div class="container">
         <div class="bento-grid">
-
             <a asp-controller="Reservation" asp-action="Index" class="bento-card bento-large text-decoration-none">
                 <div class="bento-glow glow-bl"></div>
                 <div class="bento-content h-100 d-flex flex-column justify-content-between">
