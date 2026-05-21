@@ -19,7 +19,7 @@
             public static string PastDateErrorMessage => IsBg ? "Моля, изберете валидна дата." : "Please select a valid date.";
             public static string TwoHoursErrorMessage => IsBg ? "Резервации могат да се правят най-малко два часа от текущото време." : "Reservations can be made at least two hours from now.";
             public static string SelectedTimeErrorMessage => IsBg ? "Работното време на Академията е от 8:00 до 20:00." : "The Academy's work time is from 8:00 to 20:00.";
-            public static string FutureDateErrorMessage => IsBg ? "Резервации могат да се правят за следващите 14 дни." : "Reservations can be made for the next 14 days.";
+            public static string FutureDateErrorMessage => IsBg ? "Резервации могат да се правят за следващите 60 дни." : "Reservations can be made for the next 60 days.";
             public static string SundayErrorMessage => IsBg ? "Неделя е почивен ден! Моля, изберете друго време." : "Sunday is off day! Please choose other time.";
             public static string DurationErrorMessage => IsBg ? "Продължителността трябва да бъде 60 или 120 минути." : "Duration must be either 60 or 120 minutes.";
             public static string CoachNotAvailableErrorMessage => IsBg ? "Избраният треньор не е свободен в избраното време." : "The selected coach is not available at the chosen time.";

@@ -343,7 +343,7 @@ namespace TennisAcademyApp.Services.Core
             {
                 throw new ArgumentException(TwoHoursErrorMessage);
             }
-            if (model.Date > DateTime.Now.AddDays(14))
+            if (model.Date > DateTime.Now.AddDays(60))
             {
                 throw new ArgumentException(FutureDateErrorMessage);
             }
