@@ -85,5 +85,12 @@
             public static string UserRemovedFromRoleSuccessfully => IsBg ? "Ролята беше премахната от потребителя успешно." : "User removed from role successfully.";
             public static string UserRemovedSuccessfully => IsBg ? "Потребителят беше премахнат успешно." : "User removed successfully.";
         }
+        public static class Tournament
+        {
+            private static bool IsBg => System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "bg";
+
+            public static string TournamentEnrollSuccess => IsBg ? "Успешно се записахте за турнира!" : "Successfully joined the tournament!";
+            public static string TournamentUnenrollSuccess => IsBg ? "Успешно се отписахте от турнира." : "Successfully left the tournament.";
+        }
     }
 }

@@ -42,7 +42,7 @@ namespace TennisAcademyApp.Data.Models
         public string? UserId { get; set; }
 
         [ForeignKey(nameof(UserId))]
-        public virtual IdentityUser? User { get; set; }
+        public virtual ApplicationUser? User { get; set; }
 
         [Required]
         public bool IsDeleted { get; set; } = false;

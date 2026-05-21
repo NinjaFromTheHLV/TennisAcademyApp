@@ -11,32 +11,56 @@ namespace TennisAcademyApp.Services.Core
     public class BagCartService : IBagCartService
     {
         private readonly TennisAcademyDbContext dbContext;
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly UserManager<ApplicationUser> userManager;
+        private readonly IRankingService rankingService;
 
-        public BagCartService(TennisAcademyDbContext dbContext, UserManager<IdentityUser> userManager)
+        public BagCartService(
+            TennisAcademyDbContext dbContext,
+            UserManager<ApplicationUser> userManager,
+            IRankingService rankingService)
         {
             this.dbContext = dbContext;
             this.userManager = userManager;
+            this.rankingService = rankingService;
         }
 
         public async Task<IEnumerable<BagCartIndexViewModel>> GetAllBagsInCartAsync(string userId)
         {
             var user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return Enumerable.Empty<BagCartIndexViewModel>();
+            }
 
             var currentCulture = System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
             bool isBg = currentCulture == "bg";
 
+            var leaderboard = await rankingService.GetLeaderboardAsync();
+            var userRanking = leaderboard.FirstOrDefault(u => u.FullName == $"{user.FirstName} {user.LastName}");
+
+            decimal discountMultiplier = 1.0m;
+            if (userRanking != null)
+            {
+                discountMultiplier = userRanking.Position switch
+                {
+                    1 => 0.80m, 
+                    2 => 0.85m,
+                    3 => 0.90m, 
+                    _ => 1.00m 
+                };
+            }
+
             var bagsInCart = await dbContext.BagCart
                 .Include(bc => bc.Bag)
-                .Where(bc => bc.UserId == userId)
+                .Where(bc => bc.UserId == userId && !bc.IsOrdered)
                 .Select(bc => new BagCartIndexViewModel
                 {
                     Id = bc.BagId,
                     Brand = isBg ? bc.Bag.BrandBg : bc.Bag.Brand,
                     Model = isBg ? bc.Bag.ModelBg : bc.Bag.Model,
-                    Price = bc.Bag.Price,
+                    Price = bc.Bag.Price * discountMultiplier,
                     Quantity = bc.Quantity,
-                    TotalPrice = bc.Quantity * bc.Bag.Price,
+                    TotalPrice = bc.Quantity * (bc.Bag.Price * discountMultiplier),
                     ImageUrl = bc.Bag.ImageUrl
                 })
                 .ToListAsync();
@@ -49,6 +73,7 @@ namespace TennisAcademyApp.Services.Core
             bool result = false;
             var user = await userManager.FindByIdAsync(userId);
             var bag = await dbContext.Bags.FindAsync(id);
+
             if (bag == null || quantity <= 0 || quantity > bag.Quantity)
             {
                 throw new InvalidOperationException(InvalidQuantityErrorMessage);
@@ -59,7 +84,16 @@ namespace TennisAcademyApp.Services.Core
 
             if (existingItem != null)
             {
-                existingItem.Quantity += quantity;
+                if (!existingItem.IsOrdered)
+                {
+                    existingItem.Quantity += quantity;
+                }
+                else
+                {
+                    existingItem.Quantity = quantity;
+                    existingItem.IsOrdered = false;
+                }
+
                 bag.Quantity -= quantity;
                 result = true;
             }
@@ -69,7 +103,8 @@ namespace TennisAcademyApp.Services.Core
                 {
                     UserId = userId,
                     BagId = id,
-                    Quantity = quantity
+                    Quantity = quantity,
+                    IsOrdered = false
                 };
                 bag.Quantity -= quantity;
 
@@ -78,7 +113,6 @@ namespace TennisAcademyApp.Services.Core
             }
 
             await dbContext.SaveChangesAsync();
-
             return result;
         }
 
@@ -86,7 +120,7 @@ namespace TennisAcademyApp.Services.Core
         {
             bool result = false;
             var cartItem = await dbContext.BagCart
-                .FirstOrDefaultAsync(bc => bc.BagId == bagId && bc.UserId == userId);
+                .FirstOrDefaultAsync(bc => bc.BagId == bagId && bc.UserId == userId && !bc.IsOrdered);
 
             if (cartItem == null)
             {
@@ -99,17 +133,22 @@ namespace TennisAcademyApp.Services.Core
             result = true;
             return result;
         }
+
         public async Task<bool> CheckOutAllBagsAsync(string userId)
         {
             bool result = false;
 
             var cartItems = await dbContext.BagCart
-                .Where(bc => bc.UserId == userId)
+                .Where(bc => bc.UserId == userId && !bc.IsOrdered)
                 .ToListAsync();
 
             if (cartItems.Any())
             {
-                dbContext.BagCart.RemoveRange(cartItems);
+                foreach (var item in cartItems)
+                {
+                    item.IsOrdered = true;
+                }
+
                 await dbContext.SaveChangesAsync();
                 result = true;
             }

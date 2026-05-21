@@ -22,11 +22,11 @@ namespace TennisAcademyApp.Tests.Services
     public class ReservationServiceTests
     {
         private TennisAcademyDbContext dbContext;
-        private Mock<IUserStore<IdentityUser>> userStoreMock;
-        private Mock<UserManager<IdentityUser>> userManagerMock;
+        private Mock<IUserStore<ApplicationUser>> userStoreMock;
+        private Mock<UserManager<ApplicationUser>> userManagerMock;
         private ReservationService service;
 
-        private IdentityUser existingUser;
+        private ApplicationUser existingUser;
 
         [SetUp]
         public void SetUp()
@@ -37,13 +37,13 @@ namespace TennisAcademyApp.Tests.Services
 
             dbContext = new TennisAcademyDbContext(options);
 
-            userStoreMock = new Mock<IUserStore<IdentityUser>>();
-            userManagerMock = new Mock<UserManager<IdentityUser>>(
+            userStoreMock = new Mock<IUserStore<ApplicationUser>>();
+            userManagerMock = new Mock<UserManager<ApplicationUser>>(
                 userStoreMock.Object, null, null, null, null, null, null, null, null);
 
             service = new ReservationService(dbContext, userManagerMock.Object);
 
-            existingUser = new IdentityUser { Id = "user-1", UserName = "tester" };
+            existingUser = new ApplicationUser { Id = "user-1", UserName = "tester" };
         }
 
         private async Task SeedBasicEntitiesAsync()
@@ -101,7 +101,7 @@ namespace TennisAcademyApp.Tests.Services
         {
             // arrange
             userManagerMock.Setup(u => u.FindByIdAsync(It.IsAny<string>()))
-                           .ReturnsAsync((IdentityUser)null);
+                           .ReturnsAsync((ApplicationUser)null);
 
             // act
             var result = await service.GetUserReservationsAsync("nonexistent");
@@ -158,7 +158,7 @@ namespace TennisAcademyApp.Tests.Services
         public void CreateReservationAsync_UserNull_ThrowsArgumentException()
         {
             // arrange
-            userManagerMock.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((IdentityUser)null);
+            userManagerMock.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((ApplicationUser)null);
 
             var model = new ReservationCreateInputModel
             {
@@ -206,7 +206,7 @@ namespace TennisAcademyApp.Tests.Services
 
             var conflictDate = DateTime.Now.AddDays(2).Date.AddHours(10); // 10:00 two days later
             // existing reservation that conflicts
-            var user = new IdentityUser { Id = "user-2", UserName = "conflictUser" };
+            var user = new ApplicationUser { Id = "user-2", UserName = "conflictUser" };
             await dbContext.Reservations.AddAsync(new Reservation
             {
                 Id = 301,
@@ -339,7 +339,7 @@ namespace TennisAcademyApp.Tests.Services
         public void GetUserReservationDetailsAsync_UserNull_Throws()
         {
             // arrange
-            userStoreMock.Setup(u => u.FindByIdAsync(It.IsAny<string>(), default)).ReturnsAsync((IdentityUser)null);
+            userStoreMock.Setup(u => u.FindByIdAsync(It.IsAny<string>(), default)).ReturnsAsync((ApplicationUser)null);
 
             // act & assert
             var ex = Assert.ThrowsAsync<ArgumentException>(() => service.GetUserReservationDetailsAsync("no", 1));
@@ -407,7 +407,7 @@ namespace TennisAcademyApp.Tests.Services
         public void GetUserReservationForDeletingAsync_UserNull_Throws()
         {
             // arrange
-            userStoreMock.Setup(u => u.FindByIdAsync(It.IsAny<string>(), default)).ReturnsAsync((IdentityUser)null);
+            userStoreMock.Setup(u => u.FindByIdAsync(It.IsAny<string>(), default)).ReturnsAsync((ApplicationUser)null);
 
             // act & assert
             var ex = Assert.ThrowsAsync<ArgumentException>(() => service.GetUserReservationForDeletingAsync("no", 1));
@@ -472,7 +472,7 @@ namespace TennisAcademyApp.Tests.Services
         public void DeleteReservationAsync_UserNull_Throws()
         {
             // arrange
-            userStoreMock.Setup(u => u.FindByIdAsync(It.IsAny<string>(), default)).ReturnsAsync((IdentityUser)null);
+            userStoreMock.Setup(u => u.FindByIdAsync(It.IsAny<string>(), default)).ReturnsAsync((ApplicationUser)null);
 
             var model = new ReservationDeleteViewModel { Id = 701 };
 

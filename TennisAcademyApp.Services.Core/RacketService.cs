@@ -13,8 +13,8 @@ namespace TennisAcademyApp.Services.Core
     public class RacketService : IRacketService
     {
         private readonly TennisAcademyDbContext dbContext;
-        private readonly UserManager<IdentityUser> userManager;
-        public RacketService(TennisAcademyDbContext dbContext, UserManager<IdentityUser> userManager)
+        private readonly UserManager<ApplicationUser> userManager;
+        public RacketService(TennisAcademyDbContext dbContext, UserManager<ApplicationUser> userManager)
         {
             this.dbContext = dbContext;
             this.userManager = userManager;

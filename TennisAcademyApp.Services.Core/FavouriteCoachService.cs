@@ -13,8 +13,8 @@ namespace TennisAcademyApp.Services.Core
     public class FavouriteCoachService : IFavouriteCoachService
     {
         private readonly TennisAcademyDbContext dbContext;
-        private readonly UserManager<IdentityUser> userManager;
-        public FavouriteCoachService(TennisAcademyDbContext dbContext, UserManager<IdentityUser> userManager)
+        private readonly UserManager<ApplicationUser> userManager;
+        public FavouriteCoachService(TennisAcademyDbContext dbContext, UserManager<ApplicationUser> userManager)
         {
             this.dbContext = dbContext;
             this.userManager = userManager;

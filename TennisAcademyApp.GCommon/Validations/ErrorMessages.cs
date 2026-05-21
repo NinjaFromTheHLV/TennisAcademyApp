@@ -129,5 +129,12 @@
             public static string UserNotInRoleErrorMessage => IsBg ? "Потребителят не притежава тази роля." : "User is not in the specified role.";
             public static string UserFailedToRemoveFromRoleErrorMessage => IsBg ? "Възникна грешка при премахването на потребителя от ролята, опитайте отново." : "An error occurred while removing the user from the role, try again.";
         }
+        public static class Tournament
+        {
+            private static bool IsBg => System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "bg";
+
+            public static string TournamentEnrollError => IsBg ? "Неуспешно записване. Може би турнирът е пълен или вече сте записан." : "Failed to join. The tournament might be full or you are already enrolled.";
+            public static string TournamentUnenrollError => IsBg ? "Неуспешно отписване. Може би вече не сте част от този турнир." : "Failed to leave. You might not be enrolled in this tournament.";
+        }
     }
 }

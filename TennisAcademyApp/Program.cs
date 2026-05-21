@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TennisAcademyApp.Data;
+using TennisAcademyApp.Data.Models;
 using TennisAcademyApp.Services.Core;
 using TennisAcademyApp.Services.Core.Contracts;
 using static TennisAcademyApp.Data.Seeding.RoleSeeding;
@@ -20,7 +21,7 @@ namespace TennisAcademyApp
                 options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+            builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = false;
                 options.Password.RequireNonAlphanumeric = false;
@@ -50,6 +51,8 @@ namespace TennisAcademyApp
             builder.Services.AddScoped<IBallCartService, BallCartService>();
             builder.Services.AddScoped<IBagService, BagService>();
             builder.Services.AddScoped<IBagCartService, BagCartService>();
+            builder.Services.AddScoped<ITournamentService, TournamentService>();
+            builder.Services.AddScoped<IRankingService, RankingService>();
             builder.Services.AddScoped<IUserService, UserService>();
 
             var app = builder.Build(); // <--- Container is locked here

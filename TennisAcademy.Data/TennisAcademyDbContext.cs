@@ -7,7 +7,7 @@ using TennisAcademyApp.Data.Models;
 
 namespace TennisAcademyApp.Data
 {
-    public class TennisAcademyDbContext : IdentityDbContext<IdentityUser>
+    public class TennisAcademyDbContext : IdentityDbContext<ApplicationUser>
     {
         public const string FacultyNumber = "22180021";
 
@@ -28,6 +28,9 @@ namespace TennisAcademyApp.Data
         public virtual DbSet<Bag> Bags { get; set; } = null!;
         public virtual DbSet<BagCart> BagCart { get; set; } = null!;
         public virtual DbSet<AuditLog> AuditLogs { get; set; } = null!;
+        public DbSet<TournamentCategory> TournamentCategories { get; set; } = null!;
+        public DbSet<Tournament> Tournaments { get; set; } = null!;
+        public DbSet<TournamentUser> TournamentsUsers { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder config)
         {
@@ -44,6 +47,11 @@ namespace TennisAcademyApp.Data
             {
                 if (entityType.ClrType.Namespace != null &&
                     entityType.ClrType.Namespace.StartsWith("Microsoft.AspNetCore.Identity"))
+                {
+                    continue;
+                }
+
+                if (entityType.ClrType == typeof(ApplicationUser))
                 {
                     continue;
                 }

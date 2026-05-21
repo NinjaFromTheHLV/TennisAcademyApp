@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TennisAcademyApp.Data;
+using TennisAcademyApp.Data.Models;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Admin.UserManagement;
 using TennisAcademyApp.ViewModels.DropDown;
@@ -12,9 +13,9 @@ namespace TennisAcademyApp.Services.Core
     public class UserService : IUserService
     {
         private readonly TennisAcademyDbContext dbContext;
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
-        public UserService(UserManager<IdentityUser> userManager,
+        public UserService(UserManager<ApplicationUser> userManager,
                            RoleManager<IdentityRole> roleManager,
                            TennisAcademyDbContext dbContext)
         {
@@ -76,8 +77,8 @@ namespace TennisAcademyApp.Services.Core
                     {
                         var coach = new Data.Models.Coach
                         {
-                            Name = user.UserName ?? "New Trainer",
-                            NameBg = "Нов Треньор",
+                            Name = $"{user.FirstName} {user.LastName}",
+                            NameBg = $"{user.FirstName} {user.LastName}",
                             ImageUrl = "~/pictures/DefaultUserImage.webp",
                             Age = 30,
                             Nationality = "Unknown",

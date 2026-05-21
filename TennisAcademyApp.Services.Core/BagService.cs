@@ -12,9 +12,9 @@ namespace TennisAcademyApp.Services.Core
     public class BagService : IBagService
     {
         private readonly TennisAcademyDbContext dbContext;
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public BagService(TennisAcademyDbContext dbContext, UserManager<IdentityUser> userManager)
+        public BagService(TennisAcademyDbContext dbContext, UserManager<ApplicationUser> userManager)
         {
             this.dbContext = dbContext;
             this.userManager = userManager;

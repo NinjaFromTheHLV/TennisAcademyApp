@@ -14,7 +14,7 @@ namespace TennisAcademyApp.Tests.Services
     public class BallServiceTests
     {
         private TennisAcademyDbContext dbContext;
-        private Mock<UserManager<IdentityUser>> userManagerMock;
+        private Mock<UserManager<ApplicationUser>> userManagerMock;
         private BallService ballService;
 
         [SetUp]
@@ -26,8 +26,8 @@ namespace TennisAcademyApp.Tests.Services
 
             dbContext = new TennisAcademyDbContext(options);
 
-            var userStoreMock = new Mock<IUserStore<IdentityUser>>();
-            userManagerMock = new Mock<UserManager<IdentityUser>>(
+            var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
+            userManagerMock = new Mock<UserManager<ApplicationUser>>(
                 userStoreMock.Object, null, null, null, null, null, null, null, null
             );
 
@@ -105,7 +105,7 @@ namespace TennisAcademyApp.Tests.Services
         [Test]
         public async Task AddBallAsync_UserIsAdmin_ShouldAddBallAndReturnTrue()
         {
-            var user = new IdentityUser { Id = "admin-id" };
+            var user = new ApplicationUser { Id = "admin-id" };
             var model = new BallCreateInputModel
             {
                 Brand = "Yonex",
@@ -129,7 +129,7 @@ namespace TennisAcademyApp.Tests.Services
         [Test]
         public async Task AddBallAsync_UserNotAdmin_ShouldNotAddBallAndReturnFalse()
         {
-            var user = new IdentityUser { Id = "user-id" };
+            var user = new ApplicationUser { Id = "user-id" };
             var model = new BallCreateInputModel
             {
                 Brand = "Yonex",
@@ -153,7 +153,7 @@ namespace TennisAcademyApp.Tests.Services
         public async Task GetBallForEditingAsync_AdminUserWithValidBall_ShouldReturnModel()
         {
             // Arrange
-            var user = new IdentityUser { Id = "admin-id" };
+            var user = new ApplicationUser { Id = "admin-id" };
             var ball = new Ball
             {
                 Id = 1,
@@ -184,7 +184,7 @@ namespace TennisAcademyApp.Tests.Services
         public void GetBallForEditingAsync_NonAdminUser_ShouldThrowUnauthorizedAccessException()
         {
             // Arrange
-            var user = new IdentityUser { Id = "user-id" };
+            var user = new ApplicationUser { Id = "user-id" }; 
 
             userManagerMock.Setup(x => x.FindByIdAsync("user-id")).ReturnsAsync(user);
             userManagerMock.Setup(x => x.IsInRoleAsync(user, "Admin")).ReturnsAsync(false);
@@ -199,7 +199,7 @@ namespace TennisAcademyApp.Tests.Services
         public void GetBallForEditingAsync_AdminUserButBallNotFound_ShouldThrowArgumentException()
         {
             // Arrange
-            var user = new IdentityUser { Id = "admin-id" };
+            var user = new ApplicationUser { Id = "admin-id" }; 
 
             userManagerMock.Setup(x => x.FindByIdAsync("admin-id")).ReturnsAsync(user);
             userManagerMock.Setup(x => x.IsInRoleAsync(user, "Admin")).ReturnsAsync(true);
@@ -263,7 +263,7 @@ namespace TennisAcademyApp.Tests.Services
         [Test]
         public void GetBallForDeletingAsync_UserNotAdmin_ShouldThrowException()
         {
-            var user = new IdentityUser { Id = "user-id" };
+            var user = new ApplicationUser { Id = "user-id" }; 
 
             userManagerMock.Setup(x => x.FindByIdAsync("user-id")).ReturnsAsync(user);
             userManagerMock.Setup(x => x.IsInRoleAsync(user, "Admin")).ReturnsAsync(false);
@@ -277,7 +277,7 @@ namespace TennisAcademyApp.Tests.Services
         public async Task GetBallForDeletingAsync_AdminUserWithValidBall_ShouldReturnModel()
         {
             // Arrange
-            var user = new IdentityUser { Id = "admin-id" };
+            var user = new ApplicationUser { Id = "admin-id" }; 
             var ball = new Ball
             {
                 Id = 1,
@@ -309,7 +309,7 @@ namespace TennisAcademyApp.Tests.Services
         public void GetBallForDeletingAsync_NonAdminUser_ShouldThrowUnauthorizedAccessException()
         {
             // Arrange
-            var user = new IdentityUser { Id = "user-id" };
+            var user = new ApplicationUser { Id = "user-id" }; 
 
             userManagerMock.Setup(x => x.FindByIdAsync("user-id")).ReturnsAsync(user);
             userManagerMock.Setup(x => x.IsInRoleAsync(user, "Admin")).ReturnsAsync(false);
@@ -324,7 +324,7 @@ namespace TennisAcademyApp.Tests.Services
         public void GetBallForDeletingAsync_AdminUserButBallNotFound_ShouldThrowArgumentException()
         {
             // Arrange
-            var user = new IdentityUser { Id = "admin-id" };
+            var user = new ApplicationUser { Id = "admin-id" }; 
 
             userManagerMock.Setup(x => x.FindByIdAsync("admin-id")).ReturnsAsync(user);
             userManagerMock.Setup(x => x.IsInRoleAsync(user, "Admin")).ReturnsAsync(true);
@@ -338,7 +338,7 @@ namespace TennisAcademyApp.Tests.Services
         [Test]
         public void DeleteBallAsync_NonExistingBall_ShouldThrowException()
         {
-            var user = new IdentityUser { Id = "admin-id" };
+            var user = new ApplicationUser { Id = "admin-id" }; 
             var model = new BallDeleteViewModel
             {
                 Id = 999,
@@ -358,7 +358,7 @@ namespace TennisAcademyApp.Tests.Services
         [Test]
         public async Task DeleteBallAsync_ExistingBall_ShouldDeleteAndReturnTrue()
         {
-            var user = new IdentityUser { Id = "admin-id" };
+            var user = new ApplicationUser { Id = "admin-id" }; 
             var ball = new Ball
             {
                 Id = 1,

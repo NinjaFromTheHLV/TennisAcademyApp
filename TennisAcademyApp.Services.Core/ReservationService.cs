@@ -13,12 +13,14 @@ namespace TennisAcademyApp.Services.Core
     public class ReservationService : IReservationService
     {
         private readonly TennisAcademyDbContext dbContext;
-        private readonly UserManager<IdentityUser> userManager;
-        public ReservationService(TennisAcademyDbContext dbContext, UserManager<IdentityUser> userManager)
+        private readonly UserManager<ApplicationUser> userManager;
+
+        public ReservationService(TennisAcademyDbContext dbContext, UserManager<ApplicationUser> userManager)
         {
             this.dbContext = dbContext;
             this.userManager = userManager;
         }
+
         public async Task<IEnumerable<ReservationIndexViewModel>?> GetFilteredUserReservationsAsync(string userId, string? searchTerm, DateTime? fromDate, DateTime? toDate, string? sortOrder)
         {
             await AutoReservationDeleteAsync();
@@ -27,7 +29,7 @@ namespace TennisAcademyApp.Services.Core
             bool isBg = currentCulture == "bg";
 
             var query = dbContext.Reservations
-                .Where(r => r.PlayerId == userId && r.IsDeleted == false)
+                .Where(r => r.PlayerId == userId && r.IsDeleted == false && r.IsCompleted == false)
                 .AsQueryable();
 
             if (fromDate.HasValue)
@@ -68,6 +70,7 @@ namespace TennisAcademyApp.Services.Core
                 })
                 .ToListAsync();
         }
+
         public async Task<IEnumerable<ReservationExportViewModel>> GetAllReservationsForExportAsync(string? searchTerm, DateTime? fromDate, DateTime? toDate)
         {
             var query = this.dbContext.Reservations
@@ -105,9 +108,10 @@ namespace TennisAcademyApp.Services.Core
                 })
                 .ToListAsync();
         }
+
         public async Task<IEnumerable<ReservationIndexViewModel>?> GetUserReservationsAsync(string userId)
         {
-            var autoDelete = await AutoReservationDeleteAsync();
+            await AutoReservationDeleteAsync();
             var user = await userManager.FindByIdAsync(userId);
 
             var reservations = await dbContext.Reservations
@@ -115,7 +119,7 @@ namespace TennisAcademyApp.Services.Core
                 .Include(r => r.Coach)
                 .Include(r => r.Surface)
                 .Include(r => r.TrainingType)
-                .Where(r => r.PlayerId == userId && r.IsDeleted == false)
+                .Where(r => r.PlayerId == userId && r.IsDeleted == false && r.IsCompleted == false)
                 .Select(r => new ReservationIndexViewModel
                 {
                     ReservationId = r.Id,
@@ -127,6 +131,7 @@ namespace TennisAcademyApp.Services.Core
 
             return reservations;
         }
+
         public async Task<bool> CreateReservationAsync(string userId, ReservationCreateInputModel model)
         {
             bool result = false;
@@ -161,28 +166,33 @@ namespace TennisAcademyApp.Services.Core
                 Date = model.Date,
                 Duration = model.Duration,
                 Note = model.Note,
-                NoteBg = isBg ? model.Note : null
+                NoteBg = isBg ? model.Note : null,
+                IsCompleted = false,
+                IsDeleted = false
             };
 
             await dbContext.Reservations.AddAsync(newReservation);
             await dbContext.SaveChangesAsync();
 
             result = true;
-
             return result;
         }
+
         public async Task<bool> AutoReservationDeleteAsync()
         {
             bool result = false;
             var expiredReservations = await dbContext.Reservations
-                .Where(r => r.Date <= DateTime.Now)
+                .Where(r => r.Date <= DateTime.Now && !r.IsCompleted && !r.IsDeleted)
                 .ToListAsync();
 
             if (expiredReservations.Any())
             {
-                expiredReservations.ForEach(r => r.IsDeleted = true);
-                await dbContext.SaveChangesAsync();
+                foreach (var r in expiredReservations)
+                {
+                    r.IsCompleted = true;
+                }
 
+                await dbContext.SaveChangesAsync();
                 return true;
             }
             return result;
@@ -209,7 +219,6 @@ namespace TennisAcademyApp.Services.Core
                     .Include(r => r.TrainingType)
                     .FirstOrDefaultAsync(r => r.Id == id && r.PlayerId == userId);
 
-
                 if (reservationDetails == null)
                 {
                     throw new ArgumentException(ReservationNotFoundErrorMessage);
@@ -234,7 +243,6 @@ namespace TennisAcademyApp.Services.Core
         public async Task<ReservationDeleteViewModel?> GetUserReservationForDeletingAsync(string userId, int? id)
         {
             ReservationDeleteViewModel? reservationToDelete = null;
-
             var user = await userManager.FindByIdAsync(userId);
 
             if (user == null)
@@ -249,12 +257,15 @@ namespace TennisAcademyApp.Services.Core
                     .Include(r => r.Coach)
                     .Include(r => r.Surface)
                     .FirstOrDefaultAsync(r => r.Id == id && r.PlayerId == userId);
+
                 if (reservation == null)
                 {
                     throw new ArgumentException(ReservationNotFoundErrorMessage);
                 }
+
                 var currentCulture = System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
                 bool isBg = currentCulture == "bg";
+
                 if (reservation.PlayerId == userId)
                 {
                     reservationToDelete = new ReservationDeleteViewModel
@@ -283,21 +294,21 @@ namespace TennisAcademyApp.Services.Core
             {
                 throw new ArgumentException(ReservationNotFoundErrorMessage);
             }
+
             if (reservation.PlayerId == userId)
             {
                 reservation.IsDeleted = true;
+                reservation.IsCompleted = false;
                 await dbContext.SaveChangesAsync();
             }
 
             result = true;
-
             return result;
         }
 
         public async Task<IEnumerable<ReservationHistoryViewModel>?> GetUserReservationHistoryAsync(string userId)
         {
             var user = await userManager.FindByIdAsync(userId);
-
             var currentCulture = System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
             bool isBg = currentCulture == "bg";
 
@@ -307,7 +318,7 @@ namespace TennisAcademyApp.Services.Core
                 .Include(r => r.Coach)
                 .Include(r => r.Surface)
                 .Include(r => r.TrainingType)
-                .Where(r => r.PlayerId == userId && r.IsDeleted == true)
+                .Where(r => r.PlayerId == userId && (r.IsDeleted || r.IsCompleted))
                 .Select(r => new ReservationHistoryViewModel
                 {
                     ReservationId = r.Id,
@@ -315,12 +326,13 @@ namespace TennisAcademyApp.Services.Core
                     TrainingTypeName = isBg ? r.TrainingType.NameBg : r.TrainingType.Name,
                     SurfaceName = isBg ? r.Surface.NameBg : r.Surface.Name,
                     SurfaceImageUrl = r.Surface.ImageUrl,
-                    IsCanceled = r.Date > DateTime.Now
+                    IsCanceled = r.IsDeleted
                 })
                 .ToListAsync();
 
             return pastReservations;
         }
+
         public async Task DateValidationAsync(ReservationCreateInputModel model)
         {
             if (model.Date < DateTime.Now)
@@ -346,6 +358,7 @@ namespace TennisAcademyApp.Services.Core
             }
             await Task.CompletedTask;
         }
+
         public async Task<bool> IsCoachAvailableAtTheTimeAsync(ReservationCreateInputModel model)
         {
             bool result = false;
@@ -355,6 +368,7 @@ namespace TennisAcademyApp.Services.Core
                 .AsNoTracking()
                 .AnyAsync(r =>
                     r.CoachId == model.CoachId &&
+                    !r.IsDeleted &&
                     r.Date < endDate &&
                     r.Date.AddMinutes(r.Duration) > model.Date);
 

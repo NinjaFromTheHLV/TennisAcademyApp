@@ -14,10 +14,11 @@ namespace TennisAcademyApp.Data.Models
         [Required]
         [Comment("Foreign Key of IdentityUser")]
         public string UserId { get; set; } = null!;
-        public virtual IdentityUser User { get; set; } = null!;
+        public virtual ApplicationUser User { get; set; } = null!;
 
         [Required]
         [Comment("Quantity of Bags in Cart")]
         public int Quantity { get; set; }
+        public bool IsOrdered { get; set; } = false;
     }
 }

@@ -19,9 +19,9 @@ namespace TennisAcademyApp.Services.Core
     public class CoachService : ICoachService
     {
         private readonly TennisAcademyDbContext dbContext;
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly UserManager<ApplicationUser> userManager;
         private readonly IConfiguration configuration;
-        public CoachService(TennisAcademyDbContext dbContext, UserManager<IdentityUser> userManager, IConfiguration configuration)
+        public CoachService(TennisAcademyDbContext dbContext, UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
             this.dbContext = dbContext;
             this.userManager = userManager;
@@ -200,7 +200,7 @@ namespace TennisAcademyApp.Services.Core
                 throw new ArgumentException("A user with this coach email already exists.");
             }
 
-            var coachUser = new IdentityUser
+            var coachUser = new ApplicationUser
             {
                 Email = coachEmail,
                 UserName = coachEmail,

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TennisAcademyApp.Data.Models;
 using static TennisAcademyApp.GCommon.Validations.ValidationConstants;
 
 namespace TennisAcademyApp.Data.Seeding
@@ -34,7 +35,7 @@ namespace TennisAcademyApp.Data.Seeding
         }
         private static async Task SeedCoachesAsync(IServiceProvider serviceProvider)
         {
-            var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var dbContext = serviceProvider.GetRequiredService<TennisAcademyDbContext>();
             var configuration = serviceProvider.GetRequiredService<IConfiguration>();
 
@@ -60,7 +61,7 @@ namespace TennisAcademyApp.Data.Seeding
 
                 if (user == null)
                 {
-                    user = new IdentityUser
+                    user = new ApplicationUser
                     {
                         Email = coachEmail,
                         UserName = coachEmail,
@@ -90,7 +91,7 @@ namespace TennisAcademyApp.Data.Seeding
 
         private static async Task SeedAdminAsync(IServiceProvider serviceProvider)
         {
-            var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var adminConfiguration = serviceProvider.GetRequiredService<IConfiguration>();
 
             string adminUserEmail = adminConfiguration["AdminSettings:Username"];
@@ -99,8 +100,10 @@ namespace TennisAcademyApp.Data.Seeding
             var adminUser = await userManager.FindByEmailAsync(adminUserEmail);
             if (adminUser == null)
             {
-                adminUser = new IdentityUser
+                adminUser = new ApplicationUser
                 {
+                    FirstName = "Admin",
+                    LastName = "Admin",
                     Email = adminUserEmail,
                     UserName = adminUserEmail,
                     EmailConfirmed = false

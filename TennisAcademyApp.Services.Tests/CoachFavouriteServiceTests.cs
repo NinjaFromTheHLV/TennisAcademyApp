@@ -14,9 +14,9 @@ namespace TennisAcademyApp.Tests.Services
     public class FavouriteCoachServiceTests
     {
         private TennisAcademyDbContext dbContext;
-        private Mock<UserManager<IdentityUser>> userManagerMock;
+        private Mock<UserManager<ApplicationUser>> userManagerMock;
         private FavouriteCoachService service;
-        private IdentityUser testUser;
+        private ApplicationUser testUser;
 
         [SetUp]
         public void SetUp()
@@ -27,12 +27,12 @@ namespace TennisAcademyApp.Tests.Services
 
             dbContext = new TennisAcademyDbContext(options);
 
-            var store = new Mock<IUserStore<IdentityUser>>();
-            userManagerMock = new Mock<UserManager<IdentityUser>>(store.Object, null, null, null, null, null, null, null, null);
+            var store = new Mock<IUserStore<ApplicationUser>>();
+            userManagerMock = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
 
             service = new FavouriteCoachService(dbContext, userManagerMock.Object);
 
-            testUser = new IdentityUser { Id = "user1", UserName = "test" };
+            testUser = new ApplicationUser { Id = "user1", UserName = "test" };
         }
 
         [Test]
@@ -71,7 +71,7 @@ namespace TennisAcademyApp.Tests.Services
         [Test]
         public async Task AddFavouriteCoachAsync_WhenUserIsNull_ReturnsFalse()
         {
-            userManagerMock.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((IdentityUser)null);
+            userManagerMock.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((ApplicationUser)null);
 
             var coach = new Coach {CoachId = 1, Name = "Coach1", Description = "null", Nationality = "null", };
             dbContext.Coaches.Add(coach);
@@ -115,7 +115,7 @@ namespace TennisAcademyApp.Tests.Services
         [Test]
         public async Task RemoveFromFavouritesAsync_WhenUserIsNull_ReturnsFalse()
         {
-            userManagerMock.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((IdentityUser)null);
+            userManagerMock.Setup(u => u.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((ApplicationUser)null);
 
             var result = await service.RemoveFromFavouritesAsync("user1", 1);
 

@@ -14,7 +14,7 @@ namespace TennisAcademyApp.Tests.Services
     public class BagServiceTests
     {
         private TennisAcademyDbContext dbContext;
-        private Mock<UserManager<IdentityUser>> userManagerMock;
+        private Mock<UserManager<ApplicationUser>> userManagerMock;
         private BagService bagService;
 
         [SetUp]
@@ -26,8 +26,8 @@ namespace TennisAcademyApp.Tests.Services
 
             dbContext = new TennisAcademyDbContext(options);
 
-            var userStoreMock = new Mock<IUserStore<IdentityUser>>();
-            userManagerMock = new Mock<UserManager<IdentityUser>>(userStoreMock.Object, null, null, null, null, null, null, null, null);
+            var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
+            userManagerMock = new Mock<UserManager<ApplicationUser>>(userStoreMock.Object, null, null, null, null, null, null, null, null);
 
             bagService = new BagService(dbContext, userManagerMock.Object);
         }
@@ -105,7 +105,7 @@ namespace TennisAcademyApp.Tests.Services
         [Test]
         public async Task AddBagAsync_UserIsAdmin_ShouldAddBagAndReturnTrue()
         {
-            var user = new IdentityUser { Id = "admin-id" };
+            var user = new ApplicationUser { Id = "admin-id" };
             var model = new BagCreateInputModel
             {
                 Brand = "Yonex",
@@ -129,7 +129,7 @@ namespace TennisAcademyApp.Tests.Services
         [Test]
         public async Task AddBagAsync_UserNotAdmin_ShouldNotAddBagAndReturnFalse()
         {
-            var user = new IdentityUser { Id = "user-id" };
+            var user = new ApplicationUser { Id = "user-id" };
             var model = new BagCreateInputModel
             {
                 Brand = "Yonex",
@@ -152,7 +152,7 @@ namespace TennisAcademyApp.Tests.Services
         [Test]
         public void GetBagForEditingAsync_UserNotAdmin_ShouldThrowException()
         {
-            var user = new IdentityUser { Id = "user-id" };
+            var user = new ApplicationUser { Id = "user-id" };
 
             userManagerMock.Setup(x => x.FindByIdAsync("user-id")).ReturnsAsync(user);
             userManagerMock.Setup(x => x.IsInRoleAsync(user, "Admin")).ReturnsAsync(false);
@@ -173,7 +173,7 @@ namespace TennisAcademyApp.Tests.Services
         [Test]
         public async Task GetBagForEditingAsync_AdminUserWithValidBag_ShouldReturnModel()
         {
-            var user = new IdentityUser { Id = "admin-id" };
+            var user = new ApplicationUser { Id = "admin-id" };
             var bag = new Bag
             {
                 Id = 1,
@@ -249,7 +249,7 @@ namespace TennisAcademyApp.Tests.Services
         [Test]
         public void GetBagForDeletingAsync_UserNotAdmin_ShouldThrowException()
         {
-            var user = new IdentityUser { Id = "user-id" };
+            var user = new ApplicationUser { Id = "user-id" };
 
             userManagerMock.Setup(x => x.FindByIdAsync("user-id")).ReturnsAsync(user);
             userManagerMock.Setup(x => x.IsInRoleAsync(user, "Admin")).ReturnsAsync(false);
@@ -270,7 +270,7 @@ namespace TennisAcademyApp.Tests.Services
         [Test]
         public async Task GetBagForDeletingAsync_AdminUserWithValidBag_ShouldReturnModel()
         {
-            var user = new IdentityUser { Id = "admin-id" };
+            var user = new ApplicationUser { Id = "admin-id" };
             var bag = new Bag
             {
                 Id = 1,
@@ -296,7 +296,7 @@ namespace TennisAcademyApp.Tests.Services
         [Test]
         public void DeleteBagAsync_NonExistingBag_ShouldThrowException()
         {
-            var user = new IdentityUser { Id = "admin-id" };
+            var user = new ApplicationUser { Id = "admin-id" };
             var model = new BagDeleteViewModel
             {
                 Id = 999,
@@ -316,7 +316,7 @@ namespace TennisAcademyApp.Tests.Services
         [Test]
         public async Task DeleteBagAsync_ExistingBag_ShouldDeleteAndReturnTrue()
         {
-            var user = new IdentityUser { Id = "admin-id" };
+            var user = new ApplicationUser { Id = "admin-id" };
             var bag = new Bag
             {
                 Id = 1,

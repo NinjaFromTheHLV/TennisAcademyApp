@@ -14,7 +14,7 @@ namespace TennisAcademyApp.Tests
     public class CoachServiceTests
     {
         private TennisAcademyDbContext dbContext;
-        private Mock<UserManager<IdentityUser>> userManagerMock = null!;
+        private Mock<UserManager<ApplicationUser>> userManagerMock = null!;
         private CoachService coachService = null!;
 
         [SetUp]
@@ -34,8 +34,8 @@ namespace TennisAcademyApp.Tests
             dbContext.UserFavourites.Add(new UserFavourite { UserId = "user1", CoachId = 1 });
             dbContext.SaveChanges();
 
-            var userStoreMock = new Mock<IUserStore<IdentityUser>>();
-            userManagerMock = new Mock<UserManager<IdentityUser>>(userStoreMock.Object,
+            var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
+            userManagerMock = new Mock<UserManager<ApplicationUser>>(userStoreMock.Object,
                 null, null, null, null, null, null, null, null);
 
             var inMemorySettings = new Dictionary<string, string> {
@@ -52,7 +52,7 @@ namespace TennisAcademyApp.Tests
         [Test]
         public async Task GetCoachDetailsAsync_ReturnsCorrectDetails_AndIsInUserFavorites()
         {
-            var user = new IdentityUser { Id = "user1" };
+            var user = new ApplicationUser { Id = "user1" };
             userManagerMock.Setup(um => um.FindByIdAsync("user1")).ReturnsAsync(user);
 
             var result = await coachService.GetCoachDetailsAsync("user1", 1);
@@ -70,7 +70,7 @@ namespace TennisAcademyApp.Tests
         [Test]
         public void GetCoachDetailsAsync_Throws_WhenCoachNotFound()
         {
-            var user = new IdentityUser { Id = "user1" };
+            var user = new ApplicationUser { Id = "user1" };
             userManagerMock.Setup(um => um.FindByIdAsync("user1")).ReturnsAsync(user);
 
             var ex = Assert.ThrowsAsync<ArgumentException>(async () =>
@@ -82,7 +82,7 @@ namespace TennisAcademyApp.Tests
         [Test]
         public void AddCoachAsync_Throws_WhenUserIsNotAdmin()
         {
-            var user = new IdentityUser { Id = "user1" };
+            var user = new ApplicationUser { Id = "user1" };
             userManagerMock.Setup(um => um.FindByIdAsync("user1")).ReturnsAsync(user);
             userManagerMock.Setup(um => um.IsInRoleAsync(user, "Admin")).ReturnsAsync(false);
 
@@ -104,7 +104,7 @@ namespace TennisAcademyApp.Tests
         [Test]
         public async Task AddCoachAsync_AddsCoach_WhenUserIsAdmin()
         {
-            var user = new IdentityUser { Id = "adminUser" };
+            var user = new ApplicationUser { Id = "adminUser" };
             userManagerMock.Setup(um => um.FindByIdAsync("adminUser")).ReturnsAsync(user);
             userManagerMock.Setup(um => um.IsInRoleAsync(user, "Admin")).ReturnsAsync(true);
 
@@ -126,7 +126,7 @@ namespace TennisAcademyApp.Tests
         [Test]
         public void GetCoachForEdittingAsync_Throws_WhenUserIsNotAdmin()
         {
-            var user = new IdentityUser { Id = "user1" };
+            var user = new ApplicationUser { Id = "user1" };
             userManagerMock.Setup(um => um.FindByIdAsync("user1")).ReturnsAsync(user);
             userManagerMock.Setup(um => um.IsInRoleAsync(user, "Admin")).ReturnsAsync(false);
 
@@ -139,7 +139,7 @@ namespace TennisAcademyApp.Tests
         [Test]
         public async Task GetCoachForEdittingAsync_ReturnsCorrectModel_WhenUserIsAdmin()
         {
-            var user = new IdentityUser { Id = "adminUser" };
+            var user = new ApplicationUser { Id = "adminUser" };
             userManagerMock.Setup(um => um.FindByIdAsync("adminUser")).ReturnsAsync(user);
             userManagerMock.Setup(um => um.IsInRoleAsync(user, "Admin")).ReturnsAsync(true);
 
@@ -158,7 +158,7 @@ namespace TennisAcademyApp.Tests
         [Test]
         public void EdittedCoachAsync_Throws_WhenCoachNotFound()
         {
-            var user = new IdentityUser { Id = "user1" };
+            var user = new ApplicationUser { Id = "user1" };
             userManagerMock.Setup(um => um.FindByIdAsync("user1")).ReturnsAsync(user);
 
             var model = new CoachEditInputModel
@@ -180,7 +180,7 @@ namespace TennisAcademyApp.Tests
         [Test]
         public async Task EdittedCoachAsync_UpdatesCoach_WhenValid()
         {
-            var user = new IdentityUser { Id = "user1" };
+            var user = new ApplicationUser { Id = "user1" };
             userManagerMock.Setup(um => um.FindByIdAsync("user1")).ReturnsAsync(user);
 
             var model = new CoachEditInputModel
@@ -208,7 +208,7 @@ namespace TennisAcademyApp.Tests
         [Test]
         public void GetCoachForDeletingAsync_Throws_WhenUserIsNotAdmin()
         {
-            var user = new IdentityUser { Id = "user1" };
+            var user = new ApplicationUser { Id = "user1" };
             userManagerMock.Setup(um => um.FindByIdAsync("user1")).ReturnsAsync(user);
             userManagerMock.Setup(um => um.IsInRoleAsync(user, "Admin")).ReturnsAsync(false);
 
@@ -221,7 +221,7 @@ namespace TennisAcademyApp.Tests
         [Test]
         public async Task GetCoachForDeletingAsync_ReturnsCorrectModel_WhenUserIsAdmin()
         {
-            var user = new IdentityUser { Id = "adminUser" };
+            var user = new ApplicationUser { Id = "adminUser" };
             userManagerMock.Setup(um => um.FindByIdAsync("adminUser")).ReturnsAsync(user);
             userManagerMock.Setup(um => um.IsInRoleAsync(user, "Admin")).ReturnsAsync(true);
 
@@ -236,7 +236,7 @@ namespace TennisAcademyApp.Tests
         [Test]
         public void DeletedCoachAsync_Throws_WhenCoachNotFound()
         {
-            var user = new IdentityUser { Id = "user1" };
+            var user = new ApplicationUser { Id = "user1" };
             userManagerMock.Setup(um => um.FindByIdAsync("user1")).ReturnsAsync(user);
 
             var model = new DeleteCoachViewModel { CoachId = 999, Name = "Nonexistent", ImageUrl = null };
@@ -250,7 +250,7 @@ namespace TennisAcademyApp.Tests
         [Test]
         public async Task DeletedCoachAsync_DeletesCoach_WhenValid()
         {
-            var user = new IdentityUser { Id = "user1" };
+            var user = new ApplicationUser { Id = "user1" };
             userManagerMock.Setup(um => um.FindByIdAsync("user1")).ReturnsAsync(user);
 
             var coach = new Coach 

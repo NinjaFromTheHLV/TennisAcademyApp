@@ -14,7 +14,7 @@ namespace TennisAcademyApp.Tests
     public class RacketServiceTests
     {
         private TennisAcademyDbContext dbContext;
-        private Mock<UserManager<IdentityUser>> mockUserManager;
+        private Mock<UserManager<ApplicationUser>> mockUserManager;
         private RacketService service;
 
         [SetUp]
@@ -26,8 +26,8 @@ namespace TennisAcademyApp.Tests
 
             dbContext = new TennisAcademyDbContext(options);
 
-            mockUserManager = new Mock<UserManager<IdentityUser>>(
-                Mock.Of<IUserStore<IdentityUser>>(), null, null, null, null, null, null, null, null);
+            mockUserManager = new Mock<UserManager<ApplicationUser>>(
+                Mock.Of<IUserStore<ApplicationUser>>(), null, null, null, null, null, null, null, null);
 
             service = new RacketService(dbContext, mockUserManager.Object);
         }
@@ -92,7 +92,7 @@ namespace TennisAcademyApp.Tests
         public async Task AddRacketAsync_ShouldAdd_WhenUserIsAdmin()
         {
             // Arrange
-            var adminUser = new IdentityUser { Id = "admin1" };
+            var adminUser = new ApplicationUser { Id = "admin1" };
             mockUserManager.Setup(m => m.FindByIdAsync("admin1")).ReturnsAsync(adminUser);
             mockUserManager.Setup(m => m.IsInRoleAsync(adminUser, "Admin")).ReturnsAsync(true);
 
@@ -118,7 +118,7 @@ namespace TennisAcademyApp.Tests
         public void AddRacketAsync_ShouldThrow_WhenNotAdmin()
         {
             // Arrange
-            var normalUser = new IdentityUser { Id = "user1" };
+            var normalUser = new ApplicationUser { Id = "user1" };
             mockUserManager.Setup(m => m.FindByIdAsync("user1")).ReturnsAsync(normalUser);
             mockUserManager.Setup(m => m.IsInRoleAsync(normalUser, "Admin")).ReturnsAsync(false);
 
@@ -144,7 +144,7 @@ namespace TennisAcademyApp.Tests
         public async Task GetRacketForEdittingAsync_ShouldReturnModel_WhenAdmin()
         {
             // Arrange
-            var adminUser = new IdentityUser { Id = "admin2" };
+            var adminUser = new ApplicationUser { Id = "admin2" };
             mockUserManager.Setup(m => m.FindByIdAsync("admin2")).ReturnsAsync(adminUser);
             mockUserManager.Setup(m => m.IsInRoleAsync(adminUser, "Admin")).ReturnsAsync(true);
 
@@ -163,7 +163,7 @@ namespace TennisAcademyApp.Tests
         public void GetRacketForEdittingAsync_ShouldThrow_WhenNotAdmin()
         {
             // Arrange
-            var normalUser = new IdentityUser { Id = "user2" };
+            var normalUser = new ApplicationUser { Id = "user2" };
             mockUserManager.Setup(m => m.FindByIdAsync("user2")).ReturnsAsync(normalUser);
             mockUserManager.Setup(m => m.IsInRoleAsync(normalUser, "Admin")).ReturnsAsync(false);
 
@@ -207,7 +207,7 @@ namespace TennisAcademyApp.Tests
         public async Task GetRacketForDeletingAsync_ShouldReturnModel_WhenAdmin()
         {
             // Arrange
-            var adminUser = new IdentityUser { Id = "admin3" };
+            var adminUser = new ApplicationUser { Id = "admin3" };
             mockUserManager.Setup(m => m.FindByIdAsync("admin3")).ReturnsAsync(adminUser);
             mockUserManager.Setup(m => m.IsInRoleAsync(adminUser, "Admin")).ReturnsAsync(true);
 
@@ -226,7 +226,7 @@ namespace TennisAcademyApp.Tests
         public async Task DeleteRacketAsync_ShouldRemoveRacket()
         {
             // Arrange
-            var adminUser = new IdentityUser { Id = "admin4" };
+            var adminUser = new ApplicationUser { Id = "admin4" };
             mockUserManager.Setup(m => m.FindByIdAsync("admin4")).ReturnsAsync(adminUser);
             mockUserManager.Setup(m => m.IsInRoleAsync(adminUser, "Admin")).ReturnsAsync(true);
 

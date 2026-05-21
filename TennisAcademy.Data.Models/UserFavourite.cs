@@ -10,7 +10,7 @@ namespace TennisAcademyApp.Data.Models
         [Comment("Foreign Key which references to IdentityUser")]
         [Required]
         public string UserId { get; set; } = null!;
-        public virtual IdentityUser User { get; set; } = null!;
+        public virtual ApplicationUser User { get; set; } = null!;
         [Comment("Foreign Key which references to Coach")]
         [Required]
         public int CoachId { get; set; }

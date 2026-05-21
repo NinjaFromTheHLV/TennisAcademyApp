@@ -13,7 +13,7 @@ namespace TennisAcademyApp.Tests.Services
     public class UserServiceTests
     {
         private TennisAcademyDbContext dbContext;
-        private Mock<UserManager<IdentityUser>> userManagerMock;
+        private Mock<UserManager<ApplicationUser>> userManagerMock;
         private Mock<RoleManager<IdentityRole>> roleManagerMock;
         private UserService userService;
 
@@ -26,8 +26,8 @@ namespace TennisAcademyApp.Tests.Services
 
             dbContext = new TennisAcademyDbContext(options);
 
-            var userStoreMock = new Mock<IUserStore<IdentityUser>>();
-            userManagerMock = new Mock<UserManager<IdentityUser>>(
+            var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
+            userManagerMock = new Mock<UserManager<ApplicationUser>>(
                 userStoreMock.Object, null, null, null, null, null, null, null, null);
 
             var roleStoreMock = new Mock<IRoleStore<IdentityRole>>();
@@ -41,13 +41,13 @@ namespace TennisAcademyApp.Tests.Services
         public async Task AssignUserToRoleAsync_ShouldReturnFalse_IfUserNotFoundOrRoleMissing()
         {
             userManagerMock.Setup(u => u.FindByIdAsync("user1"))
-                .ReturnsAsync((IdentityUser?)null);
+                .ReturnsAsync((ApplicationUser?)null);
 
             var result = await userService.AssignUserToRoleAsync("user1", "Admin");
             Assert.That(result, Is.False);
 
             userManagerMock.Setup(u => u.FindByIdAsync("user2"))
-                .ReturnsAsync(new IdentityUser { Id = "user2" });
+                .ReturnsAsync(new ApplicationUser { Id = "user2" });
 
             roleManagerMock.Setup(r => r.RoleExistsAsync("InvalidRole"))
                 .ReturnsAsync(false);
@@ -59,7 +59,7 @@ namespace TennisAcademyApp.Tests.Services
         [Test]
         public void AssignUserToRoleAsync_ShouldThrow_IfUserAlreadyInRole()
         {
-            var user = new IdentityUser { Id = "user1" };
+            var user = new ApplicationUser { Id = "user1" };
 
             userManagerMock.Setup(u => u.FindByIdAsync("user1")).ReturnsAsync(user);
             roleManagerMock.Setup(r => r.RoleExistsAsync("Admin")).ReturnsAsync(true);
@@ -72,7 +72,7 @@ namespace TennisAcademyApp.Tests.Services
         [Test]
         public async Task AssignUserToRoleAsync_ShouldAddRole_WhenNotInRole()
         {
-            var user = new IdentityUser { Id = "user1" };
+            var user = new ApplicationUser { Id = "user1" };
 
             userManagerMock.Setup(u => u.FindByIdAsync("user1")).ReturnsAsync(user);
             roleManagerMock.Setup(r => r.RoleExistsAsync("Admin")).ReturnsAsync(true);
@@ -87,11 +87,11 @@ namespace TennisAcademyApp.Tests.Services
         [Test]
         public async Task RemoveUserFromRoleAsync_ShouldReturnFalse_IfUserOrRoleMissing()
         {
-            userManagerMock.Setup(u => u.FindByIdAsync("user1")).ReturnsAsync((IdentityUser?)null);
+            userManagerMock.Setup(u => u.FindByIdAsync("user1")).ReturnsAsync((ApplicationUser?)null);
             var result = await userService.RemoveUserFromRoleAsync("user1", "Admin");
             Assert.That(result, Is.False);
 
-            userManagerMock.Setup(u => u.FindByIdAsync("user2")).ReturnsAsync(new IdentityUser { Id = "user2" });
+            userManagerMock.Setup(u => u.FindByIdAsync("user2")).ReturnsAsync(new ApplicationUser { Id = "user2" });
             roleManagerMock.Setup(r => r.RoleExistsAsync("InvalidRole")).ReturnsAsync(false);
             result = await userService.RemoveUserFromRoleAsync("user2", "InvalidRole");
             Assert.That(result, Is.False);
@@ -100,7 +100,7 @@ namespace TennisAcademyApp.Tests.Services
         [Test]
         public async Task RemoveUserFromRoleAsync_ShouldReturnTrue_WhenRoleRemoved()
         {
-            var user = new IdentityUser { Id = "user1" };
+            var user = new ApplicationUser { Id = "user1" };
 
             userManagerMock.Setup(u => u.FindByIdAsync("user1")).ReturnsAsync(user);
             roleManagerMock.Setup(r => r.RoleExistsAsync("Admin")).ReturnsAsync(true);
@@ -115,7 +115,7 @@ namespace TennisAcademyApp.Tests.Services
         [Test]
         public async Task RemoveUserAsync_ShouldReturnFalse_IfUserNotFound()
         {
-            userManagerMock.Setup(u => u.FindByIdAsync("user1")).ReturnsAsync((IdentityUser?)null);
+            userManagerMock.Setup(u => u.FindByIdAsync("user1")).ReturnsAsync((ApplicationUser?)null);
 
             var result = await userService.RemoveUserAsync("user1");
 
@@ -125,7 +125,7 @@ namespace TennisAcademyApp.Tests.Services
         [Test]
         public async Task RemoveUserAsync_ShouldRemoveAllRelatedDataAndUser()
         {
-            var user = new IdentityUser { Id = "user1" };
+            var user = new ApplicationUser { Id = "user1" };
 
             userManagerMock.Setup(u => u.FindByIdAsync("user1")).ReturnsAsync(user);
             userManagerMock.Setup(u => u.DeleteAsync(user)).ReturnsAsync(IdentityResult.Success);

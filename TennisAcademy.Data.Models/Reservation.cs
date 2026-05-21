@@ -40,7 +40,7 @@ namespace TennisAcademyApp.Data.Models
         [Required]
         public string PlayerId { get; set; } = null!;
 
-        public virtual IdentityUser Player { get; set; } = null!;
+        public virtual ApplicationUser Player { get; set; } = null!;
 
         [Comment("Duration of the session")]
         [Required]
@@ -51,5 +51,6 @@ namespace TennisAcademyApp.Data.Models
         public DateTime Date { get; set; }
 
         public bool IsDeleted { get; set; }
+        public bool IsCompleted { get; set; } = false;
     }
 }
