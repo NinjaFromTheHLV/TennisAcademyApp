@@ -28,14 +28,14 @@
     stroke-width: 4;
     stroke-linecap: round;
     stroke-linejoin: round;
-    stroke-dasharray: 3500;
-    stroke-dashoffset: 3500;
+    stroke-dasharray: 2300;
+    stroke-dashoffset: 2300;
     animation: drawLine 6s ease-in-out infinite;
 }
 
 @keyframes drawLine {
     0% {
-        stroke-dashoffset: 3500;
+        stroke-dashoffset: 2300;
         opacity: 0;
     }
 
