@@ -30,7 +30,7 @@
     stroke-linejoin: round;
     stroke-dasharray: 3500;
     stroke-dashoffset: 3500;
-    animation: drawLine 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    animation: drawLine 6s ease-in-out infinite;
 }
 
 @keyframes drawLine {
@@ -39,19 +39,87 @@
         opacity: 0;
     }
 
-    10% {
+    15% {
         opacity: 1;
     }
 
-    70% {
+    60% {
         stroke-dashoffset: 0;
         opacity: 1;
+    }
+
+    85% {
+        stroke-dashoffset: 0;
+        opacity: 0;
     }
 
     100% {
         stroke-dashoffset: 0;
         opacity: 0;
     }
+}
+
+.working-hours-wrapper {
+    position: relative;
+    width: 320px;
+    height: 56px;
+    margin: 0 auto 35px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.oval-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.oval-path {
+    fill: rgba(204, 255, 0, 0.05);
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-dasharray: 700;
+    stroke-dashoffset: 700;
+    animation: drawOval 6s ease-in-out infinite;
+}
+
+@keyframes drawOval {
+    0% {
+        stroke-dashoffset: 700;
+        opacity: 0;
+    }
+
+    15% {
+        opacity: 1;
+    }
+
+    60% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
+
+    85% {
+        stroke-dashoffset: 0;
+        opacity: 0;
+    }
+
+    100% {
+        stroke-dashoffset: 0;
+        opacity: 0;
+    }
+}
+
+.working-hours-text {
+    position: relative;
+    z-index: 1;
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
 }
 
 .hero-title {

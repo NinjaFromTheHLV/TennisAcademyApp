@@ -37,9 +37,19 @@
                 <span>@(isBg ? "Корта" : "Court")</span>
             </h1>
 
-            <p class="hero-subtitle mb-5">
+            <p class="hero-subtitle mb-4">
                 @(isBg ? "Резервирай корт за секунди, екипирай се с най-доброто и вдигни нивото на играта си." : "Book a court in seconds, gear up with the best, and elevate your game.")
             </p>
+
+            <div class="working-hours-wrapper">
+                <svg class="oval-svg" viewBox="0 0 320 56">
+                    <rect x="2" y="2" width="316" height="52" rx="26" ry="26" class="oval-path" />
+                </svg>
+                <div class="working-hours-text">
+                    <i class="bi bi-clock-history me-2 text-accent"></i>
+                    @(isBg ? "Работно време: 08:00 - 20:00" : "Working Hours: 08:00 - 20:00")
+                </div>
+            </div>
 
             <div class="d-flex justify-content-center gap-3 flex-wrap">
                 <a asp-controller="Reservation" asp-action="Index" class="btn btn-hero-primary text-decoration-none">
