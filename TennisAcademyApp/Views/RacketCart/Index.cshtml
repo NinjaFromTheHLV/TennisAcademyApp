@@ -53,7 +53,20 @@
                                     <img src="@item.ImageUrl" alt="Racket Image" class="rounded-3 object-fit-cover" style="width: 55px; height: 55px;" />
                                     <div>
                                         <h5 class="fw-semibold text-light m-0">@item.Brand @item.Model</h5>
-                                        <small class="text-white-50">@(isBg ? "Цена за брой:" : "Price per racket:") @item.Price.ToString("C", new System.Globalization.CultureInfo("de-DE"))</small>
+                                        
+                                        @if (item.IsGift)
+                                        {
+                                            <span class="badge bg-success text-uppercase py-1 px-2 mt-1">
+                                                <i class="bi bi-gift-fill me-1"></i>@(isBg ? "Подарък" : "Gift")
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <small class="text-white-50">
+                                                @(isBg ? "Цена за брой:" : "Price per racket:") 
+                                                @item.Price.ToString("C", new System.Globalization.CultureInfo("de-DE"))
+                                            </small>
+                                        }
                                     </div>
                                 </div>
                             </div>
@@ -75,7 +88,6 @@
                                     </button>
                                 </form>
                             </div>
-
                         </div>
                     </div>
                 </div>

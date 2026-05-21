@@ -38,48 +38,43 @@ namespace TennisAcademyApp.Services.Core
             var leaderboard = await rankingService.GetLeaderboardAsync();
             var userRanking = leaderboard.FirstOrDefault(u => u.FullName == $"{user.FirstName} {user.LastName}");
 
-            decimal discountMultiplier = 1.0m;
-            if (userRanking != null)
+            decimal discountMultiplier = userRanking?.Position switch
             {
-                discountMultiplier = userRanking.Position switch
-                {
-                    1 => 0.80m, 
-                    2 => 0.85m, 
-                    3 => 0.90m, 
-                    _ => 1.00m 
-                };
-            }
+                1 => 0.80m,
+                2 => 0.85m,
+                3 => 0.90m,
+                _ => 1.00m
+            };
 
-            var ballsInCart = await dbContext.BallCart
+            return await dbContext.BallCart
                 .Include(bc => bc.Ball)
-                .Where(bc => bc.UserId == userId && !bc.IsOrdered) 
+                .Where(bc => bc.UserId == userId && !bc.IsOrdered)
                 .Select(bc => new BallCartIndexViewModel
                 {
                     Id = bc.BallId,
                     Brand = isBg ? bc.Ball.BrandBg : bc.Ball.Brand,
                     Model = isBg ? bc.Ball.ModelBg : bc.Ball.Model,
-                    Price = bc.Ball.Price * discountMultiplier,
+                    // Ако е подарък, цената и общата сума са 0
+                    Price = bc.IsGift ? 0m : (bc.Ball.Price * discountMultiplier),
                     Quantity = bc.Quantity,
-                    TotalPrice = bc.Quantity * (bc.Ball.Price * discountMultiplier),
-                    ImageUrl = bc.Ball.ImageUrl
+                    TotalPrice = bc.IsGift ? 0m : (bc.Quantity * (bc.Ball.Price * discountMultiplier)),
+                    ImageUrl = bc.Ball.ImageUrl,
+                    IsGift = bc.IsGift
                 })
                 .ToListAsync();
-
-            return ballsInCart;
         }
 
         public async Task<bool> AddBallToCartAsync(string userId, int ballId, int quantity)
         {
-            bool result = false;
             var ball = await dbContext.Balls.FindAsync(ballId);
-
             if (ball == null || quantity <= 0 || quantity > ball.Quantity)
             {
                 throw new InvalidOperationException(InvalidQuantityErrorMessage);
             }
 
+            // Търсим само артикули, които НЕ са подаръци, за да ги групираме правилно
             var existingItem = await dbContext.BallCart
-                .FirstOrDefaultAsync(bc => bc.UserId == userId && bc.BallId == ballId);
+                .FirstOrDefaultAsync(bc => bc.UserId == userId && bc.BallId == ballId && !bc.IsGift);
 
             if (existingItem != null)
             {
@@ -92,9 +87,6 @@ namespace TennisAcademyApp.Services.Core
                     existingItem.Quantity = quantity;
                     existingItem.IsOrdered = false;
                 }
-
-                ball.Quantity -= quantity;
-                result = true;
             }
             else
             {
@@ -103,22 +95,19 @@ namespace TennisAcademyApp.Services.Core
                     UserId = userId,
                     BallId = ballId,
                     Quantity = quantity,
-                    IsOrdered = false
+                    IsOrdered = false,
+                    IsGift = false // Явно указваме, че е купен артикул
                 };
-                ball.Quantity -= quantity;
-
                 await dbContext.BallCart.AddAsync(cartItem);
-                result = true;
             }
 
+            ball.Quantity -= quantity;
             await dbContext.SaveChangesAsync();
-            return result;
+            return true;
         }
 
         public async Task<bool> RemoveBallFromCartAsync(string userId, int ballId)
         {
-            bool result = false;
-
             var cartItem = await dbContext.BallCart
                 .FirstOrDefaultAsync(bc => bc.BallId == ballId && bc.UserId == userId && !bc.IsOrdered);
 
@@ -127,32 +116,33 @@ namespace TennisAcademyApp.Services.Core
                 throw new InvalidOperationException(BallNotFoundInCartErrorMessage);
             }
 
+            // Връщаме количеството обратно в инвентара на магазина
+            var ball = await dbContext.Balls.FindAsync(ballId);
+            if (ball != null)
+            {
+                ball.Quantity += cartItem.Quantity;
+            }
+
             dbContext.BallCart.Remove(cartItem);
             await dbContext.SaveChangesAsync();
-            result = true;
-
-            return result;
+            return true;
         }
 
         public async Task<bool> CheckOutAllBallsAsync(string userId)
         {
-            bool result = false;
-
             var cartItems = await dbContext.BallCart
                 .Where(bc => bc.UserId == userId && !bc.IsOrdered)
                 .ToListAsync();
 
-            if (cartItems.Any())
-            {
-                foreach (var item in cartItems)
-                {
-                    item.IsOrdered = true; 
-                }
+            if (!cartItems.Any()) return false;
 
-                await dbContext.SaveChangesAsync();
-                result = true;
+            foreach (var item in cartItems)
+            {
+                item.IsOrdered = true;
             }
-            return result;
+
+            await dbContext.SaveChangesAsync();
+            return true;
         }
     }
 }

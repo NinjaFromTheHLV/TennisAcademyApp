@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TennisAcademyApp.Data;
 using TennisAcademyApp.Data.Models;
+using TennisAcademyApp.Services;
+using TennisAcademyApp.Services.Contracts;
 using TennisAcademyApp.Services.Core;
 using TennisAcademyApp.Services.Core.Contracts;
 using static TennisAcademyApp.Data.Seeding.RoleSeeding;
@@ -53,6 +55,7 @@ namespace TennisAcademyApp
             builder.Services.AddScoped<IBagCartService, BagCartService>();
             builder.Services.AddScoped<ITournamentService, TournamentService>();
             builder.Services.AddScoped<IRankingService, RankingService>();
+            builder.Services.AddScoped<IWheelService, WheelService>();
             builder.Services.AddScoped<IUserService, UserService>();
 
             var app = builder.Build(); // <--- Container is locked here

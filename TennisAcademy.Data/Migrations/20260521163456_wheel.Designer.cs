@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TennisAcademyApp.Data;
 
@@ -11,9 +12,11 @@ using TennisAcademyApp.Data;
 namespace TennisAcademyApp.Data.Migrations
 {
     [DbContext(typeof(TennisAcademyDbContext))]
-    partial class TennisAcademyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260521163456_wheel")]
+    partial class wheel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -381,9 +384,6 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasColumnType("nvarchar(450)")
                         .HasComment("Foreign Key of IdentityUser");
 
-                    b.Property<bool>("IsGift")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsOrdered")
                         .HasColumnType("bit");
 
@@ -505,9 +505,6 @@ namespace TennisAcademyApp.Data.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)")
                         .HasComment("Foreign Key of IdentityUser");
-
-                    b.Property<bool>("IsGift")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("IsOrdered")
                         .HasColumnType("bit");
@@ -806,9 +803,6 @@ namespace TennisAcademyApp.Data.Migrations
 
                     b.Property<int?>("BallId")
                         .HasColumnType("int");
-
-                    b.Property<bool>("IsGift")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("IsOrdered")
                         .HasColumnType("bit");

@@ -19,5 +19,6 @@ namespace TennisAcademyApp.Data.Models
         [Comment("Quantity of Balls in Cart")]
         public int Quantity { get; set; }
         public bool IsOrdered { get; set; } = false;
+        public bool IsGift { get; set; } = false;
     }
 }

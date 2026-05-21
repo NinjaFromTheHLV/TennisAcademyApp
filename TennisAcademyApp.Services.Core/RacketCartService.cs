@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using TennisAcademyApp.Data;
+using TennisAcademyApp.Data.Models;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Cart;
-using TennisAcademyApp.Data.Models;
 using static TennisAcademyApp.GCommon.Validations.ErrorMessages.RacketCart;
-using Microsoft.EntityFrameworkCore;
 
 namespace TennisAcademyApp.Services.Core
 {
@@ -27,10 +27,7 @@ namespace TennisAcademyApp.Services.Core
         public async Task<IEnumerable<RacketCartIndexViewModel>> GetAllRacketsInCartAsync(string userId)
         {
             var user = await userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                return Enumerable.Empty<RacketCartIndexViewModel>();
-            }
+            if (user == null) return Enumerable.Empty<RacketCartIndexViewModel>();
 
             var currentCulture = System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
             bool isBg = currentCulture == "bg";
@@ -38,121 +35,94 @@ namespace TennisAcademyApp.Services.Core
             var leaderboard = await rankingService.GetLeaderboardAsync();
             var userRanking = leaderboard.FirstOrDefault(u => u.FullName == $"{user.FirstName} {user.LastName}");
 
-            decimal discountMultiplier = 1.0m;
-            if (userRanking != null)
+            decimal discountMultiplier = userRanking?.Position switch
             {
-                discountMultiplier = userRanking.Position switch
-                {
-                    1 => 0.80m,
-                    2 => 0.85m,
-                    3 => 0.90m,
-                    _ => 1.00m
-                };
-            }
+                1 => 0.80m,
+                2 => 0.85m,
+                3 => 0.90m,
+                _ => 1.00m
+            };
 
-            var racketsInCart = await dbContext.RacketCart
-                .Include(r => r.Racket)
+            return await dbContext.RacketCart
+                .Include(rc => rc.Racket)
                 .Where(rc => rc.UserId == userId && !rc.IsOrdered)
                 .Select(rc => new RacketCartIndexViewModel
                 {
                     Id = rc.RacketId,
                     Brand = isBg ? rc.Racket.BrandBg : rc.Racket.Brand,
                     Model = isBg ? rc.Racket.ModelBg : rc.Racket.Model,
-                    Price = rc.Racket.Price * discountMultiplier,
+                    // Цената е 0, ако е подарък
+                    Price = rc.IsGift ? 0m : (rc.Racket.Price * discountMultiplier),
                     Quantity = rc.Quantity,
-                    TotalPrice = rc.Quantity * (rc.Racket.Price * discountMultiplier),
-                    ImageUrl = rc.Racket.ImageUrl
+                    TotalPrice = rc.IsGift ? 0m : (rc.Quantity * (rc.Racket.Price * discountMultiplier)),
+                    ImageUrl = rc.Racket.ImageUrl,
+                    IsGift = rc.IsGift
                 })
                 .ToListAsync();
-
-            return racketsInCart;
         }
 
-        public async Task<bool> AddRacketToCartAsync(string userId, int racketId, int quantity)
+        public async Task<bool> AddRacketToCartAsync(string userId, int id, int quantity)
         {
-            bool result = false;
-            var racket = await dbContext.Rackets.FindAsync(racketId);
-
+            var racket = await dbContext.Rackets.FindAsync(id);
             if (racket == null || quantity <= 0 || quantity > racket.Quantity)
-            {
                 throw new InvalidOperationException(InvalidQuantityErrorMessage);
-            }
 
+            // Търсим само платени ракети (IsGift == false)
             var existingItem = await dbContext.RacketCart
-                .FirstOrDefaultAsync(rc => rc.UserId == userId && rc.RacketId == racketId);
+                .FirstOrDefaultAsync(rc => rc.UserId == userId && rc.RacketId == id && !rc.IsGift);
 
             if (existingItem != null)
             {
-                if (!existingItem.IsOrdered)
-                {
-                    existingItem.Quantity += quantity;
-                }
-                else
-                {
-                    existingItem.Quantity = quantity;
-                    existingItem.IsOrdered = false;
-                }
-
-                racket.Quantity -= quantity;
-                result = true;
+                existingItem.Quantity += (!existingItem.IsOrdered) ? quantity : 0;
+                existingItem.IsOrdered = false;
             }
             else
             {
-                var cartItem = new RacketCart
+                await dbContext.RacketCart.AddAsync(new RacketCart
                 {
                     UserId = userId,
-                    RacketId = racketId,
+                    RacketId = id,
                     Quantity = quantity,
-                    IsOrdered = false
-                };
-                racket.Quantity -= quantity;
-
-                await dbContext.RacketCart.AddAsync(cartItem);
-                result = true;
+                    IsOrdered = false,
+                    IsGift = false
+                });
             }
 
+            racket.Quantity -= quantity;
             await dbContext.SaveChangesAsync();
-            return result;
+            return true;
         }
 
-        public async Task<bool> RemoveRacketFromCartAsync(string userId, int racketId)
+        public async Task<bool> RemoveRacketFromCartAsync(string userId, int id)
         {
-            bool result = false;
-
             var cartItem = await dbContext.RacketCart
-                .FirstOrDefaultAsync(rc => rc.RacketId == racketId && rc.UserId == userId && !rc.IsOrdered);
+                .FirstOrDefaultAsync(rc => rc.RacketId == id && rc.UserId == userId && !rc.IsOrdered);
 
-            if (cartItem == null)
-            {
-                throw new InvalidOperationException(RacketNotFoundInCartErrorMessage);
-            }
+            if (cartItem == null) throw new InvalidOperationException(RacketNotFoundInCartErrorMessage);
+
+            var racket = await dbContext.Rackets.FindAsync(id);
+            if (racket != null) racket.Quantity += cartItem.Quantity;
 
             dbContext.RacketCart.Remove(cartItem);
             await dbContext.SaveChangesAsync();
-            result = true;
-
-            return result;
+            return true;
         }
 
         public async Task<bool> CheckOutAllRacketsAsync(string userId)
         {
-            bool result = false;
-
             var cartItems = await dbContext.RacketCart
                 .Where(rc => rc.UserId == userId && !rc.IsOrdered)
                 .ToListAsync();
 
-            if (cartItems.Any())
-            {
-                foreach (var item in cartItems)
-                {
-                    item.IsOrdered = true; 
-                }
+            if (!cartItems.Any()) return false;
 
-                await dbContext.SaveChangesAsync();
-                result = true;
+            foreach (var item in cartItems)
+            {
+                item.IsOrdered = true;
             }
-            return result;
+
+            await dbContext.SaveChangesAsync();
+            return true;
         }
     }
 }

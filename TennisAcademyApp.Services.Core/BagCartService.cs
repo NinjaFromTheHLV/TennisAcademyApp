@@ -43,10 +43,10 @@ namespace TennisAcademyApp.Services.Core
             {
                 discountMultiplier = userRanking.Position switch
                 {
-                    1 => 0.80m, 
+                    1 => 0.80m,
                     2 => 0.85m,
-                    3 => 0.90m, 
-                    _ => 1.00m 
+                    3 => 0.90m,
+                    _ => 1.00m
                 };
             }
 
@@ -58,10 +58,13 @@ namespace TennisAcademyApp.Services.Core
                     Id = bc.BagId,
                     Brand = isBg ? bc.Bag.BrandBg : bc.Bag.Brand,
                     Model = isBg ? bc.Bag.ModelBg : bc.Bag.Model,
-                    Price = bc.Bag.Price * discountMultiplier,
+                    // АКО Е ПОДАРЪК, ЦЕНАТА Е 0, ИНАЧЕ Е СТАНДАРТНАТА С ОТСТЪПКА
+                    Price = bc.IsGift ? 0m : (bc.Bag.Price * discountMultiplier),
                     Quantity = bc.Quantity,
-                    TotalPrice = bc.Quantity * (bc.Bag.Price * discountMultiplier),
-                    ImageUrl = bc.Bag.ImageUrl
+                    // ОБЩАТА ЦЕНА СЪЩО Е 0 ЗА ПОДАРЪК
+                    TotalPrice = bc.IsGift ? 0m : (bc.Quantity * (bc.Bag.Price * discountMultiplier)),
+                    ImageUrl = bc.Bag.ImageUrl,
+                    IsGift = bc.IsGift // Подаваме го към View-то
                 })
                 .ToListAsync();
 
@@ -79,8 +82,9 @@ namespace TennisAcademyApp.Services.Core
                 throw new InvalidOperationException(InvalidQuantityErrorMessage);
             }
 
+            // ВАЖНО: Търсим само платени чанти (IsGift == false), за да не ги смесваме с подаръците
             var existingItem = await dbContext.BagCart
-                .FirstOrDefaultAsync(bc => bc.UserId == userId && bc.BagId == id);
+                .FirstOrDefaultAsync(bc => bc.UserId == userId && bc.BagId == id && !bc.IsGift);
 
             if (existingItem != null)
             {
@@ -104,7 +108,8 @@ namespace TennisAcademyApp.Services.Core
                     UserId = userId,
                     BagId = id,
                     Quantity = quantity,
-                    IsOrdered = false
+                    IsOrdered = false,
+                    IsGift = false // При стандартно добавяне не е подарък
                 };
                 bag.Quantity -= quantity;
 

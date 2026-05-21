@@ -93,6 +93,12 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link text-dark fw-bold" asp-area="" asp-controller="Wheel" asp-action="Index">
+                    <i class="bi bi-gift-fill text-danger me-1"></i>
+                    @(isBg ? "Колело на късмета" : "Wheel of Fortune")
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link dropdown-toggle d-flex align-items-center justify-content-between"
                    data-bs-toggle="collapse"
                    data-bs-target="#cartSubmenu"
