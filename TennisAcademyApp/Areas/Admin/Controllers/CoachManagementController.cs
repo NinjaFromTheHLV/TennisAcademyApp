@@ -63,9 +63,9 @@ namespace TennisAcademyApp.Areas.Admin.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                TempData["ErrorMessage"] = CoachAddErrorMessage;
+                TempData["ErrorMessage"] = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
                 return RedirectToAction(nameof(Index));
             }
         }

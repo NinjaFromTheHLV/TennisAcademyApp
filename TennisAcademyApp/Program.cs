@@ -60,6 +60,8 @@ namespace TennisAcademyApp
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IDateTimeProvider, DateTimeProvider>();
 
+            builder.Services.AddSingleton(new DeepL.Translator(builder.Configuration["DeepL:ApiKey"]));
+
             var app = builder.Build(); // <--- Container is locked here
 
             using (var scope = app.Services.CreateScope())

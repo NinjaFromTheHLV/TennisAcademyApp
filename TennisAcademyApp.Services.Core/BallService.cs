@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TennisAcademyApp.Data;
 using TennisAcademyApp.Data.Models;
+using TennisAcademyApp.GCommon.TextUtility;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Ball;
 using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Ball;
@@ -68,48 +69,29 @@ namespace TennisAcademyApp.Services.Core
 
         public async Task<bool> AddBallAsync(string userId, BallCreateInputModel model)
         {
-            bool result = false;
             var user = await userManager.FindByIdAsync(userId);
-            bool IsAdmin = await userManager.IsInRoleAsync(user, "Admin");
+            if (user == null || !await userManager.IsInRoleAsync(user, "Admin"))
+                return false;
 
-            if (IsAdmin)
+            // Използваме TextUtility за стабилен резултат без API заявки
+            string brandBg = TextUtility.CapitalizeNames(TextUtility.TransliterateToBg(model.Brand));
+            string modelBg = TextUtility.CapitalizeNames(TextUtility.TransliterateToBg(model.Model));
+
+            var ball = new Ball
             {
-                var translator = new GoogleTranslator();
-                string brandBgResult = model.Brand;
-                string modelBgResult = model.Model;
+                Brand = model.Brand,
+                BrandBg = brandBg,
+                Model = model.Model,
+                ModelBg = modelBg,
+                Price = model.Price,
+                Quantity = model.Quantity,
+                ImageUrl = model.ImageUrl ?? "~/pictures/DefaultBallImage.webp",
+            };
 
-                // ЗАЩИТА: Предотвратява краш при Rate Limit (429) от Google
-                try
-                {
-                    var brandTranslation = await translator.TranslateAsync(model.Brand, "bg", "en");
-                    brandBgResult = brandTranslation.Translation;
+            await dbContext.Balls.AddAsync(ball);
+            await dbContext.SaveChangesAsync();
 
-                    var modelTranslation = await translator.TranslateAsync(model.Model, "bg", "en");
-                    modelBgResult = modelTranslation.Translation;
-                }
-                catch (Exception)
-                {
-                    // Оставяме стойностите без превод, ако API-то ни откаже достъп
-                }
-
-                var ball = new Ball
-                {
-                    Brand = model.Brand,
-                    BrandBg = brandBgResult,
-                    Model = model.Model,
-                    ModelBg = modelBgResult,
-                    Price = model.Price,
-                    Quantity = model.Quantity,
-                    ImageUrl = model.ImageUrl ?? "~/pictures/DefaultBallImage.webp",
-                };
-
-                await dbContext.Balls.AddAsync(ball);
-                await dbContext.SaveChangesAsync();
-
-                result = true;
-            }
-
-            return result;
+            return true;
         }
 
         public async Task<BallEditFormModel> GetBallForEditingAsync(string userId, int? id)
@@ -138,45 +120,25 @@ namespace TennisAcademyApp.Services.Core
 
         public async Task<bool> EditBallAsync(BallEditFormModel model)
         {
-            // Зареждаме проследяван запис от контекста без AsNoTracking
             var ball = await dbContext.Balls.FirstOrDefaultAsync(b => b.Id == model.Id);
-
             if (ball == null)
             {
                 throw new ArgumentException(BallNotFoundErrorMessage);
             }
 
-            var translator = new GoogleTranslator();
-            string brandBgResult = model.Brand;
-            string modelBgResult = model.Model;
+            // Пак използваме TextUtility за консистентност
+            string brandBg = TextUtility.CapitalizeNames(TextUtility.TransliterateToBg(model.Brand));
+            string modelBg = TextUtility.CapitalizeNames(TextUtility.TransliterateToBg(model.Model));
 
-            // ЗАЩИТА: Предотвратява краш при Rate Limit (429)
-            try
-            {
-                var brandTranslation = await translator.TranslateAsync(model.Brand, "bg", "en");
-                brandBgResult = brandTranslation.Translation;
-
-                var modelTranslation = await translator.TranslateAsync(model.Model, "bg", "en");
-                modelBgResult = modelTranslation.Translation;
-            }
-            catch (Exception)
-            {
-                // Защитаваме CRUD операцията при блокиран превод
-            }
-
-            // Променяме само бизнес полетата директно върху следения обект
             ball.Brand = model.Brand;
-            ball.BrandBg = brandBgResult;
+            ball.BrandBg = brandBg;
             ball.Model = model.Model;
-            ball.ModelBg = modelBgResult;
+            ball.ModelBg = modelBg;
             ball.Price = model.Price;
             ball.Quantity = model.Quantity;
             ball.ImageUrl = model.ImageUrl;
 
-            // ОПРАВЕНО: Премахнат изцяло dbContext.Entry(ball).State = EntityState.Modified;
-            // Сега EF Core ще ъпдейтне само променените полета, без да чупи скритата дата
             await dbContext.SaveChangesAsync();
-
             return true;
         }
 

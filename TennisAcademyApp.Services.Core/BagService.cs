@@ -1,4 +1,5 @@
-﻿using GTranslate.Translators;
+﻿using DeepL;
+using GTranslate.Translators;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TennisAcademyApp.Data;
 using TennisAcademyApp.Data.Models;
+using TennisAcademyApp.GCommon.TextUtility;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Bag;
 using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Bag;
@@ -49,7 +51,6 @@ namespace TennisAcademyApp.Services.Core
         {
             if (id.HasValue)
             {
-                // ОПРАВЕНО: Махнат AsNoTracking(), за да може обектът да се следи от контекста при редакция
                 var bag = await dbContext.Bags
                     .FirstOrDefaultAsync(b => b.Id == id.Value);
 
@@ -68,47 +69,28 @@ namespace TennisAcademyApp.Services.Core
 
         public async Task<bool> AddBagAsync(string userId, BagCreateInputModel model)
         {
-            bool result = false;
             var loggedUser = await userManager.FindByIdAsync(userId);
-            bool IsAdmin = await userManager.IsInRoleAsync(loggedUser, "Admin");
+            if (loggedUser == null || !await userManager.IsInRoleAsync(loggedUser, "Admin"))
+                return false;
 
-            if (IsAdmin)
+            string brandBg = TextUtility.CapitalizeNames(TextUtility.TransliterateToBg(model.Brand));
+            string modelBg = TextUtility.CapitalizeNames(TextUtility.TransliterateToBg(model.Model));
+
+            var bag = new Bag
             {
-                var translator = new GoogleTranslator();
-                string brandBgResult = model.Brand;
-                string modelBgResult = model.Model;
+                Brand = model.Brand,
+                BrandBg = brandBg,
+                Model = model.Model,
+                ModelBg = modelBg,
+                Price = model.Price,
+                Quantity = model.Quantity,
+                ImageUrl = model.ImageUrl ?? "~/pictures/DefaultBagImage.webp",
+            };
 
-                // ЗАЩИТА: Предотвратява гърмене при грешка 429 от Google API
-                try
-                {
-                    var brandTranslation = await translator.TranslateAsync(model.Brand, "bg", "en");
-                    brandBgResult = brandTranslation.Translation;
+            await dbContext.Bags.AddAsync(bag);
+            await dbContext.SaveChangesAsync();
 
-                    var modelTranslation = await translator.TranslateAsync(model.Model, "bg", "en");
-                    modelBgResult = modelTranslation.Translation;
-                }
-                catch (Exception)
-                {
-                    // Ако Google API е блокирано, оставяме стойностите по подразбиране
-                }
-
-                var bag = new Bag
-                {
-                    Brand = model.Brand,
-                    BrandBg = brandBgResult,
-                    Model = model.Model,
-                    ModelBg = modelBgResult,
-                    Price = model.Price,
-                    Quantity = model.Quantity,
-                    ImageUrl = model.ImageUrl ?? "~/pictures/DefaultBagImage.webp",
-                };
-
-                await dbContext.Bags.AddAsync(bag);
-                await dbContext.SaveChangesAsync();
-
-                result = true;
-            }
-            return result;
+            return true;
         }
 
         public async Task<BagEditFormModel> GetBagForEditingAsync(string userId, int? id)
@@ -137,45 +119,21 @@ namespace TennisAcademyApp.Services.Core
 
         public async Task<bool> EditBagAsync(BagEditFormModel model)
         {
-            // Зареждаме следен запис от базата без AsNoTracking
             var bag = await dbContext.Bags.FirstOrDefaultAsync(b => b.Id == model.Id);
+            if (bag == null) throw new ArgumentException(BagNotFoundErrorMessage);
 
-            if (bag == null)
-            {
-                throw new ArgumentException(BagNotFoundErrorMessage);
-            }
+            string brandBg = TextUtility.CapitalizeNames(TextUtility.TransliterateToBg(model.Brand));
+            string modelBg = TextUtility.CapitalizeNames(TextUtility.TransliterateToBg(model.Model));
 
-            var translator = new GoogleTranslator();
-            string brandBgResult = model.Brand;
-            string modelBgResult = model.Model;
-
-            // ЗАЩИТА: Предотвратява краш при Rate Limit (429)
-            try
-            {
-                var brandTranslation = await translator.TranslateAsync(model.Brand, "bg", "en");
-                brandBgResult = brandTranslation.Translation;
-
-                var modelTranslation = await translator.TranslateAsync(model.Model, "bg", "en");
-                modelBgResult = modelTranslation.Translation;
-            }
-            catch (Exception)
-            {
-                // При грешка запазваме текста без превод
-            }
-
-            // Променяме само бизнес полетата
             bag.Brand = model.Brand;
-            bag.BrandBg = brandBgResult;
+            bag.BrandBg = brandBg;
             bag.Model = model.Model;
-            bag.ModelBg = modelBgResult;
+            bag.ModelBg = modelBg;
             bag.Price = model.Price;
             bag.Quantity = model.Quantity;
             bag.ImageUrl = model.ImageUrl;
 
-            // ОПРАВЕНО: Премахнат изцяло dbContext.Entry(bag).State = EntityState.Modified;
-            // EF Core сам ще ъпдейтне променените колони без да чупи скритата дата
             await dbContext.SaveChangesAsync();
-
             return true;
         }
 

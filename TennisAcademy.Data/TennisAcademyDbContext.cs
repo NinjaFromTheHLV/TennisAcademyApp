@@ -72,7 +72,7 @@ namespace TennisAcademyApp.Data
                 config.Entity(entityType.ClrType)
                     .Property<DateTime>(auditColumnName)
                     .HasDefaultValueSql("GETDATE()")
-                    .ValueGeneratedOnAddOrUpdate(); // Оправя проблема със счупените сървизи
+                    .ValueGeneratedOnAddOrUpdate();
             }
 
             config.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
@@ -90,8 +90,6 @@ namespace TennisAcademyApp.Data
             UpdateAuditFields();
             return base.SaveChanges();
         }
-
-        // Изнасяме логиката в помощен метод, за да няма дублиране на код
         private void UpdateAuditFields()
         {
             string auditColumnName = $"LastModified_{FacultyNumber}";

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TennisAcademyApp.Data;
 using TennisAcademyApp.Data.Models;
+using TennisAcademyApp.GCommon.TextUtility;
 using TennisAcademyApp.Services.Core.Contracts;
 using TennisAcademyApp.ViewModels.Racket;
 using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Racket;
@@ -68,36 +69,19 @@ namespace TennisAcademyApp.Services.Core
         public async Task<bool> AddRacketAsync(string userId, RacketCreateInputModel model)
         {
             var user = await userManager.FindByIdAsync(userId);
-            bool isAdmin = await userManager.IsInRoleAsync(user, "Admin");
-            if (user == null || !isAdmin)
-            {
+            if (user == null || !await userManager.IsInRoleAsync(user, "Admin"))
                 throw new ArgumentException("You have to be an Admin to add rackets");
-            }
 
-            var translator = new GoogleTranslator();
-            string brandBgResult = model.Brand;
-            string modelBgResult = model.Model;
-
-            // ЗАЩИТА: Предотвратява краш при Rate Limit (429) от Google
-            try
-            {
-                var brandTranslation = await translator.TranslateAsync(model.Brand, "bg", "en");
-                brandBgResult = brandTranslation.Translation;
-
-                var modelTranslation = await translator.TranslateAsync(model.Model, "bg", "en");
-                modelBgResult = modelTranslation.Translation;
-            }
-            catch (Exception)
-            {
-                // Оставяме стойностите без превод, ако API-то ни откаже достъп
-            }
+            // Използваме TextUtility за стабилен резултат без API заявки
+            string brandBg = TextUtility.CapitalizeNames(TextUtility.TransliterateToBg(model.Brand));
+            string modelBg = TextUtility.CapitalizeNames(TextUtility.TransliterateToBg(model.Model));
 
             var racket = new Racket
             {
                 Brand = model.Brand,
-                BrandBg = brandBgResult,
+                BrandBg = brandBg,
                 Model = model.Model,
-                ModelBg = modelBgResult,
+                ModelBg = modelBg,
                 Price = model.Price,
                 Quantity = model.Quantity,
                 ImageUrl = model.ImageUrl ?? "~/pictures/DefaultRacketImage.webp"
@@ -134,45 +118,23 @@ namespace TennisAcademyApp.Services.Core
 
         public async Task<bool> EditRacketAsync(RacketEditFormModel model)
         {
-            // Зареждаме проследяван запис от контекста без AsNoTracking
             var racket = await dbContext.Rackets.FirstOrDefaultAsync(r => r.Id == model.Id);
-
             if (racket == null)
-            {
                 throw new ArgumentException(RacketNotFoundErrorMessage);
-            }
 
-            var translator = new GoogleTranslator();
-            string brandBgResult = model.Brand;
-            string modelBgResult = model.Model;
+            // Пак използваме TextUtility за консистентност
+            string brandBg = TextUtility.CapitalizeNames(TextUtility.TransliterateToBg(model.Brand));
+            string modelBg = TextUtility.CapitalizeNames(TextUtility.TransliterateToBg(model.Model));
 
-            // ЗАЩИТА: Предотвратява краш при Rate Limit (429)
-            try
-            {
-                var brandTranslation = await translator.TranslateAsync(model.Brand, "bg", "en");
-                brandBgResult = brandTranslation.Translation;
-
-                var modelTranslation = await translator.TranslateAsync(model.Model, "bg", "en");
-                modelBgResult = modelTranslation.Translation;
-            }
-            catch (Exception)
-            {
-                // Защитаваме CRUD операцията при блокиран превод
-            }
-
-            // Променяме само бизнес полетата директно върху следения обект
             racket.Brand = model.Brand;
-            racket.BrandBg = brandBgResult;
+            racket.BrandBg = brandBg;
             racket.Model = model.Model;
-            racket.ModelBg = modelBgResult;
+            racket.ModelBg = modelBg;
             racket.Price = model.Price;
             racket.Quantity = model.Quantity;
             racket.ImageUrl = model.ImageUrl;
 
-            // ОПРАВЕНО: Премахнат изцяло dbContext.Entry(racket).State = EntityState.Modified;
-            // Сега EF Core ще ъпдейтне само променените полета, без да чупи скритата дата
             await dbContext.SaveChangesAsync();
-
             return true;
         }
 
