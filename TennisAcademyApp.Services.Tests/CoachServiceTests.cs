@@ -1,12 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using DeepL;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using TennisAcademyApp.Data;
 using TennisAcademyApp.Data.Models;
 using TennisAcademyApp.Services.Core;
@@ -37,7 +34,9 @@ namespace TennisAcademyApp.Tests
             mockConfiguration = new Mock<IConfiguration>();
             mockConfiguration.Setup(c => c["CoachSettings:DefaultPassword"]).Returns("Test1234!");
 
-            coachService = new CoachService(dbContext, mockUserManager.Object, mockConfiguration.Object);
+            var dummyTranslator = new Translator("dummy-api-key");
+
+            coachService = new CoachService(dbContext, mockUserManager.Object, mockConfiguration.Object, dummyTranslator);
         }
 
         [TearDown]
@@ -157,7 +156,7 @@ namespace TennisAcademyApp.Tests
         }
 
         [Test]
-        public async Task AddCoachAsync_ThrowsException_WhenUserIsNotAdmin()
+        public void AddCoachAsync_ThrowsException_WhenUserIsNotAdmin()
         {
             var userId = "user1";
             var user = new ApplicationUser { Id = userId };
@@ -170,7 +169,7 @@ namespace TennisAcademyApp.Tests
         }
 
         [Test]
-        public async Task AddCoachAsync_ThrowsException_WhenEmailAlreadyExists()
+        public void AddCoachAsync_ThrowsException_WhenEmailAlreadyExists()
         {
             var userId = "admin1";
             var user = new ApplicationUser { Id = userId };
