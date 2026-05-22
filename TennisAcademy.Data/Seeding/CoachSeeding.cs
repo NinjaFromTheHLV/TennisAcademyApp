@@ -19,7 +19,7 @@ namespace TennisAcademyApp.Data.Seeding
                     DescriptionBg = "Един от най-великите тенисисти на всички времена, известен с доминацията си на клей кортове.",
                     Nationality = "Spanish",
                     NationalityBg = "Испанец",
-                    ImageUrl = "~/pictures/rafa.jpg"
+                    ImageUrl = "https://imageio.forbes.com/specials-images/imageserve/5ece8a5c938ec500060aae37/0x0.jpg?format=jpg&crop=2462,2460,x503,y156,safe&height=416&width=416&fit=bounds"
                 },
                 new Coach
                 {

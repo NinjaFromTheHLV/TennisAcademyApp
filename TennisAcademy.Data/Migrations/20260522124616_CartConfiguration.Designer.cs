@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TennisAcademyApp.Data;
 
@@ -11,9 +12,11 @@ using TennisAcademyApp.Data;
 namespace TennisAcademyApp.Data.Migrations
 {
     [DbContext(typeof(TennisAcademyDbContext))]
-    partial class TennisAcademyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260522124616_CartConfiguration")]
+    partial class CartConfiguration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -608,7 +611,7 @@ namespace TennisAcademyApp.Data.Migrations
                             Age = 38,
                             Description = "One of the greatest tennis players of all time, known for his clay court dominance.",
                             DescriptionBg = "Един от най-великите тенисисти на всички времена, известен с доминацията си на клей кортове.",
-                            ImageUrl = "https://imageio.forbes.com/specials-images/imageserve/5ece8a5c938ec500060aae37/0x0.jpg?format=jpg&crop=2462,2460,x503,y156,safe&height=416&width=416&fit=bounds",
+                            ImageUrl = "~/pictures/rafa.jpg",
                             IsDeleted = false,
                             Name = "Rafael Nadal",
                             NameBg = "Рафаел Надал",

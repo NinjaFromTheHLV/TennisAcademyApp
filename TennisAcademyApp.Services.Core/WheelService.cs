@@ -58,35 +58,35 @@ namespace TennisAcademyApp.Services
             int winningIndex = Random.Shared.Next(0, 6);
             string prizeName = "ОПИТАЙ ПАК";
 
-            if (winningIndex == 0) 
+            if (winningIndex == 0)
             {
                 var item = await _context.Rackets.Select(r => new { r.Id, r.Model }).FirstOrDefaultAsync();
                 if (item != null)
                 {
                     prizeName = item.Model;
-                    var cartItem = await _context.RacketCart.FirstOrDefaultAsync(c => c.UserId == userId && c.RacketId == item.Id);
+                    var cartItem = await _context.RacketCart.FirstOrDefaultAsync(c => c.UserId == userId && c.RacketId == item.Id && c.IsGift == true);
                     if (cartItem != null) cartItem.Quantity++;
                     else _context.RacketCart.Add(new RacketCart { UserId = userId, RacketId = item.Id, Quantity = 1, IsGift = true });
                 }
             }
-            else if (winningIndex == 2) 
+            else if (winningIndex == 2)
             {
                 var item = await _context.Balls.Select(b => new { b.Id, b.Brand }).FirstOrDefaultAsync();
                 if (item != null)
                 {
                     prizeName = item.Brand;
-                    var cartItem = await _context.BallCart.FirstOrDefaultAsync(c => c.UserId == userId && c.BallId == item.Id);
+                    var cartItem = await _context.BallCart.FirstOrDefaultAsync(c => c.UserId == userId && c.BallId == item.Id && c.IsGift == true);
                     if (cartItem != null) cartItem.Quantity++;
                     else _context.BallCart.Add(new BallCart { UserId = userId, BallId = item.Id, Quantity = 1, IsGift = true });
                 }
             }
-            else if (winningIndex == 4) 
+            else if (winningIndex == 4)
             {
                 var item = await _context.Bags.Select(b => new { b.Id, b.Brand }).FirstOrDefaultAsync();
                 if (item != null)
                 {
                     prizeName = item.Brand;
-                    var cartItem = await _context.BagCart.FirstOrDefaultAsync(c => c.UserId == userId && c.BagId == item.Id);
+                    var cartItem = await _context.BagCart.FirstOrDefaultAsync(c => c.UserId == userId && c.BagId == item.Id && c.IsGift == true);
                     if (cartItem != null) cartItem.Quantity++;
                     else _context.BagCart.Add(new BagCart { UserId = userId, BagId = item.Id, Quantity = 1, IsGift = true });
                 }

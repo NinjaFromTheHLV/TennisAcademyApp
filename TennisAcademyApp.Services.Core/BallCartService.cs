@@ -109,14 +109,15 @@ namespace TennisAcademyApp.Services.Core
         public async Task<bool> RemoveBallFromCartAsync(string userId, int ballId)
         {
             var cartItem = await dbContext.BallCart
-                .FirstOrDefaultAsync(bc => bc.BallId == ballId && bc.UserId == userId && !bc.IsOrdered);
+                .Where(bc => bc.BallId == ballId && bc.UserId == userId && !bc.IsOrdered)
+                .OrderBy(bc => bc.IsGift)
+                .FirstOrDefaultAsync();
 
             if (cartItem == null)
             {
                 throw new InvalidOperationException(BallNotFoundInCartErrorMessage);
             }
 
-            // Връщаме количеството обратно в инвентара на магазина
             var ball = await dbContext.Balls.FindAsync(ballId);
             if (ball != null)
             {

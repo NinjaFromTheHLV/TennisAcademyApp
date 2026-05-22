@@ -58,13 +58,11 @@ namespace TennisAcademyApp.Services.Core
                     Id = bc.BagId,
                     Brand = isBg ? bc.Bag.BrandBg : bc.Bag.Brand,
                     Model = isBg ? bc.Bag.ModelBg : bc.Bag.Model,
-                    // АКО Е ПОДАРЪК, ЦЕНАТА Е 0, ИНАЧЕ Е СТАНДАРТНАТА С ОТСТЪПКА
                     Price = bc.IsGift ? 0m : (bc.Bag.Price * discountMultiplier),
                     Quantity = bc.Quantity,
-                    // ОБЩАТА ЦЕНА СЪЩО Е 0 ЗА ПОДАРЪК
                     TotalPrice = bc.IsGift ? 0m : (bc.Quantity * (bc.Bag.Price * discountMultiplier)),
                     ImageUrl = bc.Bag.ImageUrl,
-                    IsGift = bc.IsGift // Подаваме го към View-то
+                    IsGift = bc.IsGift 
                 })
                 .ToListAsync();
 
@@ -82,7 +80,6 @@ namespace TennisAcademyApp.Services.Core
                 throw new InvalidOperationException(InvalidQuantityErrorMessage);
             }
 
-            // ВАЖНО: Търсим само платени чанти (IsGift == false), за да не ги смесваме с подаръците
             var existingItem = await dbContext.BagCart
                 .FirstOrDefaultAsync(bc => bc.UserId == userId && bc.BagId == id && !bc.IsGift);
 
@@ -109,7 +106,7 @@ namespace TennisAcademyApp.Services.Core
                     BagId = id,
                     Quantity = quantity,
                     IsOrdered = false,
-                    IsGift = false // При стандартно добавяне не е подарък
+                    IsGift = false
                 };
                 bag.Quantity -= quantity;
 
@@ -125,7 +122,9 @@ namespace TennisAcademyApp.Services.Core
         {
             bool result = false;
             var cartItem = await dbContext.BagCart
-                .FirstOrDefaultAsync(bc => bc.BagId == bagId && bc.UserId == userId && !bc.IsOrdered);
+                .Where(bc => bc.BagId == bagId && bc.UserId == userId && !bc.IsOrdered)
+                .OrderBy(bc => bc.IsGift)
+                .FirstOrDefaultAsync();
 
             if (cartItem == null)
             {

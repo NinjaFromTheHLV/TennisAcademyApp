@@ -130,7 +130,8 @@ namespace TennisAcademyApp.Services.Core
                 {
                     Id = c.CoachId,
                     Name = c.Name,
-                    NameBg = c.NameBg
+                    NameBg = c.NameBg,
+                    ImageUrl = c.ImageUrl
                 })
                 .ToListAsync();
 

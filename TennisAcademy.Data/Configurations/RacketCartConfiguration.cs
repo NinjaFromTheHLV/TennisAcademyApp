@@ -8,8 +8,7 @@ namespace TennisAcademyApp.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<RacketCart> config)
         {
-            config
-                .HasKey(rc => new { rc.RacketId, rc.UserId });
+            config.HasKey(rc => new { rc.RacketId, rc.UserId, rc.IsGift });
 
             config
                 .HasOne(rc => rc.Racket)

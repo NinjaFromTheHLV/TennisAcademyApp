@@ -1,5 +1,5 @@
-﻿
-#surface-preview-holder {
+﻿#surface-preview-holder,
+#coach-preview-holder {
     position: absolute;
     bottom: 110%;
     left: 0;
@@ -16,20 +16,23 @@
     z-index: 1060;
 }
 
-    #surface-preview-holder.visible {
+    #surface-preview-holder.visible,
+    #coach-preview-holder.visible {
         opacity: 1;
         visibility: visible;
         transform: translateY(0) scale(1);
     }
 
-#popup-img {
+#popup-img,
+#coach-popup-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
 }
 
-.custom-surface-dropdown .dropdown-item:hover {
+.custom-surface-dropdown .dropdown-item:hover,
+.custom-coach-dropdown .dropdown-item:hover {
     background-color: var(--accent) !important;
     color: #000 !important;
 }

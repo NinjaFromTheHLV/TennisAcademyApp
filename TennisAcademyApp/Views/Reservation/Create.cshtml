@@ -59,12 +59,40 @@
                     </div>
 
                     <div class="form-group mb-3">
-                        <label asp-for="CoachId" class="form-label">
-                            <i class="bi bi-person-badge me-1 text-primary"></i> @(isBg ? "Треньор" : "Coach")
-                        </label>
-                        <select asp-for="CoachId" class="form-control form-select" asp-items="@(new SelectList(Model.Coaches, "Id", isBg ? "NameBg" : "Name"))">
-                            <option value="">@(isBg ? "-- Избери треньор --" : "-- Select Coach --")</option>
-                        </select>
+                        <div class="position-relative d-inline-block w-100">
+                            <label asp-for="CoachId" class="form-label m-0">
+                                <i class="bi bi-person-badge me-1 text-primary"></i> @(isBg ? "Треньор" : "Coach")
+                            </label>
+
+                            <div id="coach-preview-holder">
+                                <img id="coach-popup-img" src="" alt="Coach Preview" />
+                            </div>
+                        </div>
+
+                        <input type="hidden" asp-for="CoachId" id="hidden-coach-id" />
+
+                        <div class="dropdown custom-coach-dropdown mt-2">
+                            <button class="form-control form-select text-start d-flex justify-content-between align-items-center" type="button" id="coachDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                                @(isBg ? "-- Избери треньор --" : "-- Select Coach --")
+                            </button>
+
+                            <ul class="dropdown-menu w-100 p-2 shadow bg-dark" aria-labelledby="coachDropdownBtn">
+                                <li>
+                                    <a class="dropdown-item text-muted coach-hover-item" href="#" data-value="">
+                                        @(isBg ? "-- Избери треньор --" : "-- Select Coach --")
+                                    </a>
+                                </li>
+                                @foreach (var coach in Model.Coaches)
+                                {
+                                    var imgUrl = string.IsNullOrEmpty(coach.ImageUrl) ? "/pictures/DefaultUserImage.webp" : coach.ImageUrl;
+                                    <li>
+                                        <a class="dropdown-item text-light coach-hover-item" href="#" data-value="@coach.Id" data-img="@imgUrl">
+                                            @(isBg? coach.NameBg: coach.Name)
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
                         <span asp-validation-for="CoachId" class="text-danger small"></span>
                     </div>
 
@@ -182,6 +210,41 @@
                     const dropdownInstance = bootstrap.Dropdown.getInstance(dropdownBtn);
                     if (dropdownInstance) dropdownInstance.hide();
                     previewHolder.classList.remove("visible");
+                });
+            });
+
+            const coachDropdownBtn = document.getElementById("coachDropdownBtn");
+            const coachHiddenInput = document.getElementById("hidden-coach-id");
+            const coachPreviewHolder = document.getElementById("coach-preview-holder");
+            const coachPopupImg = document.getElementById("coach-popup-img");
+            const coachHoverItems = document.querySelectorAll(".coach-hover-item");
+
+            coachHoverItems.forEach(item => {
+                item.addEventListener("mouseenter", function () {
+                    const imgUrl = this.getAttribute("data-img");
+                    if (imgUrl) {
+                        coachPopupImg.src = imgUrl;
+                        coachPreviewHolder.classList.add("visible");
+                    } else {
+                        coachPreviewHolder.classList.remove("visible");
+                    }
+                });
+
+                item.addEventListener("mouseleave", function () {
+                    coachPreviewHolder.classList.remove("visible");
+                });
+
+                item.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    const value = this.getAttribute("data-value");
+                    const text = this.textContent.trim();
+
+                    coachHiddenInput.value = value;
+                    coachDropdownBtn.textContent = text;
+
+                    const dropdownInstance = bootstrap.Dropdown.getInstance(coachDropdownBtn);
+                    if (dropdownInstance) dropdownInstance.hide();
+                    coachPreviewHolder.classList.remove("visible");
                 });
             });
         });

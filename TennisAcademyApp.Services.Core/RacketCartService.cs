@@ -51,7 +51,6 @@ namespace TennisAcademyApp.Services.Core
                     Id = rc.RacketId,
                     Brand = isBg ? rc.Racket.BrandBg : rc.Racket.Brand,
                     Model = isBg ? rc.Racket.ModelBg : rc.Racket.Model,
-                    // Цената е 0, ако е подарък
                     Price = rc.IsGift ? 0m : (rc.Racket.Price * discountMultiplier),
                     Quantity = rc.Quantity,
                     TotalPrice = rc.IsGift ? 0m : (rc.Quantity * (rc.Racket.Price * discountMultiplier)),
@@ -67,7 +66,6 @@ namespace TennisAcademyApp.Services.Core
             if (racket == null || quantity <= 0 || quantity > racket.Quantity)
                 throw new InvalidOperationException(InvalidQuantityErrorMessage);
 
-            // Търсим само платени ракети (IsGift == false)
             var existingItem = await dbContext.RacketCart
                 .FirstOrDefaultAsync(rc => rc.UserId == userId && rc.RacketId == id && !rc.IsGift);
 
@@ -96,7 +94,9 @@ namespace TennisAcademyApp.Services.Core
         public async Task<bool> RemoveRacketFromCartAsync(string userId, int id)
         {
             var cartItem = await dbContext.RacketCart
-                .FirstOrDefaultAsync(rc => rc.RacketId == id && rc.UserId == userId && !rc.IsOrdered);
+                .Where(rc => rc.RacketId == id && rc.UserId == userId && !rc.IsOrdered)
+                .OrderBy(rc => rc.IsGift)
+                .FirstOrDefaultAsync();
 
             if (cartItem == null) throw new InvalidOperationException(RacketNotFoundInCartErrorMessage);
 

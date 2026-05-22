@@ -83,7 +83,6 @@ namespace TennisAcademyApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            // 1. Инициализираме модела с празни списъци по подразбиране
             var model = new ReservationCreateInputModel
             {
                 Date = DateTime.Now,
