@@ -1,281 +1,335 @@
-﻿//using Microsoft.AspNetCore.Identity;
-//using Microsoft.EntityFrameworkCore;
-//using Moq;
-//using NUnit.Framework;
-//using TennisAcademyApp.Data;
-//using TennisAcademyApp.Data.Models;
-//using TennisAcademyApp.Services.Core;
-//using TennisAcademyApp.Services.Core.Contracts;
-//using TennisAcademyApp.ViewModels.Ranking;
-//using static TennisAcademyApp.GCommon.Validations.ErrorMessages.RacketCart;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Moq;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using TennisAcademyApp.Data;
+using TennisAcademyApp.Data.Models;
+using TennisAcademyApp.Services.Core;
+using TennisAcademyApp.Services.Core.Contracts;
+using TennisAcademyApp.ViewModels.Cart;
+using TennisAcademyApp.ViewModels.Ranking;
 
-//namespace TennisAcademyApp.Tests.Services
-//{
-//    [TestFixture]
-//    public class RacketCartServiceTests
-//    {
-//        private TennisAcademyDbContext dbContext;
-//        private Mock<UserManager<ApplicationUser>> userManagerMock;
-//        private Mock<IRankingService> rankingServiceMock; 
-//        private RacketCartService racketCartService;
+namespace TennisAcademyApp.Tests
+{
+    [TestFixture]
+    public class RacketCartServiceTests
+    {
+        private TennisAcademyDbContext dbContext;
+        private RacketCartService racketCartService;
+        private Mock<UserManager<ApplicationUser>> mockUserManager;
+        private Mock<IRankingService> mockRankingService;
 
-//        [SetUp]
-//        public void SetUp()
-//        {
-//            var options = new DbContextOptionsBuilder<TennisAcademyDbContext>()
-//                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-//                .Options;
+        [SetUp]
+        public void Setup()
+        {
+            var options = new DbContextOptionsBuilder<TennisAcademyDbContext>()
+                .UseInMemoryDatabase(databaseName: "TennisAcademyTestDb_" + Guid.NewGuid().ToString())
+                .Options;
 
-//            dbContext = new TennisAcademyDbContext(options);
+            dbContext = new TennisAcademyDbContext(options);
 
-//            var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
-//            userManagerMock = new Mock<UserManager<ApplicationUser>>(
-//                userStoreMock.Object, null, null, null, null, null, null, null, null);
+            var store = new Mock<IUserStore<ApplicationUser>>();
+            mockUserManager = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
 
-//            rankingServiceMock = new Mock<IRankingService>();
-//            rankingServiceMock.Setup(s => s.GetLeaderboardAsync())
-//                              .ReturnsAsync(new List<UserRankingViewModel>());
+            mockRankingService = new Mock<IRankingService>();
 
-//            racketCartService = new RacketCartService(dbContext, userManagerMock.Object, rankingServiceMock.Object);
-//        }
+            racketCartService = new RacketCartService(dbContext, mockUserManager.Object, mockRankingService.Object);
+        }
 
-//        [Test]
-//        public async Task GetAllRacketsInCartAsync_ShouldReturnCorrectRackets()
-//        {
-//            var userId = "user1";
-//            var user = new ApplicationUser { Id = userId };
+        [TearDown]
+        public void TearDown()
+        {
+            dbContext.Database.EnsureDeleted();
+            dbContext.Dispose();
+        }
 
-//            var racket = new Racket
-//            {
-//                Id = 1,
-//                Brand = "Wilson",
-//                Model = "Pro Staff",
-//                Price = 150m,
-//                Quantity = 10,
-//                ImageUrl = "wilson.jpg"
-//            };
+        [Test]
+        public async Task GetAllRacketsInCartAsync_ReturnsEmpty_WhenUserNotFound()
+        {
+            mockUserManager.Setup(um => um.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((ApplicationUser)null!);
 
-//            var cartItem = new RacketCart
-//            {
-//                RacketId = racket.Id,
-//                UserId = userId,
-//                Quantity = 2,
-//                Racket = racket
-//            };
+            var result = await racketCartService.GetAllRacketsInCartAsync("invalid-user");
 
-//            await dbContext.Rackets.AddAsync(racket);
-//            await dbContext.RacketCart.AddAsync(cartItem);
-//            await dbContext.SaveChangesAsync();
+            Assert.That(result, Is.Empty);
+        }
 
-//            userManagerMock.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+        [Test]
+        public async Task GetAllRacketsInCartAsync_CalculatesDiscountCorrectly_ForRankOne()
+        {
+            var userId = "user1";
+            var user = new ApplicationUser { Id = userId, FirstName = "Jane", LastName = "Doe" };
 
-//            var result = (await racketCartService.GetAllRacketsInCartAsync(userId)).ToList();
+            mockUserManager.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
 
-//            Assert.That(result.Count, Is.EqualTo(1));
-//            Assert.That(result[0].Id, Is.EqualTo(racket.Id));
-//            Assert.That(result[0].Brand, Is.EqualTo("Wilson"));
-//            Assert.That(result[0].Model, Is.EqualTo("Pro Staff"));
-//            Assert.That(result[0].Price, Is.EqualTo(150m));
-//            Assert.That(result[0].Quantity, Is.EqualTo(2));
-//            Assert.That(result[0].TotalPrice, Is.EqualTo(300m)); // 2 * 150
-//            Assert.That(result[0].ImageUrl, Is.EqualTo("wilson.jpg"));
-//        }
+            var racket = new Racket
+            {
+                Id = 1,
+                Brand = "Wilson",
+                BrandBg = "Уилсън",
+                Price = 200,
+                Quantity = 50,
+                Model = "Pro Staff",
+                ModelBg = "Про Стаф",
+                ImageUrl = "racket.jpg"
+            };
+            var cartItem = new RacketCart { UserId = userId, RacketId = 1, Quantity = 2, IsOrdered = false, IsGift = false };
 
-//        [Test]
-//        public async Task AddRacketToCartAsync_ShouldAddNewItem_WhenNotExists()
-//        {
-//            var userId = "user2";
-//            var user = new ApplicationUser { Id = userId };
+            dbContext.Rackets.Add(racket);
+            dbContext.RacketCart.Add(cartItem);
+            await dbContext.SaveChangesAsync();
 
-//            var racket = new Racket
-//            {
-//                Id = 1,
-//                Brand = "Head",
-//                Model = "Radical",
-//                Price = 180m,
-//                Quantity = 5,
-//                ImageUrl = "head.jpg"
-//            };
+            mockRankingService.Setup(rs => rs.GetLeaderboardAsync())
+                .ReturnsAsync(new List<UserRankingViewModel>
+                {
+                    new UserRankingViewModel { FullName = "Jane Doe", Position = 1 }
+                });
 
-//            await dbContext.Rackets.AddAsync(racket);
-//            await dbContext.SaveChangesAsync();
+            var result = await racketCartService.GetAllRacketsInCartAsync(userId);
+            var item = result.First();
 
-//            userManagerMock.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            Assert.That(item.Price, Is.EqualTo(160m));
+            Assert.That(item.TotalPrice, Is.EqualTo(320m));
+        }
 
-//            var result = await racketCartService.AddRacketToCartAsync(userId, racket.Id, 3);
+        [Test]
+        public async Task GetAllRacketsInCartAsync_SetsPriceToZero_WhenItemIsGift()
+        {
+            var userId = "user1";
+            var user = new ApplicationUser { Id = userId, FirstName = "Jane", LastName = "Doe" };
 
-//            Assert.That(result, Is.True);
+            mockUserManager.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            mockRankingService.Setup(rs => rs.GetLeaderboardAsync()).ReturnsAsync(new List<UserRankingViewModel>());
 
-//            var cartItem = await dbContext.RacketCart.FirstOrDefaultAsync(rc => rc.UserId == userId && rc.RacketId == racket.Id);
-//            Assert.That(cartItem, Is.Not.Null);
-//            Assert.That(cartItem.Quantity, Is.EqualTo(3));
+            var racket = new Racket
+            {
+                Id = 1,
+                Brand = "Head",
+                BrandBg = "Хед",
+                Price = 150,
+                Quantity = 50,
+                Model = "Radical",
+                ModelBg = "Радикал",
+                ImageUrl = "racket.jpg"
+            };
+            var cartItem = new RacketCart { UserId = userId, RacketId = 1, Quantity = 3, IsOrdered = false, IsGift = true };
 
-//            var updatedRacket = await dbContext.Rackets.FindAsync(racket.Id);
-//            Assert.That(updatedRacket.Quantity, Is.EqualTo(2)); // 5 - 3 = 2
-//        }
+            dbContext.Rackets.Add(racket);
+            dbContext.RacketCart.Add(cartItem);
+            await dbContext.SaveChangesAsync();
 
-//        [Test]
-//        public async Task AddRacketToCartAsync_ShouldUpdateQuantity_WhenAlreadyInCart()
-//        {
-//            var userId = "user3";
-//            var user = new ApplicationUser { Id = userId };
+            var result = await racketCartService.GetAllRacketsInCartAsync(userId);
+            var item = result.First();
 
-//            var racket = new Racket
-//            {
-//                Id = 1,
-//                Brand = "Babolat",
-//                Model = "Pure Aero",
-//                Price = 170m,
-//                Quantity = 8,
-//                ImageUrl = "babolat.jpg"
-//            };
+            Assert.That(item.Price, Is.EqualTo(0m));
+            Assert.That(item.TotalPrice, Is.EqualTo(0m));
+        }
 
-//            var existingCartItem = new RacketCart
-//            {
-//                RacketId = racket.Id,
-//                UserId = userId,
-//                Quantity = 2
-//            };
+        [Test]
+        public void AddRacketToCartAsync_ThrowsException_WhenRacketDoesNotExist()
+        {
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await racketCartService.AddRacketToCartAsync("user1", 99, 1));
+        }
 
-//            await dbContext.Rackets.AddAsync(racket);
-//            await dbContext.RacketCart.AddAsync(existingCartItem);
-//            await dbContext.SaveChangesAsync();
+        [Test]
+        public async Task AddRacketToCartAsync_ThrowsException_WhenQuantityIsInvalid()
+        {
+            var racket = new Racket
+            {
+                Id = 1,
+                Brand = "Babolat",
+                BrandBg = "Баболат",
+                Quantity = 5,
+                Model = "Pure Aero",
+                ModelBg = "Пюр Аеро",
+                ImageUrl = "racket.jpg"
+            };
+            dbContext.Rackets.Add(racket);
+            await dbContext.SaveChangesAsync();
 
-//            userManagerMock.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await racketCartService.AddRacketToCartAsync("user1", 1, 0));
 
-//            var result = await racketCartService.AddRacketToCartAsync(userId, racket.Id, 3);
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await racketCartService.AddRacketToCartAsync("user1", 1, 10));
+        }
 
-//            Assert.That(result, Is.True);
+        [Test]
+        public async Task AddRacketToCartAsync_AddsNewItem_WhenNotInCart()
+        {
+            var racket = new Racket
+            {
+                Id = 1,
+                Brand = "Yonex",
+                BrandBg = "Йонекс",
+                Quantity = 20,
+                Model = "Ezone",
+                ModelBg = "Изоун",
+                ImageUrl = "racket.jpg"
+            };
+            dbContext.Rackets.Add(racket);
+            await dbContext.SaveChangesAsync();
 
-//            var cartItem = await dbContext.RacketCart.FirstOrDefaultAsync(rc => rc.UserId == userId && rc.RacketId == racket.Id);
-//            Assert.That(cartItem.Quantity, Is.EqualTo(5)); // 2 + 3
+            var result = await racketCartService.AddRacketToCartAsync("user1", 1, 5);
 
-//            var updatedRacket = await dbContext.Rackets.FindAsync(racket.Id);
-//            Assert.That(updatedRacket.Quantity, Is.EqualTo(5)); // 8 - 3 = 5
-//        }
+            var cartItem = await dbContext.RacketCart.FirstOrDefaultAsync();
+            var updatedRacket = await dbContext.Rackets.FindAsync(1);
 
-//        [Test]
-//        public void AddRacketToCartAsync_ShouldThrow_WhenInvalidQuantity()
-//        {
-//            var userId = "user4";
-//            var user = new ApplicationUser { Id = userId };
+            Assert.That(result, Is.True);
+            Assert.That(cartItem, Is.Not.Null);
+            Assert.That(cartItem!.Quantity, Is.EqualTo(5));
+            Assert.That(cartItem.IsGift, Is.False);
+            Assert.That(cartItem.IsOrdered, Is.False);
+            Assert.That(updatedRacket!.Quantity, Is.EqualTo(15));
+        }
 
-//            var racket = new Racket
-//            {
-//                Id = 1,
-//                Brand = "Prince",
-//                Model = "Tour",
-//                Price = 140m,
-//                Quantity = 4,
-//                ImageUrl = "prince.jpg"
-//            };
+        [Test]
+        public async Task AddRacketToCartAsync_IncreasesQuantity_WhenAlreadyInCartAndNotOrdered()
+        {
+            var racket = new Racket
+            {
+                Id = 1,
+                Brand = "Head",
+                BrandBg = "Хед",
+                Quantity = 20,
+                Model = "Speed",
+                ModelBg = "Спийд",
+                ImageUrl = "racket.jpg"
+            };
+            var existingCartItem = new RacketCart { UserId = "user1", RacketId = 1, Quantity = 2, IsOrdered = false, IsGift = false };
 
-//            dbContext.Rackets.Add(racket);
-//            dbContext.SaveChanges();
+            dbContext.Rackets.Add(racket);
+            dbContext.RacketCart.Add(existingCartItem);
+            await dbContext.SaveChangesAsync();
 
-//            userManagerMock.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            var result = await racketCartService.AddRacketToCartAsync("user1", 1, 3);
 
-//            Assert.ThrowsAsync<InvalidOperationException>(async () =>
-//                await racketCartService.AddRacketToCartAsync(userId, racket.Id, 0), InvalidQuantityErrorMessage);
+            var updatedCartItem = await dbContext.RacketCart.FirstAsync();
+            var updatedRacket = await dbContext.Rackets.FindAsync(1);
 
-//            Assert.ThrowsAsync<InvalidOperationException>(async () =>
-//                await racketCartService.AddRacketToCartAsync(userId, racket.Id, 10), InvalidQuantityErrorMessage);
+            Assert.That(result, Is.True);
+            Assert.That(updatedCartItem.Quantity, Is.EqualTo(5));
+            Assert.That(updatedRacket!.Quantity, Is.EqualTo(17));
+        }
 
-//            Assert.ThrowsAsync<InvalidOperationException>(async () =>
-//                await racketCartService.AddRacketToCartAsync(userId, 999, 1), InvalidQuantityErrorMessage);
-//        }
+        [Test]
+        public async Task AddRacketToCartAsync_ResetsItem_WhenAlreadyInCartButOrdered()
+        {
+            var racket = new Racket
+            {
+                Id = 1,
+                Brand = "Babolat",
+                BrandBg = "Баболат",
+                Quantity = 20,
+                Model = "Pure Drive",
+                ModelBg = "Пюр Драйв",
+                ImageUrl = "racket.jpg"
+            };
+            var existingCartItem = new RacketCart { UserId = "user1", RacketId = 1, Quantity = 5, IsOrdered = true, IsGift = false };
 
-//        [Test]
-//        public async Task RemoveRacketFromCartAsync_ShouldRemoveItem_WhenExists()
-//        {
-//            var userId = "user5";
-//            var user = new ApplicationUser { Id = userId };
+            dbContext.Rackets.Add(racket);
+            dbContext.RacketCart.Add(existingCartItem);
+            await dbContext.SaveChangesAsync();
 
-//            var racket = new Racket
-//            {
-//                Id = 1,
-//                Brand = "Yonex",
-//                Model = "EZone",
-//                Price = 160m,
-//                Quantity = 10,
-//                ImageUrl = "yonex.jpg"
-//            };
+            var result = await racketCartService.AddRacketToCartAsync("user1", 1, 4);
 
-//            var cartItem = new RacketCart
-//            {
-//                RacketId = racket.Id,
-//                UserId = userId,
-//                Quantity = 2
-//            };
+            var updatedCartItem = await dbContext.RacketCart.FirstAsync();
+            var updatedRacket = await dbContext.Rackets.FindAsync(1);
 
-//            await dbContext.Rackets.AddAsync(racket);
-//            await dbContext.RacketCart.AddAsync(cartItem);
-//            await dbContext.SaveChangesAsync();
+            Assert.That(result, Is.True);
+            Assert.That(updatedCartItem.Quantity, Is.EqualTo(5));
+            Assert.That(updatedCartItem.IsOrdered, Is.False);
+            Assert.That(updatedRacket!.Quantity, Is.EqualTo(16));
+        }
 
-//            userManagerMock.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+        [Test]
+        public void RemoveRacketFromCartAsync_ThrowsException_WhenItemNotFound()
+        {
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await racketCartService.RemoveRacketFromCartAsync("user1", 1));
+        }
 
-//            var result = await racketCartService.RemoveRacketFromCartAsync(userId, racket.Id);
+        [Test]
+        public async Task RemoveRacketFromCartAsync_RemovesItemSuccessfullyAndRestoresQuantity()
+        {
+            var racket = new Racket
+            {
+                Id = 1,
+                Brand = "Tecnifibre",
+                BrandBg = "Технифайбър",
+                Quantity = 10,
+                Model = "TFight",
+                ModelBg = "ТиФайт",
+                ImageUrl = "racket.jpg"
+            };
+            var cartItem = new RacketCart { UserId = "user1", RacketId = 1, Quantity = 3, IsOrdered = false };
 
-//            Assert.That(result, Is.True);
+            dbContext.Rackets.Add(racket);
+            dbContext.RacketCart.Add(cartItem);
+            await dbContext.SaveChangesAsync();
 
-//            var itemInDb = await dbContext.RacketCart.FirstOrDefaultAsync(rc => rc.UserId == userId && rc.RacketId == racket.Id);
-//            Assert.That(itemInDb, Is.Null);
-//        }
+            var result = await racketCartService.RemoveRacketFromCartAsync("user1", 1);
 
-//        [Test]
-//        public void RemoveRacketFromCartAsync_ShouldThrow_WhenItemNotFound()
-//        {
-//            var userId = "user6";
-//            var user = new ApplicationUser { Id = userId };
+            var itemInDb = await dbContext.RacketCart.FirstOrDefaultAsync();
+            var updatedRacket = await dbContext.Rackets.FindAsync(1);
 
-//            userManagerMock.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            Assert.That(result, Is.True);
+            Assert.That(itemInDb, Is.Null);
+            Assert.That(updatedRacket!.Quantity, Is.EqualTo(13));
+        }
 
-//            Assert.ThrowsAsync<InvalidOperationException>(async () =>
-//                await racketCartService.RemoveRacketFromCartAsync(userId, 999), RacketNotFoundInCartErrorMessage);
-//        }
+        [Test]
+        public async Task RemoveRacketFromCartAsync_PrioritizesRemovingNonGiftItems()
+        {
+            var racket = new Racket { Id = 1, Brand = "Wilson", BrandBg = "У", Quantity = 10, Model = "M", ModelBg = "М", ImageUrl = "u.jpg" };
+            var regularItem = new RacketCart { UserId = "user1", RacketId = 1, Quantity = 2, IsOrdered = false, IsGift = false };
+            var giftItem = new RacketCart { UserId = "user1", RacketId = 1, Quantity = 1, IsOrdered = false, IsGift = true };
 
-//        [Test]
-//        public async Task CheckOutAllRacketsAsync_ShouldRemoveAllItems()
-//        {
-//            var userId = "user7";
-//            var user = new ApplicationUser { Id = userId };
+            dbContext.Rackets.Add(racket);
+            dbContext.RacketCart.AddRange(regularItem, giftItem);
+            await dbContext.SaveChangesAsync();
 
-//            var cartItems = new List<RacketCart>
-//            {
-//                new RacketCart { RacketId = 1, UserId = userId, Quantity = 1 },
-//                new RacketCart { RacketId = 2, UserId = userId, Quantity = 2 }
-//            };
+            var result = await racketCartService.RemoveRacketFromCartAsync("user1", 1);
 
-//            await dbContext.RacketCart.AddRangeAsync(cartItems);
-//            await dbContext.SaveChangesAsync();
+            var remainingItems = await dbContext.RacketCart.ToListAsync();
+            var updatedRacket = await dbContext.Rackets.FindAsync(1);
 
-//            userManagerMock.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            Assert.That(result, Is.True);
+            Assert.That(remainingItems, Has.Count.EqualTo(1));
+            Assert.That(remainingItems.First().IsGift, Is.True);
+            Assert.That(updatedRacket!.Quantity, Is.EqualTo(12));
+        }
 
-//            var result = await racketCartService.CheckOutAllRacketsAsync(userId);
+        [Test]
+        public async Task CheckOutAllRacketsAsync_ReturnsFalse_WhenCartIsEmpty()
+        {
+            var result = await racketCartService.CheckOutAllRacketsAsync("user1");
 
-//            Assert.That(result, Is.True);
+            Assert.That(result, Is.False);
+        }
 
-//            var remainingItems = await dbContext.RacketCart.Where(rc => rc.UserId == userId).ToListAsync();
-//            Assert.That(remainingItems.Count, Is.EqualTo(0));
-//        }
+        [Test]
+        public async Task CheckOutAllRacketsAsync_MarksAllActiveItemsAsOrdered()
+        {
+            var item1 = new RacketCart { UserId = "user1", RacketId = 1, IsOrdered = false };
+            var item2 = new RacketCart { UserId = "user1", RacketId = 2, IsOrdered = false };
+            var item3 = new RacketCart { UserId = "user2", RacketId = 3, IsOrdered = false };
 
-//        [Test]
-//        public async Task CheckOutAllRacketsAsync_ShouldReturnFalse_WhenNoItems()
-//        {
-//            var userId = "user8";
-//            var user = new ApplicationUser { Id = userId };
+            dbContext.RacketCart.AddRange(item1, item2, item3);
+            await dbContext.SaveChangesAsync();
 
-//            userManagerMock.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            var result = await racketCartService.CheckOutAllRacketsAsync("user1");
 
-//            var result = await racketCartService.CheckOutAllRacketsAsync(userId);
+            var user1Items = await dbContext.RacketCart.Where(rc => rc.UserId == "user1").ToListAsync();
+            var user2Item = await dbContext.RacketCart.FirstAsync(rc => rc.UserId == "user2");
 
-//            Assert.That(result, Is.False);
-//        }
-
-//        [TearDown]
-//        public void TearDown()
-//        {
-//            dbContext.Dispose();
-//        }
-//    }
-//}
+            Assert.That(result, Is.True);
+            Assert.That(user1Items.All(i => i.IsOrdered), Is.True);
+            Assert.That(user2Item.IsOrdered, Is.False);
+        }
+    }
+}

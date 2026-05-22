@@ -1,398 +1,235 @@
-﻿//using NUnit.Framework;
-//using Moq;
-//using Microsoft.AspNetCore.Identity;
-//using Microsoft.EntityFrameworkCore;
-//using TennisAcademyApp.Data;
-//using TennisAcademyApp.Data.Models;
-//using TennisAcademyApp.Services.Core;
-//using TennisAcademyApp.ViewModels.Ball;
-//using static TennisAcademyApp.GCommon.Validations.ErrorMessages.Ball;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Moq;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using TennisAcademyApp.Data;
+using TennisAcademyApp.Data.Models;
+using TennisAcademyApp.Services.Core;
+using TennisAcademyApp.ViewModels.Ball;
 
-//namespace TennisAcademyApp.Tests.Services
-//{
-//    [TestFixture]
-//    public class BallServiceTests
-//    {
-//        private TennisAcademyDbContext dbContext;
-//        private Mock<UserManager<ApplicationUser>> userManagerMock;
-//        private BallService ballService;
+namespace TennisAcademyApp.Tests
+{
+    [TestFixture]
+    public class BallServiceTests
+    {
+        private TennisAcademyDbContext dbContext;
+        private BallService ballService;
+        private Mock<UserManager<ApplicationUser>> mockUserManager;
 
-//        [SetUp]
-//        public void SetUp()
-//        {
-//            var options = new DbContextOptionsBuilder<TennisAcademyDbContext>()
-//                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-//                .Options;
+        [SetUp]
+        public void Setup()
+        {
+            var options = new DbContextOptionsBuilder<TennisAcademyDbContext>()
+                .UseInMemoryDatabase(databaseName: "TennisAcademyTestDb_" + Guid.NewGuid().ToString())
+                .Options;
 
-//            dbContext = new TennisAcademyDbContext(options);
+            dbContext = new TennisAcademyDbContext(options);
 
-//            var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
-//            userManagerMock = new Mock<UserManager<ApplicationUser>>(
-//                userStoreMock.Object, null, null, null, null, null, null, null, null
-//            );
+            var store = new Mock<IUserStore<ApplicationUser>>();
+            mockUserManager = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
 
-//            ballService = new BallService(dbContext, userManagerMock.Object);
-//        }
+            ballService = new BallService(dbContext, mockUserManager.Object);
+        }
 
-//        [Test]
-//        public async Task GetAllBallsAsync_ShouldReturnAllBallsWithCorrectProperties()
-//        {
-//            dbContext.Balls.Add(new Ball
-//            {
-//                Id = 1,
-//                Brand = "Wilson",
-//                Model = "US Open",
-//                Price = 15.5m,
-//                Quantity = 100,
-//                ImageUrl = "ball1.jpg",
-//            });
-//            dbContext.Balls.Add(new Ball
-//            {
-//                Id = 2,
-//                Brand = "Head",
-//                Model = "ATP",
-//                Price = 18m,
-//                Quantity = 80,
-//                ImageUrl = "ball2.jpg",
-//            });
-//            await dbContext.SaveChangesAsync();
+        [TearDown]
+        public void TearDown()
+        {
+            dbContext.Database.EnsureDeleted();
+            dbContext.Dispose();
+        }
 
-//            var result = (await ballService.GetAllBallsAsync()).ToList();
+        [Test]
+        public async Task GetAllBallsAsync_ReturnsAllBalls()
+        {
+            var ball1 = new Ball { Id = 1, Brand = "Wilson", BrandBg = "Уилсън", Model = "US Open", ModelBg = "ЮС Оупън", Price = 10, Quantity = 50, ImageUrl = "url1.jpg" };
+            var ball2 = new Ball { Id = 2, Brand = "Head", BrandBg = "Хед", Model = "Tour", ModelBg = "Тур", Price = 12, Quantity = 30, ImageUrl = "url2.jpg" };
 
-//            Assert.That(result.Count, Is.EqualTo(2));
-//            Assert.That(result[0].Brand, Is.EqualTo("Wilson"));
-//            Assert.That(result[0].ImageUrl, Is.EqualTo("ball1.jpg"));
-//            Assert.That(result[1].Brand, Is.EqualTo("Head"));
-//            Assert.That(result[1].ImageUrl, Is.EqualTo("ball2.jpg"));
-//        }
+            dbContext.Balls.AddRange(ball1, ball2);
+            await dbContext.SaveChangesAsync();
 
-//        [Test]
-//        public void FindBallByIdAsync_WithNullId_ShouldThrowArgumentException()
-//        {
-//            var ex = Assert.ThrowsAsync<ArgumentException>(async () => await ballService.FindBallByIdAsync(null));
-//            Assert.That(ex.Message, Is.EqualTo(BallCannotBeNullErrorMessage));
-//        }
+            var result = await ballService.GetAllBallsAsync();
 
-//        [Test]
-//        public void FindBallByIdAsync_WithNonExistingId_ShouldThrowArgumentException()
-//        {
-//            var ex = Assert.ThrowsAsync<ArgumentException>(async () => await ballService.FindBallByIdAsync(999));
-//            Assert.That(ex.Message, Is.EqualTo(BallNotFoundErrorMessage));
-//        }
+            Assert.That(result.Count(), Is.EqualTo(2));
+            Assert.That(result.Any(b => b.Id == 1), Is.True);
+            Assert.That(result.Any(b => b.Id == 2), Is.True);
+        }
 
-//        [Test]
-//        public async Task FindBallByIdAsync_WithValidId_ShouldReturnBall()
-//        {
-//            var ball = new Ball
-//            {
-//                Id = 1,
-//                Brand = "Babolat",
-//                Model = "Team",
-//                Price = 14m,
-//                Quantity = 50,
-//                ImageUrl = "babolat.jpg"
-//            };
-//            dbContext.Balls.Add(ball);
-//            await dbContext.SaveChangesAsync();
+        [Test]
+        public void FindBallByIdAsync_ThrowsException_WhenIdIsNull()
+        {
+            Assert.ThrowsAsync<ArgumentException>(async () => await ballService.FindBallByIdAsync(null));
+        }
 
-//            var result = await ballService.FindBallByIdAsync(1);
+        [Test]
+        public void FindBallByIdAsync_ThrowsException_WhenBallNotFound()
+        {
+            Assert.ThrowsAsync<ArgumentException>(async () => await ballService.FindBallByIdAsync(99));
+        }
 
-//            Assert.That(result, Is.Not.Null);
-//            Assert.That(result.Brand, Is.EqualTo("Babolat"));
-//            Assert.That(result.ImageUrl, Is.EqualTo("babolat.jpg"));
-//        }
+        [Test]
+        public async Task FindBallByIdAsync_ReturnsBall_WhenFound()
+        {
+            var ball = new Ball { Id = 1, Brand = "Wilson", BrandBg = "Уилсън", Model = "US Open", ModelBg = "ЮС Оупън", Price = 10, Quantity = 50, ImageUrl = "url1.jpg" };
+            dbContext.Balls.Add(ball);
+            await dbContext.SaveChangesAsync();
 
-//        [Test]
-//        public async Task AddBallAsync_UserIsAdmin_ShouldAddBallAndReturnTrue()
-//        {
-//            var user = new ApplicationUser { Id = "admin-id" };
-//            var model = new BallCreateInputModel
-//            {
-//                Brand = "Yonex",
-//                Model = "Tour",
-//                Price = 16m,
-//                Quantity = 60,
-//                ImageUrl = "yonex.jpg"
-//            };
+            var result = await ballService.FindBallByIdAsync(1);
 
-//            userManagerMock.Setup(x => x.FindByIdAsync("admin-id")).ReturnsAsync(user);
-//            userManagerMock.Setup(x => x.IsInRoleAsync(user, "Admin")).ReturnsAsync(true);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Id, Is.EqualTo(1));
+            Assert.That(result.Brand, Is.EqualTo("Wilson"));
+        }
 
-//            var result = await ballService.AddBallAsync("admin-id", model);
+        [Test]
+        public async Task AddBallAsync_ReturnsFalse_WhenUserIsNotAdmin()
+        {
+            var userId = "user1";
+            var user = new ApplicationUser { Id = userId };
+            mockUserManager.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            mockUserManager.Setup(um => um.IsInRoleAsync(user, "Admin")).ReturnsAsync(false);
 
-//            Assert.That(result, Is.True);
-//            var ballInDb = await dbContext.Balls.FirstOrDefaultAsync(b => b.Brand == "Yonex");
-//            Assert.That(ballInDb, Is.Not.Null);
-//            Assert.That(ballInDb.ImageUrl, Is.EqualTo("yonex.jpg"));
-//        }
+            var model = new BallCreateInputModel { Brand = "Wilson", Model = "US Open", Price = 10, Quantity = 50, ImageUrl = "url.jpg" };
 
-//        [Test]
-//        public async Task AddBallAsync_UserNotAdmin_ShouldNotAddBallAndReturnFalse()
-//        {
-//            var user = new ApplicationUser { Id = "user-id" };
-//            var model = new BallCreateInputModel
-//            {
-//                Brand = "Yonex",
-//                Model = "Tour",
-//                Price = 16m,
-//                Quantity = 60,
-//                ImageUrl = "yonex.jpg"
-//            };
+            var result = await ballService.AddBallAsync(userId, model);
 
-//            userManagerMock.Setup(x => x.FindByIdAsync("user-id")).ReturnsAsync(user);
-//            userManagerMock.Setup(x => x.IsInRoleAsync(user, "Admin")).ReturnsAsync(false);
+            Assert.That(result, Is.False);
+            Assert.That(dbContext.Balls.Count(), Is.EqualTo(0));
+        }
 
-//            var result = await ballService.AddBallAsync("user-id", model);
+        [Test]
+        public async Task AddBallAsync_AddsBallAndReturnsTrue_WhenUserIsAdmin()
+        {
+            var userId = "admin1";
+            var user = new ApplicationUser { Id = userId };
+            mockUserManager.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            mockUserManager.Setup(um => um.IsInRoleAsync(user, "Admin")).ReturnsAsync(true);
 
-//            Assert.That(result, Is.False);
-//            var ballInDb = await dbContext.Balls.FirstOrDefaultAsync(b => b.Brand == "Yonex");
-//            Assert.That(ballInDb, Is.Null);
-//        }
+            var model = new BallCreateInputModel { Brand = "Wilson", Model = "US Open", Price = 10, Quantity = 50, ImageUrl = "url.jpg" };
 
-//        [Test]
-//        public async Task GetBallForEditingAsync_AdminUserWithValidBall_ShouldReturnModel()
-//        {
-//            // Arrange
-//            var user = new ApplicationUser { Id = "admin-id" };
-//            var ball = new Ball
-//            {
-//                Id = 1,
-//                Brand = "Wilson",
-//                Model = "US Open",
-//                Price = 15.5m,
-//                Quantity = 100,
-//                ImageUrl = "wilson.jpg"
-//            };
+            var result = await ballService.AddBallAsync(userId, model);
+            var ballInDb = await dbContext.Balls.FirstOrDefaultAsync();
 
-//            dbContext.Balls.Add(ball);
-//            await dbContext.SaveChangesAsync();
+            Assert.That(result, Is.True);
+            Assert.That(ballInDb, Is.Not.Null);
+            Assert.That(ballInDb!.Brand, Is.EqualTo("Wilson"));
+            Assert.That(ballInDb.Price, Is.EqualTo(10));
+        }
 
-//            userManagerMock.Setup(x => x.FindByIdAsync("admin-id")).ReturnsAsync(user);
-//            userManagerMock.Setup(x => x.IsInRoleAsync(user, "Admin")).ReturnsAsync(true);
+        [Test]
+        public void GetBallForEditingAsync_ThrowsException_WhenUserIsNotAdmin()
+        {
+            var userId = "user1";
+            var user = new ApplicationUser { Id = userId };
+            mockUserManager.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            mockUserManager.Setup(um => um.IsInRoleAsync(user, "Admin")).ReturnsAsync(false);
 
-//            // Act
-//            var result = await ballService.GetBallForEditingAsync("admin-id", 1);
+            Assert.ThrowsAsync<UnauthorizedAccessException>(async () => await ballService.GetBallForEditingAsync(userId, 1));
+        }
 
-//            // Assert
-//            Assert.That(result, Is.Not.Null);
-//            Assert.That(result.Id, Is.EqualTo(1));
-//            Assert.That(result.Brand, Is.EqualTo("Wilson"));
-//            Assert.That(result.ImageUrl, Is.EqualTo("wilson.jpg"));
-//        }
+        [Test]
+        public async Task GetBallForEditingAsync_ReturnsModel_WhenUserIsAdminAndBallExists()
+        {
+            var userId = "admin1";
+            var user = new ApplicationUser { Id = userId };
+            mockUserManager.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            mockUserManager.Setup(um => um.IsInRoleAsync(user, "Admin")).ReturnsAsync(true);
 
-//        [Test]
-//        public void GetBallForEditingAsync_NonAdminUser_ShouldThrowUnauthorizedAccessException()
-//        {
-//            // Arrange
-//            var user = new ApplicationUser { Id = "user-id" }; 
+            var ball = new Ball { Id = 1, Brand = "Wilson", BrandBg = "Уилсън", Model = "US Open", ModelBg = "ЮС Оупън", Price = 10, Quantity = 50, ImageUrl = "url1.jpg" };
+            dbContext.Balls.Add(ball);
+            await dbContext.SaveChangesAsync();
 
-//            userManagerMock.Setup(x => x.FindByIdAsync("user-id")).ReturnsAsync(user);
-//            userManagerMock.Setup(x => x.IsInRoleAsync(user, "Admin")).ReturnsAsync(false);
+            var result = await ballService.GetBallForEditingAsync(userId, 1);
 
-//            // Act & Assert
-//            var ex = Assert.ThrowsAsync<UnauthorizedAccessException>(async () =>
-//                await ballService.GetBallForEditingAsync("user-id", 1));
-//            Assert.That(ex.Message, Is.EqualTo("You do not have permission to edit a ball."));
-//        }
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Id, Is.EqualTo(1));
+            Assert.That(result.Brand, Is.EqualTo("Wilson"));
+        }
 
-//        [Test]
-//        public void GetBallForEditingAsync_AdminUserButBallNotFound_ShouldThrowArgumentException()
-//        {
-//            // Arrange
-//            var user = new ApplicationUser { Id = "admin-id" }; 
+        [Test]
+        public void EditBallAsync_ThrowsException_WhenBallDoesNotExist()
+        {
+            var model = new BallEditFormModel { Id = 99, Brand = "Wilson", Model = "US Open", Price = 10, Quantity = 50, ImageUrl = "url.jpg" };
 
-//            userManagerMock.Setup(x => x.FindByIdAsync("admin-id")).ReturnsAsync(user);
-//            userManagerMock.Setup(x => x.IsInRoleAsync(user, "Admin")).ReturnsAsync(true);
+            Assert.ThrowsAsync<ArgumentException>(async () => await ballService.EditBallAsync(model));
+        }
 
-//            // Act & Assert
-//            var ex = Assert.ThrowsAsync<ArgumentException>(async () =>
-//                await ballService.GetBallForEditingAsync("admin-id", 999));
-//            Assert.That(ex.Message, Is.EqualTo("Ball not found."));
-//        }
+        [Test]
+        public async Task EditBallAsync_UpdatesBallSuccessfully()
+        {
+            var ball = new Ball { Id = 1, Brand = "OldBrand", BrandBg = "Олд", Model = "OldModel", ModelBg = "ОлдМодел", Price = 5, Quantity = 10, ImageUrl = "old.jpg" };
+            dbContext.Balls.Add(ball);
+            await dbContext.SaveChangesAsync();
 
-//        [Test]
-//        public void EditBallAsync_NonExistingBall_ShouldThrowException()
-//        {
-//            var model = new BallEditFormModel
-//            {
-//                Id = 999,
-//                Brand = "Fake",
-//                Model = "None",
-//                Price = 0m,
-//                Quantity = 0,
-//                ImageUrl = "none.jpg"
-//            };
+            var model = new BallEditFormModel { Id = 1, Brand = "NewBrand", Model = "NewModel", Price = 15, Quantity = 100, ImageUrl = "new.jpg" };
 
-//            var ex = Assert.ThrowsAsync<ArgumentException>(async () => await ballService.EditBallAsync(model));
-//            Assert.That(ex.Message, Is.EqualTo(BallNotFoundErrorMessage));
-//        }
+            var result = await ballService.EditBallAsync(model);
+            var updatedBall = await dbContext.Balls.FindAsync(1);
 
-//        [Test]
-//        public async Task EditBallAsync_ExistingBall_ShouldUpdateAndReturnTrue()
-//        {
-//            var ball = new Ball
-//            {
-//                Id = 1,
-//                Brand = "OldBrand",
-//                Model = "OldModel",
-//                Price = 10m,
-//                Quantity = 30,
-//                ImageUrl = "old.jpg"
-//            };
-//            dbContext.Balls.Add(ball);
-//            await dbContext.SaveChangesAsync();
+            Assert.That(result, Is.True);
+            Assert.That(updatedBall!.Brand, Is.EqualTo("NewBrand"));
+            Assert.That(updatedBall.Price, Is.EqualTo(15));
+            Assert.That(updatedBall.Quantity, Is.EqualTo(100));
+        }
 
-//            var model = new BallEditFormModel
-//            {
-//                Id = 1,
-//                Brand = "NewBrand",
-//                Model = "NewModel",
-//                Price = 12m,
-//                Quantity = 40,
-//                ImageUrl = "new.jpg"
-//            };
+        [Test]
+        public void GetBallForDeletingAsync_ThrowsException_WhenUserIsNotAdmin()
+        {
+            var userId = "user1";
+            var user = new ApplicationUser { Id = userId };
+            mockUserManager.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            mockUserManager.Setup(um => um.IsInRoleAsync(user, "Admin")).ReturnsAsync(false);
 
-//            var result = await ballService.EditBallAsync(model);
+            Assert.ThrowsAsync<UnauthorizedAccessException>(async () => await ballService.GetBallForDeletingAsync(userId, 1));
+        }
 
-//            Assert.That(result, Is.True);
-//            var updatedBall = await dbContext.Balls.FindAsync(1);
-//            Assert.That(updatedBall.Brand, Is.EqualTo("NewBrand"));
-//            Assert.That(updatedBall.ImageUrl, Is.EqualTo("new.jpg"));
-//        }
+        [Test]
+        public async Task GetBallForDeletingAsync_ReturnsModel_WhenUserIsAdminAndBallExists()
+        {
+            var userId = "admin1";
+            var user = new ApplicationUser { Id = userId };
+            mockUserManager.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            mockUserManager.Setup(um => um.IsInRoleAsync(user, "Admin")).ReturnsAsync(true);
 
-//        [Test]
-//        public void GetBallForDeletingAsync_UserNotAdmin_ShouldThrowException()
-//        {
-//            var user = new ApplicationUser { Id = "user-id" }; 
+            var ball = new Ball { Id = 1, Brand = "Wilson", BrandBg = "Уилсън", Model = "US Open", ModelBg = "ЮС Оупън", Price = 10, Quantity = 50, ImageUrl = "url1.jpg" };
+            dbContext.Balls.Add(ball);
+            await dbContext.SaveChangesAsync();
 
-//            userManagerMock.Setup(x => x.FindByIdAsync("user-id")).ReturnsAsync(user);
-//            userManagerMock.Setup(x => x.IsInRoleAsync(user, "Admin")).ReturnsAsync(false);
+            var result = await ballService.GetBallForDeletingAsync(userId, 1);
 
-//            var ex = Assert.ThrowsAsync<UnauthorizedAccessException>(async () =>
-//                await ballService.GetBallForDeletingAsync("user-id", 1));
-//            Assert.That(ex.Message, Is.EqualTo("You do not have permission to delete a ball."));
-//        }
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Id, Is.EqualTo(1));
+        }
 
-//        [Test]
-//        public async Task GetBallForDeletingAsync_AdminUserWithValidBall_ShouldReturnModel()
-//        {
-//            // Arrange
-//            var user = new ApplicationUser { Id = "admin-id" }; 
-//            var ball = new Ball
-//            {
-//                Id = 1,
-//                Brand = "Wilson",
-//                Model = "US Open",
-//                Price = 15.5m,
-//                Quantity = 100,
-//                ImageUrl = "wilson.jpg"
-//            };
+        [Test]
+        public void DeleteBallAsync_ThrowsException_WhenBallDoesNotExist()
+        {
+            var model = new BallDeleteViewModel { Id = 99 };
 
-//            dbContext.Balls.Add(ball);
-//            await dbContext.SaveChangesAsync();
+            Assert.ThrowsAsync<ArgumentException>(async () => await ballService.DeleteBallAsync("user1", model));
+        }
 
-//            userManagerMock.Setup(x => x.FindByIdAsync("admin-id")).ReturnsAsync(user);
-//            userManagerMock.Setup(x => x.IsInRoleAsync(user, "Admin")).ReturnsAsync(true);
+        [Test]
+        public async Task DeleteBallAsync_RemovesBallSuccessfully()
+        {
+            var userId = "admin1";
+            var user = new ApplicationUser { Id = userId };
+            mockUserManager.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
 
-//            // Act
-//            var result = await ballService.GetBallForDeletingAsync("admin-id", 1);
+            var ball = new Ball { Id = 1, Brand = "Wilson", BrandBg = "Уилсън", Model = "US Open", ModelBg = "ЮС Оупън", Price = 10, Quantity = 50, ImageUrl = "url1.jpg" };
+            dbContext.Balls.Add(ball);
+            await dbContext.SaveChangesAsync();
 
-//            // Assert
-//            Assert.That(result, Is.Not.Null);
-//            Assert.That(result.Id, Is.EqualTo(1));
-//            Assert.That(result.Brand, Is.EqualTo("Wilson"));
-//            Assert.That(result.Model, Is.EqualTo("US Open"));
-//            Assert.That(result.ImageUrl, Is.EqualTo("wilson.jpg"));
-//        }
+            var model = new BallDeleteViewModel { Id = 1 };
 
-//        [Test]
-//        public void GetBallForDeletingAsync_NonAdminUser_ShouldThrowUnauthorizedAccessException()
-//        {
-//            // Arrange
-//            var user = new ApplicationUser { Id = "user-id" }; 
+            var result = await ballService.DeleteBallAsync(userId, model);
+            var ballInDb = await dbContext.Balls.FindAsync(1);
 
-//            userManagerMock.Setup(x => x.FindByIdAsync("user-id")).ReturnsAsync(user);
-//            userManagerMock.Setup(x => x.IsInRoleAsync(user, "Admin")).ReturnsAsync(false);
-
-//            // Act & Assert
-//            var ex = Assert.ThrowsAsync<UnauthorizedAccessException>(async () =>
-//                await ballService.GetBallForDeletingAsync("user-id", 1));
-//            Assert.That(ex.Message, Is.EqualTo("You do not have permission to delete a ball."));
-//        }
-
-//        [Test]
-//        public void GetBallForDeletingAsync_AdminUserButBallNotFound_ShouldThrowArgumentException()
-//        {
-//            // Arrange
-//            var user = new ApplicationUser { Id = "admin-id" }; 
-
-//            userManagerMock.Setup(x => x.FindByIdAsync("admin-id")).ReturnsAsync(user);
-//            userManagerMock.Setup(x => x.IsInRoleAsync(user, "Admin")).ReturnsAsync(true);
-
-//            // Act & Assert
-//            var ex = Assert.ThrowsAsync<ArgumentException>(async () =>
-//                await ballService.GetBallForDeletingAsync("admin-id", 999));
-//            Assert.That(ex.Message, Is.EqualTo("Ball not found."));
-//        }
-
-//        [Test]
-//        public void DeleteBallAsync_NonExistingBall_ShouldThrowException()
-//        {
-//            var user = new ApplicationUser { Id = "admin-id" }; 
-//            var model = new BallDeleteViewModel
-//            {
-//                Id = 999,
-//                Brand = "NonExistent",
-//                Model = "None",
-//                ImageUrl = "none.jpg"
-//            };
-
-//            userManagerMock.Setup(x => x.FindByIdAsync("admin-id")).ReturnsAsync(user);
-//            userManagerMock.Setup(x => x.IsInRoleAsync(user, "Admin")).ReturnsAsync(true);
-
-//            var ex = Assert.ThrowsAsync<ArgumentException>(async () =>
-//                await ballService.DeleteBallAsync("admin-id", model));
-//            Assert.That(ex.Message, Is.EqualTo(BallNotFoundErrorMessage));
-//        }
-
-//        [Test]
-//        public async Task DeleteBallAsync_ExistingBall_ShouldDeleteAndReturnTrue()
-//        {
-//            var user = new ApplicationUser { Id = "admin-id" }; 
-//            var ball = new Ball
-//            {
-//                Id = 1,
-//                Brand = "Wilson",
-//                Model = "US Open",
-//                Price = 15.5m,
-//                Quantity = 100,
-//                ImageUrl = "usopen.jpg"
-//            };
-//            dbContext.Balls.Add(ball);
-//            await dbContext.SaveChangesAsync();
-
-//            var model = new BallDeleteViewModel
-//            {
-//                Id = 1,
-//                Brand = "Wilson",
-//                Model = "US Open",
-//                ImageUrl = "usopen.jpg"
-//            };
-
-//            userManagerMock.Setup(x => x.FindByIdAsync("admin-id")).ReturnsAsync(user);
-//            userManagerMock.Setup(x => x.IsInRoleAsync(user, "Admin")).ReturnsAsync(true);
-
-//            var result = await ballService.DeleteBallAsync("admin-id", model);
-
-//            Assert.That(result, Is.True);
-//            var deletedBall = await dbContext.Balls.FindAsync(1);
-//            Assert.That(deletedBall, Is.Null);
-//        }
-
-//        [TearDown]
-//        public void TearDown()
-//        {
-//            dbContext.Dispose();
-//        }
-//    }
-//}
+            Assert.That(result, Is.True);
+            Assert.That(ballInDb, Is.Null);
+        }
+    }
+}

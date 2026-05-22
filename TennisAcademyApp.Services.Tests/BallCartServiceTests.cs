@@ -1,284 +1,335 @@
-﻿//using Microsoft.AspNetCore.Identity;
-//using Microsoft.EntityFrameworkCore;
-//using Moq;
-//using NUnit.Framework;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Threading.Tasks;
-//using TennisAcademyApp.Data;
-//using TennisAcademyApp.Data.Models;
-//using TennisAcademyApp.Services.Core;
-//using TennisAcademyApp.Services.Core.Contracts;
-//using TennisAcademyApp.ViewModels.Ranking;
-//using static TennisAcademyApp.GCommon.Validations.ErrorMessages.BallCart;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Moq;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using TennisAcademyApp.Data;
+using TennisAcademyApp.Data.Models;
+using TennisAcademyApp.Services.Core;
+using TennisAcademyApp.Services.Core.Contracts;
+using TennisAcademyApp.ViewModels.Cart;
+using TennisAcademyApp.ViewModels.Ranking;
 
-//namespace TennisAcademyApp.Tests.Services
-//{
-//    [TestFixture]
-//    public class BallCartServiceTests
-//    {
-//        private TennisAcademyDbContext dbContext;
-//        private Mock<UserManager<ApplicationUser>> userManagerMock;
-//        private Mock<IRankingService> rankingServiceMock;
-//        private BallCartService ballCartService;
+namespace TennisAcademyApp.Tests
+{
+    [TestFixture]
+    public class BallCartServiceTests
+    {
+        private TennisAcademyDbContext dbContext;
+        private BallCartService ballCartService;
+        private Mock<UserManager<ApplicationUser>> mockUserManager;
+        private Mock<IRankingService> mockRankingService;
 
-//        [SetUp]
-//        public void SetUp()
-//        {
-//            var options = new DbContextOptionsBuilder<TennisAcademyDbContext>()
-//                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-//                .Options;
+        [SetUp]
+        public void Setup()
+        {
+            var options = new DbContextOptionsBuilder<TennisAcademyDbContext>()
+                .UseInMemoryDatabase(databaseName: "TennisAcademyTestDb_" + Guid.NewGuid().ToString())
+                .Options;
 
-//            dbContext = new TennisAcademyDbContext(options);
+            dbContext = new TennisAcademyDbContext(options);
 
-//            var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
-//            userManagerMock = new Mock<UserManager<ApplicationUser>>(
-//                userStoreMock.Object, null, null, null, null, null, null, null, null);
+            var store = new Mock<IUserStore<ApplicationUser>>();
+            mockUserManager = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
 
-//            rankingServiceMock = new Mock<IRankingService>();
-//            rankingServiceMock.Setup(s => s.GetLeaderboardAsync())
-//                              .ReturnsAsync(new List<UserRankingViewModel>());
+            mockRankingService = new Mock<IRankingService>();
 
-//            ballCartService = new BallCartService(dbContext, userManagerMock.Object, rankingServiceMock.Object);
-//        }
+            ballCartService = new BallCartService(dbContext, mockUserManager.Object, mockRankingService.Object);
+        }
 
-//        [Test]
-//        public async Task GetAllBallsInCartAsync_ShouldReturnCorrectBalls()
-//        {
-//            var userId = "user1";
-//            var user = new ApplicationUser { Id = userId };
+        [TearDown]
+        public void TearDown()
+        {
+            dbContext.Database.EnsureDeleted();
+            dbContext.Dispose();
+        }
 
-//            var ball = new Ball
-//            {
-//                Id = 1,
-//                Brand = "Wilson",
-//                Model = "Pro Staff",
-//                Price = 15m,
-//                Quantity = 10,
-//                ImageUrl = "wilson.jpg"
-//            };
+        [Test]
+        public async Task GetAllBallsInCartAsync_ReturnsEmpty_WhenUserNotFound()
+        {
+            mockUserManager.Setup(um => um.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((ApplicationUser)null!);
 
-//            var cartItem = new BallCart
-//            {
-//                BallId = ball.Id,
-//                UserId = userId,
-//                Quantity = 3,
-//                Ball = ball
-//            };
+            var result = await ballCartService.GetAllBallsInCartAsync("invalid-user");
 
-//            await dbContext.Balls.AddAsync(ball);
-//            await dbContext.BallCart.AddAsync(cartItem);
-//            await dbContext.SaveChangesAsync();
+            Assert.That(result, Is.Empty);
+        }
 
-//            userManagerMock.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+        [Test]
+        public async Task GetAllBallsInCartAsync_CalculatesDiscountCorrectly_ForRankOne()
+        {
+            var userId = "user1";
+            var user = new ApplicationUser { Id = userId, FirstName = "Jane", LastName = "Doe" };
 
-//            var result = (await ballCartService.GetAllBallsInCartAsync(userId)).ToList();
+            mockUserManager.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
 
-//            Assert.That(result.Count, Is.EqualTo(1));
-//            Assert.That(result[0].Id, Is.EqualTo(ball.Id));
-//            Assert.That(result[0].Brand, Is.EqualTo("Wilson"));
-//            Assert.That(result[0].Model, Is.EqualTo("Pro Staff"));
-//            Assert.That(result[0].Price, Is.EqualTo(15m));
-//            Assert.That(result[0].Quantity, Is.EqualTo(3));
-//            Assert.That(result[0].TotalPrice, Is.EqualTo(45m)); // 3 * 15
-//            Assert.That(result[0].ImageUrl, Is.EqualTo("wilson.jpg"));
-//        }
+            var ball = new Ball
+            {
+                Id = 1,
+                Brand = "Penn",
+                BrandBg = "Пен",
+                Price = 10,
+                Quantity = 50,
+                Model = "Championship",
+                ModelBg = "Шампионски",
+                ImageUrl = "ball.jpg"
+            };
+            var cartItem = new BallCart { UserId = userId, BallId = 1, Quantity = 2, IsOrdered = false, IsGift = false };
 
-//        [Test]
-//        public async Task AddBallToCartAsync_ShouldAddNewItem_WhenNotExists()
-//        {
-//            var userId = "user2";
-//            var user = new ApplicationUser { Id = userId };
+            dbContext.Balls.Add(ball);
+            dbContext.BallCart.Add(cartItem);
+            await dbContext.SaveChangesAsync();
 
-//            var ball = new Ball
-//            {
-//                Id = 1,
-//                Brand = "Head",
-//                Model = "Speed",
-//                Price = 20m,
-//                Quantity = 8,
-//                ImageUrl = "head.jpg"
-//            };
-//            await dbContext.Balls.AddAsync(ball);
-//            await dbContext.SaveChangesAsync();
+            mockRankingService.Setup(rs => rs.GetLeaderboardAsync())
+                .ReturnsAsync(new List<UserRankingViewModel>
+                {
+                    new UserRankingViewModel { FullName = "Jane Doe", Position = 1 }
+                });
 
-//            userManagerMock.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            var result = await ballCartService.GetAllBallsInCartAsync(userId);
+            var item = result.First();
 
-//            var result = await ballCartService.AddBallToCartAsync(userId, ball.Id, 3);
+            Assert.That(item.Price, Is.EqualTo(8m));
+            Assert.That(item.TotalPrice, Is.EqualTo(16m));
+        }
 
-//            Assert.That(result, Is.True);
+        [Test]
+        public async Task GetAllBallsInCartAsync_SetsPriceToZero_WhenItemIsGift()
+        {
+            var userId = "user1";
+            var user = new ApplicationUser { Id = userId, FirstName = "Jane", LastName = "Doe" };
 
-//            var cartItem = await dbContext.BallCart.FirstOrDefaultAsync(bc => bc.UserId == userId && bc.BallId == ball.Id);
-//            Assert.That(cartItem, Is.Not.Null);
-//            Assert.That(cartItem.Quantity, Is.EqualTo(3));
+            mockUserManager.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            mockRankingService.Setup(rs => rs.GetLeaderboardAsync()).ReturnsAsync(new List<UserRankingViewModel>());
 
-//            var updatedBall = await dbContext.Balls.FindAsync(ball.Id);
-//            Assert.That(updatedBall.Quantity, Is.EqualTo(5)); // 8 - 3 = 5
-//        }
+            var ball = new Ball
+            {
+                Id = 1,
+                Brand = "Dunlop",
+                BrandBg = "Дънлоп",
+                Price = 15,
+                Quantity = 50,
+                Model = "Fort",
+                ModelBg = "Форт",
+                ImageUrl = "ball.jpg"
+            };
+            var cartItem = new BallCart { UserId = userId, BallId = 1, Quantity = 3, IsOrdered = false, IsGift = true };
 
-//        [Test]
-//        public async Task AddBallToCartAsync_ShouldUpdateQuantity_WhenAlreadyInCart()
-//        {
-//            var userId = "user3";
-//            var user = new ApplicationUser { Id = userId };
+            dbContext.Balls.Add(ball);
+            dbContext.BallCart.Add(cartItem);
+            await dbContext.SaveChangesAsync();
 
-//            var ball = new Ball
-//            {
-//                Id = 1,
-//                Brand = "Babolat",
-//                Model = "Pure Drive",
-//                Price = 18m,
-//                Quantity = 12,
-//                ImageUrl = "babolat.jpg"
-//            };
+            var result = await ballCartService.GetAllBallsInCartAsync(userId);
+            var item = result.First();
 
-//            var existingCartItem = new BallCart
-//            {
-//                BallId = ball.Id,
-//                UserId = userId,
-//                Quantity = 4
-//            };
+            Assert.That(item.Price, Is.EqualTo(0m));
+            Assert.That(item.TotalPrice, Is.EqualTo(0m));
+        }
 
-//            await dbContext.Balls.AddAsync(ball);
-//            await dbContext.BallCart.AddAsync(existingCartItem);
-//            await dbContext.SaveChangesAsync();
+        [Test]
+        public void AddBallToCartAsync_ThrowsException_WhenBallDoesNotExist()
+        {
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await ballCartService.AddBallToCartAsync("user1", 99, 1));
+        }
 
-//            userManagerMock.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+        [Test]
+        public async Task AddBallToCartAsync_ThrowsException_WhenQuantityIsInvalid()
+        {
+            var ball = new Ball
+            {
+                Id = 1,
+                Brand = "Slazenger",
+                BrandBg = "Слазенгер",
+                Quantity = 5,
+                Model = "Wimbledon",
+                ModelBg = "Уимбълдън",
+                ImageUrl = "ball.jpg"
+            };
+            dbContext.Balls.Add(ball);
+            await dbContext.SaveChangesAsync();
 
-//            var result = await ballCartService.AddBallToCartAsync(userId, ball.Id, 3);
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await ballCartService.AddBallToCartAsync("user1", 1, 0));
 
-//            Assert.That(result, Is.True);
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await ballCartService.AddBallToCartAsync("user1", 1, 10));
+        }
 
-//            var cartItem = await dbContext.BallCart.FirstOrDefaultAsync(bc => bc.UserId == userId && bc.BallId == ball.Id);
-//            Assert.That(cartItem.Quantity, Is.EqualTo(7)); // 4 + 3
+        [Test]
+        public async Task AddBallToCartAsync_AddsNewItem_WhenNotInCart()
+        {
+            var ball = new Ball
+            {
+                Id = 1,
+                Brand = "Wilson",
+                BrandBg = "Уилсън",
+                Quantity = 20,
+                Model = "US Open",
+                ModelBg = "ЮС Оупън",
+                ImageUrl = "ball.jpg"
+            };
+            dbContext.Balls.Add(ball);
+            await dbContext.SaveChangesAsync();
 
-//            var updatedBall = await dbContext.Balls.FindAsync(ball.Id);
-//            Assert.That(updatedBall.Quantity, Is.EqualTo(9)); // 12 - 3 = 9
-//        }
+            var result = await ballCartService.AddBallToCartAsync("user1", 1, 5);
 
-//        [Test]
-//        public void AddBallToCartAsync_ShouldThrow_WhenInvalidQuantity()
-//        {
-//            var userId = "user4";
-//            var user = new ApplicationUser { Id = userId };
+            var cartItem = await dbContext.BallCart.FirstOrDefaultAsync();
+            var updatedBall = await dbContext.Balls.FindAsync(1);
 
-//            var ball = new Ball
-//            {
-//                Id = 1,
-//                Brand = "Prince",
-//                Model = "Tour",
-//                Price = 16m,
-//                Quantity = 6,
-//                ImageUrl = "prince.jpg"
-//            };
+            Assert.That(result, Is.True);
+            Assert.That(cartItem, Is.Not.Null);
+            Assert.That(cartItem!.Quantity, Is.EqualTo(5));
+            Assert.That(cartItem.IsGift, Is.False);
+            Assert.That(cartItem.IsOrdered, Is.False);
+            Assert.That(updatedBall!.Quantity, Is.EqualTo(15));
+        }
 
-//            dbContext.Balls.Add(ball);
-//            dbContext.SaveChanges();
+        [Test]
+        public async Task AddBallToCartAsync_IncreasesQuantity_WhenAlreadyInCartAndNotOrdered()
+        {
+            var ball = new Ball
+            {
+                Id = 1,
+                Brand = "Head",
+                BrandBg = "Хед",
+                Quantity = 20,
+                Model = "Tour",
+                ModelBg = "Тур",
+                ImageUrl = "ball.jpg"
+            };
+            var existingCartItem = new BallCart { UserId = "user1", BallId = 1, Quantity = 2, IsOrdered = false, IsGift = false };
 
-//            userManagerMock.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            dbContext.Balls.Add(ball);
+            dbContext.BallCart.Add(existingCartItem);
+            await dbContext.SaveChangesAsync();
 
-//            Assert.ThrowsAsync<InvalidOperationException>(async () =>
-//                await ballCartService.AddBallToCartAsync(userId, ball.Id, 0), InvalidQuantityErrorMessage);
+            var result = await ballCartService.AddBallToCartAsync("user1", 1, 3);
 
-//            Assert.ThrowsAsync<InvalidOperationException>(async () =>
-//                await ballCartService.AddBallToCartAsync(userId, ball.Id, 10), InvalidQuantityErrorMessage);
+            var updatedCartItem = await dbContext.BallCart.FirstAsync();
+            var updatedBall = await dbContext.Balls.FindAsync(1);
 
-//            Assert.ThrowsAsync<InvalidOperationException>(async () =>
-//                await ballCartService.AddBallToCartAsync(userId, 999, 1), InvalidQuantityErrorMessage);
-//        }
+            Assert.That(result, Is.True);
+            Assert.That(updatedCartItem.Quantity, Is.EqualTo(5));
+            Assert.That(updatedBall!.Quantity, Is.EqualTo(17));
+        }
 
-//        [Test]
-//        public async Task RemoveBallFromCartAsync_ShouldRemoveItem_WhenExists()
-//        {
-//            var userId = "user5";
-//            var user = new ApplicationUser { Id = userId };
+        [Test]
+        public async Task AddBallToCartAsync_ResetsItem_WhenAlreadyInCartButOrdered()
+        {
+            var ball = new Ball
+            {
+                Id = 1,
+                Brand = "Babolat",
+                BrandBg = "Баболат",
+                Quantity = 20,
+                Model = "Gold",
+                ModelBg = "Голд",
+                ImageUrl = "ball.jpg"
+            };
+            var existingCartItem = new BallCart { UserId = "user1", BallId = 1, Quantity = 5, IsOrdered = true, IsGift = false };
 
-//            var ball = new Ball
-//            {
-//                Id = 1,
-//                Brand = "Dunlop",
-//                Model = "Fort",
-//                Price = 14m,
-//                Quantity = 10,
-//                ImageUrl = "dunlop.jpg"
-//            };
+            dbContext.Balls.Add(ball);
+            dbContext.BallCart.Add(existingCartItem);
+            await dbContext.SaveChangesAsync();
 
-//            var cartItem = new BallCart
-//            {
-//                BallId = ball.Id,
-//                UserId = userId,
-//                Quantity = 2
-//            };
+            var result = await ballCartService.AddBallToCartAsync("user1", 1, 4);
 
-//            await dbContext.Balls.AddAsync(ball);
-//            await dbContext.BallCart.AddAsync(cartItem);
-//            await dbContext.SaveChangesAsync();
+            var updatedCartItem = await dbContext.BallCart.FirstAsync();
+            var updatedBall = await dbContext.Balls.FindAsync(1);
 
-//            userManagerMock.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            Assert.That(result, Is.True);
+            Assert.That(updatedCartItem.Quantity, Is.EqualTo(4));
+            Assert.That(updatedCartItem.IsOrdered, Is.False);
+            Assert.That(updatedBall!.Quantity, Is.EqualTo(16));
+        }
 
-//            var result = await ballCartService.RemoveBallFromCartAsync(userId, ball.Id);
+        [Test]
+        public void RemoveBallFromCartAsync_ThrowsException_WhenItemNotFound()
+        {
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await ballCartService.RemoveBallFromCartAsync("user1", 1));
+        }
 
-//            Assert.That(result, Is.True);
+        [Test]
+        public async Task RemoveBallFromCartAsync_RemovesItemSuccessfullyAndRestoresQuantity()
+        {
+            var ball = new Ball
+            {
+                Id = 1,
+                Brand = "Tecnifibre",
+                BrandBg = "Технифайбър",
+                Quantity = 10,
+                Model = "Court",
+                ModelBg = "Корт",
+                ImageUrl = "ball.jpg"
+            };
+            var cartItem = new BallCart { UserId = "user1", BallId = 1, Quantity = 3, IsOrdered = false };
 
-//            var itemInDb = await dbContext.BallCart.FirstOrDefaultAsync(bc => bc.UserId == userId && bc.BallId == ball.Id);
-//            Assert.That(itemInDb, Is.Null);
-//        }
+            dbContext.Balls.Add(ball);
+            dbContext.BallCart.Add(cartItem);
+            await dbContext.SaveChangesAsync();
 
-//        [Test]
-//        public void RemoveBallFromCartAsync_ShouldThrow_WhenItemNotFound()
-//        {
-//            var userId = "user6";
-//            var user = new ApplicationUser { Id = userId };
+            var result = await ballCartService.RemoveBallFromCartAsync("user1", 1);
 
-//            userManagerMock.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            var itemInDb = await dbContext.BallCart.FirstOrDefaultAsync();
+            var updatedBall = await dbContext.Balls.FindAsync(1);
 
-//            Assert.ThrowsAsync<InvalidOperationException>(async () =>
-//                await ballCartService.RemoveBallFromCartAsync(userId, 999), BallNotFoundInCartErrorMessage);
-//        }
+            Assert.That(result, Is.True);
+            Assert.That(itemInDb, Is.Null);
+            Assert.That(updatedBall!.Quantity, Is.EqualTo(13));
+        }
 
-//        [Test]
-//        public async Task CheckOutAllBallsAsync_ShouldRemoveAllItems()
-//        {
-//            var userId = "user7";
-//            var user = new ApplicationUser { Id = userId };
+        [Test]
+        public async Task RemoveBallFromCartAsync_PrioritizesRemovingNonGiftItems()
+        {
+            var ball = new Ball { Id = 1, Brand = "Wilson", BrandBg = "У", Quantity = 10, Model = "M", ModelBg = "М", ImageUrl = "u.jpg" };
+            var regularItem = new BallCart { UserId = "user1", BallId = 1, Quantity = 2, IsOrdered = false, IsGift = false };
+            var giftItem = new BallCart { UserId = "user1", BallId = 1, Quantity = 1, IsOrdered = false, IsGift = true };
 
-//            var cartItems = new List<BallCart>
-//            {
-//                new BallCart { BallId = 1, UserId = userId, Quantity = 1 },
-//                new BallCart { BallId = 2, UserId = userId, Quantity = 2 }
-//            };
+            dbContext.Balls.Add(ball);
+            dbContext.BallCart.AddRange(regularItem, giftItem);
+            await dbContext.SaveChangesAsync();
 
-//            await dbContext.BallCart.AddRangeAsync(cartItems);
-//            await dbContext.SaveChangesAsync();
+            var result = await ballCartService.RemoveBallFromCartAsync("user1", 1);
 
-//            userManagerMock.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            var remainingItems = await dbContext.BallCart.ToListAsync();
+            var updatedBall = await dbContext.Balls.FindAsync(1);
 
-//            var result = await ballCartService.CheckOutAllBallsAsync(userId);
+            Assert.That(result, Is.True);
+            Assert.That(remainingItems, Has.Count.EqualTo(1));
+            Assert.That(remainingItems.First().IsGift, Is.True);
+            Assert.That(updatedBall!.Quantity, Is.EqualTo(12));
+        }
 
-//            Assert.That(result, Is.True);
+        [Test]
+        public async Task CheckOutAllBallsAsync_ReturnsFalse_WhenCartIsEmpty()
+        {
+            var result = await ballCartService.CheckOutAllBallsAsync("user1");
 
-//            var remainingItems = await dbContext.BallCart.Where(bc => bc.UserId == userId).ToListAsync();
-//            Assert.That(remainingItems.Count, Is.EqualTo(0));
-//        }
+            Assert.That(result, Is.False);
+        }
 
-//        [Test]
-//        public async Task CheckOutAllBallsAsync_ShouldReturnFalse_WhenNoItems()
-//        {
-//            var userId = "user8";
-//            var user = new ApplicationUser { Id = userId };
+        [Test]
+        public async Task CheckOutAllBallsAsync_MarksAllActiveItemsAsOrdered()
+        {
+            var item1 = new BallCart { UserId = "user1", BallId = 1, IsOrdered = false };
+            var item2 = new BallCart { UserId = "user1", BallId = 2, IsOrdered = false };
+            var item3 = new BallCart { UserId = "user2", BallId = 3, IsOrdered = false };
 
-//            userManagerMock.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            dbContext.BallCart.AddRange(item1, item2, item3);
+            await dbContext.SaveChangesAsync();
 
-//            var result = await ballCartService.CheckOutAllBallsAsync(userId);
+            var result = await ballCartService.CheckOutAllBallsAsync("user1");
 
-//            Assert.That(result, Is.False);
-//        }
+            var user1Items = await dbContext.BallCart.Where(bc => bc.UserId == "user1").ToListAsync();
+            var user2Item = await dbContext.BallCart.FirstAsync(bc => bc.UserId == "user2");
 
-//        [TearDown]
-//        public void TearDown()
-//        {
-//            dbContext.Dispose();
-//        }
-//    }
-//}
+            Assert.That(result, Is.True);
+            Assert.That(user1Items.All(i => i.IsOrdered), Is.True);
+            Assert.That(user2Item.IsOrdered, Is.False);
+        }
+    }
+}

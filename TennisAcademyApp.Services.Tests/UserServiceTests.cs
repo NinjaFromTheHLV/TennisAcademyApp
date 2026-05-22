@@ -1,208 +1,163 @@
-﻿//using NUnit.Framework;
-//using Moq;
-//using Microsoft.AspNetCore.Identity;
-//using Microsoft.EntityFrameworkCore;
-//using TennisAcademyApp.Data;
-//using TennisAcademyApp.Data.Models;
-//using TennisAcademyApp.Services.Core;
-//using static TennisAcademyApp.GCommon.Validations.ErrorMessages.UserManagement;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using MockQueryable.Moq;
+using Moq;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using TennisAcademyApp.Data;
+using TennisAcademyApp.Data.Models;
+using TennisAcademyApp.Services.Core;
+using TennisAcademyApp.ViewModels.Admin.UserManagement;
 
-//namespace TennisAcademyApp.Tests.Services
-//{
-//    [TestFixture]
-//    public class UserServiceTests
-//    {
-//        private TennisAcademyDbContext dbContext;
-//        private Mock<UserManager<ApplicationUser>> userManagerMock;
-//        private Mock<RoleManager<IdentityRole>> roleManagerMock;
-//        private UserService userService;
+namespace TennisAcademyApp.Tests
+{
+    [TestFixture]
+    public class UserServiceTests
+    {
+        private TennisAcademyDbContext dbContext;
+        private UserService userService;
+        private Mock<UserManager<ApplicationUser>> mockUserManager;
+        private Mock<RoleManager<IdentityRole>> mockRoleManager;
 
-//        [SetUp]
-//        public void SetUp()
-//        {
-//            var options = new DbContextOptionsBuilder<TennisAcademyDbContext>()
-//                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-//                .Options;
+        [SetUp]
+        public void Setup()
+        {
+            var options = new DbContextOptionsBuilder<TennisAcademyDbContext>()
+                .UseInMemoryDatabase(databaseName: "TennisAcademyTestDb_" + Guid.NewGuid().ToString())
+                .Options;
 
-//            dbContext = new TennisAcademyDbContext(options);
+            dbContext = new TennisAcademyDbContext(options);
 
-//            var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
-//            userManagerMock = new Mock<UserManager<ApplicationUser>>(
-//                userStoreMock.Object, null, null, null, null, null, null, null, null);
+            var userStore = new Mock<IUserStore<ApplicationUser>>();
+            mockUserManager = new Mock<UserManager<ApplicationUser>>(userStore.Object, null, null, null, null, null, null, null, null);
 
-//            var roleStoreMock = new Mock<IRoleStore<IdentityRole>>();
-//            roleManagerMock = new Mock<RoleManager<IdentityRole>>(
-//                roleStoreMock.Object, null, null, null, null);
+            var roleStore = new Mock<IRoleStore<IdentityRole>>();
+            mockRoleManager = new Mock<RoleManager<IdentityRole>>(roleStore.Object, null, null, null, null);
 
-//            userService = new UserService(userManagerMock.Object, roleManagerMock.Object, dbContext);
-//        }
+            userService = new UserService(mockUserManager.Object, mockRoleManager.Object, dbContext);
+        }
 
-//        [Test]
-//        public async Task AssignUserToRoleAsync_ShouldReturnFalse_IfUserNotFoundOrRoleMissing()
-//        {
-//            userManagerMock.Setup(u => u.FindByIdAsync("user1"))
-//                .ReturnsAsync((ApplicationUser?)null);
+        [TearDown]
+        public void TearDown()
+        {
+            dbContext.Database.EnsureDeleted();
+            dbContext.Dispose();
+        }
 
-//            var result = await userService.AssignUserToRoleAsync("user1", "Admin");
-//            Assert.That(result, Is.False);
+        [Test]
+        public async Task GetUserManagementDataAsync_ExcludesCurrentUser()
+        {
+            var user1 = new ApplicationUser { Id = "admin", Email = "admin@test.com" };
+            var user2 = new ApplicationUser { Id = "user", Email = "user@test.com" };
 
-//            userManagerMock.Setup(u => u.FindByIdAsync("user2"))
-//                .ReturnsAsync(new ApplicationUser { Id = "user2" });
+            var usersList = new List<ApplicationUser> { user1, user2 };
 
-//            roleManagerMock.Setup(r => r.RoleExistsAsync("InvalidRole"))
-//                .ReturnsAsync(false);
+            var usersQueryable = usersList.AsQueryable().BuildMockDbSet();
 
-//            result = await userService.AssignUserToRoleAsync("user2", "InvalidRole");
-//            Assert.That(result, Is.False);
-//        }
+            mockUserManager.Setup(um => um.Users).Returns(usersList.AsQueryable().BuildMock());
 
-//        [Test]
-//        public void AssignUserToRoleAsync_ShouldThrow_IfUserAlreadyInRole()
-//        {
-//            var user = new ApplicationUser { Id = "user1" };
+            mockUserManager.Setup(um => um.GetRolesAsync(It.IsAny<ApplicationUser>()))
+                           .ReturnsAsync(new List<string>());
 
-//            userManagerMock.Setup(u => u.FindByIdAsync("user1")).ReturnsAsync(user);
-//            roleManagerMock.Setup(r => r.RoleExistsAsync("Admin")).ReturnsAsync(true);
-//            userManagerMock.Setup(u => u.IsInRoleAsync(user, "Admin")).ReturnsAsync(true);
+            var roles = new List<IdentityRole> { new IdentityRole { Name = "Admin" } }.AsQueryable();
+            mockRoleManager.Setup(rm => rm.Roles).Returns(roles.BuildMock());
 
-//            Assert.ThrowsAsync<InvalidOperationException>(async () =>
-//                await userService.AssignUserToRoleAsync("user1", "Admin"), UserAlreadyInRoleErrorMessage);
-//        }
+            var result = await userService.GetUserManagementDataAsync("admin");
 
-//        [Test]
-//        public async Task AssignUserToRoleAsync_ShouldAddRole_WhenNotInRole()
-//        {
-//            var user = new ApplicationUser { Id = "user1" };
+            Assert.That(result.Count(), Is.EqualTo(1));
+            Assert.That(result.First().Id, Is.EqualTo("user"));
+        }
 
-//            userManagerMock.Setup(u => u.FindByIdAsync("user1")).ReturnsAsync(user);
-//            roleManagerMock.Setup(r => r.RoleExistsAsync("Admin")).ReturnsAsync(true);
-//            userManagerMock.Setup(u => u.IsInRoleAsync(user, "Admin")).ReturnsAsync(false);
-//            userManagerMock.Setup(u => u.AddToRoleAsync(user, "Admin")).ReturnsAsync(IdentityResult.Success);
+        [Test]
+        public async Task AssignUserToRoleAsync_ReturnsFalse_WhenUserOrRoleMissing()
+        {
+            mockUserManager.Setup(um => um.FindByIdAsync("invalid")).ReturnsAsync((ApplicationUser)null!);
 
-//            var result = await userService.AssignUserToRoleAsync("user1", "Admin");
+            var result = await userService.AssignUserToRoleAsync("invalid", "Admin");
 
-//            Assert.That(result, Is.True);
-//        }
+            Assert.That(result, Is.False);
+        }
 
-//        [Test]
-//        public async Task RemoveUserFromRoleAsync_ShouldReturnFalse_IfUserOrRoleMissing()
-//        {
-//            userManagerMock.Setup(u => u.FindByIdAsync("user1")).ReturnsAsync((ApplicationUser?)null);
-//            var result = await userService.RemoveUserFromRoleAsync("user1", "Admin");
-//            Assert.That(result, Is.False);
+        [Test]
+        public async Task AssignUserToRoleAsync_AssignsRoleAndCreatesCoach_WhenRoleIsCoach()
+        {
+            // Arrange
+            var userId = "user1";
+            var user = new ApplicationUser { Id = userId, FirstName = "John", LastName = "Doe" };
+            string role = "Coach"; 
 
-//            userManagerMock.Setup(u => u.FindByIdAsync("user2")).ReturnsAsync(new ApplicationUser { Id = "user2" });
-//            roleManagerMock.Setup(r => r.RoleExistsAsync("InvalidRole")).ReturnsAsync(false);
-//            result = await userService.RemoveUserFromRoleAsync("user2", "InvalidRole");
-//            Assert.That(result, Is.False);
-//        }
+            mockUserManager.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            mockRoleManager.Setup(rm => rm.RoleExistsAsync(role)).ReturnsAsync(true);
+            mockUserManager.Setup(um => um.IsInRoleAsync(user, role)).ReturnsAsync(false);
+            mockUserManager.Setup(um => um.AddToRoleAsync(user, role)).ReturnsAsync(IdentityResult.Success);
 
-//        [Test]
-//        public async Task RemoveUserFromRoleAsync_ShouldReturnTrue_WhenRoleRemoved()
-//        {
-//            var user = new ApplicationUser { Id = "user1" };
+            // Act
+            var result = await userService.AssignUserToRoleAsync(userId, role);
+            var coachInDb = await dbContext.Coaches.FirstOrDefaultAsync(c => c.UserId == userId);
 
-//            userManagerMock.Setup(u => u.FindByIdAsync("user1")).ReturnsAsync(user);
-//            roleManagerMock.Setup(r => r.RoleExistsAsync("Admin")).ReturnsAsync(true);
-//            userManagerMock.Setup(u => u.IsInRoleAsync(user, "Admin")).ReturnsAsync(true);
-//            userManagerMock.Setup(u => u.RemoveFromRoleAsync(user, "Admin")).ReturnsAsync(IdentityResult.Success);
+            Assert.That(result, Is.True);
+            Assert.That(coachInDb, Is.Not.Null);
 
-//            var result = await userService.RemoveUserFromRoleAsync("user1", "Admin");
+            Assert.Multiple(() =>
+            {
+                Assert.That(coachInDb!.Name, Is.EqualTo("John Doe"));
+                Assert.That(coachInDb.ImageUrl, Is.Not.Null);
+                Assert.That(coachInDb.NameBg, Is.Not.Null);
+                Assert.That(coachInDb.Nationality, Is.EqualTo("Unknown"));
+            });
+        }
 
-//            Assert.That(result, Is.True);
-//        }
+        [Test]
+        public async Task RemoveUserFromRoleAsync_RemovesRoleSuccessfully()
+        {
+            var userId = "user1";
+            var user = new ApplicationUser { Id = userId };
 
-//        [Test]
-//        public async Task RemoveUserAsync_ShouldReturnFalse_IfUserNotFound()
-//        {
-//            userManagerMock.Setup(u => u.FindByIdAsync("user1")).ReturnsAsync((ApplicationUser?)null);
+            mockUserManager.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            mockRoleManager.Setup(rm => rm.RoleExistsAsync("Admin")).ReturnsAsync(true);
+            mockUserManager.Setup(um => um.IsInRoleAsync(user, "Admin")).ReturnsAsync(true);
+            mockUserManager.Setup(um => um.RemoveFromRoleAsync(user, "Admin")).ReturnsAsync(IdentityResult.Success);
 
-//            var result = await userService.RemoveUserAsync("user1");
+            var result = await userService.RemoveUserFromRoleAsync(userId, "Admin");
 
-//            Assert.That(result, Is.False);
-//        }
+            Assert.That(result, Is.True);
+        }
 
-//        [Test]
-//        public async Task RemoveUserAsync_ShouldRemoveAllRelatedDataAndUser()
-//        {
-//            var user = new ApplicationUser { Id = "user1" };
+        [Test]
+        public async Task RemoveUserAsync_DeletesUserAndRelatedData()
+        {
+            var userId = "user1";
+            var user = new ApplicationUser { Id = userId };
 
-//            userManagerMock.Setup(u => u.FindByIdAsync("user1")).ReturnsAsync(user);
-//            userManagerMock.Setup(u => u.DeleteAsync(user)).ReturnsAsync(IdentityResult.Success);
+            var coach = new Coach
+            {
+                CoachId = 1,
+                Name = "Test",
+                NameBg = "Т",
+                Nationality = "N",
+                NationalityBg = "Н",
+                Description = "D",
+                DescriptionBg = "Д",
+                ImageUrl = "t.jpg"
+            };
+            dbContext.Coaches.Add(coach);
 
-//            // Seed COach
-//            var coach = new Coach 
-//            { 
-//                CoachId = 1, 
-//                Name = "Ivan Ivanov", 
-//                Age = 40, 
-//                Description = "sdjoadjoasdjaodsd", 
-//                ImageUrl = "coach.jpg",
-//                Nationality = "bulgarin"
-//            };
-//            await dbContext.Coaches.AddAsync(coach);
+            dbContext.Reservations.Add(new Reservation { PlayerId = userId });
+            dbContext.UserFavourites.Add(new UserFavourite { UserId = userId, CoachId = 1 });
 
-//            var racket = new Racket
-//            {
-//                Id = 1,
-//                Brand = "Wilson",
-//                Model = "Pro Staff",
-//                Price = 250m,
-//                Quantity = 5,
-//                ImageUrl = "racket.jpg"
-//            };
-//            await dbContext.Rackets.AddAsync(racket);
+            await dbContext.SaveChangesAsync();
 
-//            // Seed Ball
-//            var ball = new Ball 
-//            {
-//                Id = 1,
-//                Brand = "Wilson",
-//                Model = "Pro Staff",
-//                Price = 250m,
-//                Quantity = 5,
-//                ImageUrl = "racket.jpg"
-//            };
-//            await dbContext.Balls.AddAsync(ball);
+            mockUserManager.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+            mockUserManager.Setup(um => um.DeleteAsync(user)).ReturnsAsync(IdentityResult.Success);
 
-//            // Seed Bag
-//            var bag = new Bag 
-//            {
-//                Id = 1,
-//                Brand = "Wilson",
-//                Model = "Pro Staff",
-//                Price = 250m,
-//                Quantity = 5,
-//                ImageUrl = "racket.jpg"
-//            };
-//            await dbContext.Bags.AddAsync(bag);
+            var result = await userService.RemoveUserAsync(userId);
 
-//            // Seed related user data
-//            await dbContext.UserFavourites.AddAsync(new UserFavourite { UserId = "user1", CoachId = coach.CoachId });
-//            await dbContext.RacketCart.AddAsync(new RacketCart { UserId = "user1", RacketId = racket.Id, Quantity = 1 });
-//            await dbContext.BallCart.AddAsync(new BallCart { UserId = "user1", BallId = ball.Id, Quantity = 2 });
-//            await dbContext.BagCart.AddAsync(new BagCart { UserId = "user1", BagId = bag.Id, Quantity = 1 });
-
-//            await dbContext.SaveChangesAsync();
-
-//            var result = await userService.RemoveUserAsync("user1");
-
-//            Assert.That(result, Is.True);
-
-//            Assert.That(await dbContext.UserFavourites.AnyAsync(uf => uf.UserId == "user1"), Is.False);
-//            Assert.That(await dbContext.RacketCart.AnyAsync(rc => rc.UserId == "user1"), Is.False);
-//            Assert.That(await dbContext.BallCart.AnyAsync(bc => bc.UserId == "user1"), Is.False);
-//            Assert.That(await dbContext.BagCart.AnyAsync(bc => bc.UserId == "user1"), Is.False);
-
-//            userManagerMock.Verify(u => u.DeleteAsync(user), Times.Once);
-//        }
-
-
-
-//        [TearDown]
-//        public void TearDown()
-//        {
-//            dbContext.Dispose();
-//        }
-//    }
-//}
+            Assert.That(result, Is.True);
+            Assert.That(dbContext.Reservations.Count(), Is.EqualTo(0));
+            Assert.That(dbContext.UserFavourites.Count(), Is.EqualTo(0));
+        }
+    }
+}
