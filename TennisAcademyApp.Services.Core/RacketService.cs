@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using TennisAcademyApp.Data;
 using TennisAcademyApp.Data.Models;
 using TennisAcademyApp.Services.Core.Contracts;
@@ -14,16 +17,19 @@ namespace TennisAcademyApp.Services.Core
     {
         private readonly TennisAcademyDbContext dbContext;
         private readonly UserManager<ApplicationUser> userManager;
+
         public RacketService(TennisAcademyDbContext dbContext, UserManager<ApplicationUser> userManager)
         {
             this.dbContext = dbContext;
             this.userManager = userManager;
         }
+
         public async Task<IEnumerable<RacketIndexViewModel>> GetAllRacketsAsync()
         {
             var currentCulture = System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
             bool isBg = currentCulture == "bg";
             var rackets = await dbContext.Rackets
+                .AsNoTracking()
                 .Include(r => r.RacketCart)
                 .Select(r => new RacketIndexViewModel
                 {
@@ -38,13 +44,14 @@ namespace TennisAcademyApp.Services.Core
 
             return rackets;
         }
+
         public async Task<Racket> FindRacketByIdAsync(int? id)
         {
             if (id.HasValue)
             {
+                // ОПРАВЕНО: Махнат AsNoTracking(), за да може обектът да се следи от контекста при Edit операции
                 var racket = await dbContext.Rackets
-                .AsNoTracking()
-                .FirstOrDefaultAsync(r => r.Id == id.Value);
+                    .FirstOrDefaultAsync(r => r.Id == id.Value);
 
                 if (racket == null)
                 {
@@ -57,6 +64,7 @@ namespace TennisAcademyApp.Services.Core
                 throw new ArgumentException(RacketCannotBeNullErrorMessage);
             }
         }
+
         public async Task<bool> AddRacketAsync(string userId, RacketCreateInputModel model)
         {
             var user = await userManager.FindByIdAsync(userId);
@@ -67,12 +75,22 @@ namespace TennisAcademyApp.Services.Core
             }
 
             var translator = new GoogleTranslator();
+            string brandBgResult = model.Brand;
+            string modelBgResult = model.Model;
 
-            var brandTranslation = await translator.TranslateAsync(model.Brand, "bg", "en");
-            string brandBgResult = brandTranslation.Translation;
+            // ЗАЩИТА: Предотвратява краш при Rate Limit (429) от Google
+            try
+            {
+                var brandTranslation = await translator.TranslateAsync(model.Brand, "bg", "en");
+                brandBgResult = brandTranslation.Translation;
 
-            var modelTranslation = await translator.TranslateAsync(model.Model, "bg", "en");
-            string modelBgResult = modelTranslation.Translation;
+                var modelTranslation = await translator.TranslateAsync(model.Model, "bg", "en");
+                modelBgResult = modelTranslation.Translation;
+            }
+            catch (Exception)
+            {
+                // Оставяме стойностите без превод, ако API-то ни откаже достъп
+            }
 
             var racket = new Racket
             {
@@ -93,7 +111,6 @@ namespace TennisAcademyApp.Services.Core
 
         public async Task<RacketEditFormModel> GetRacketForEdittingAsync(string userId, int? id)
         {
-            RacketEditFormModel? model = null;
             var user = await userManager.FindByIdAsync(userId);
             bool isAdmin = await userManager.IsInRoleAsync(user, "Admin");
             if (user == null || !isAdmin)
@@ -102,7 +119,7 @@ namespace TennisAcademyApp.Services.Core
             }
             var racket = await FindRacketByIdAsync(id);
 
-            model = new RacketEditFormModel
+            var model = new RacketEditFormModel
             {
                 Id = racket.Id,
                 Brand = racket.Brand,
@@ -117,8 +134,7 @@ namespace TennisAcademyApp.Services.Core
 
         public async Task<bool> EditRacketAsync(RacketEditFormModel model)
         {
-            bool result = false;
-
+            // Зареждаме проследяван запис от контекста без AsNoTracking
             var racket = await dbContext.Rackets.FirstOrDefaultAsync(r => r.Id == model.Id);
 
             if (racket == null)
@@ -127,13 +143,24 @@ namespace TennisAcademyApp.Services.Core
             }
 
             var translator = new GoogleTranslator();
+            string brandBgResult = model.Brand;
+            string modelBgResult = model.Model;
 
-            var brandTranslation = await translator.TranslateAsync(model.Brand, "bg", "en");
-            string brandBgResult = brandTranslation.Translation;
+            // ЗАЩИТА: Предотвратява краш при Rate Limit (429)
+            try
+            {
+                var brandTranslation = await translator.TranslateAsync(model.Brand, "bg", "en");
+                brandBgResult = brandTranslation.Translation;
 
-            var modelTranslation = await translator.TranslateAsync(model.Model, "bg", "en");
-            string modelBgResult = modelTranslation.Translation;
+                var modelTranslation = await translator.TranslateAsync(model.Model, "bg", "en");
+                modelBgResult = modelTranslation.Translation;
+            }
+            catch (Exception)
+            {
+                // Защитаваме CRUD операцията при блокиран превод
+            }
 
+            // Променяме само бизнес полетата директно върху следения обект
             racket.Brand = model.Brand;
             racket.BrandBg = brandBgResult;
             racket.Model = model.Model;
@@ -142,12 +169,11 @@ namespace TennisAcademyApp.Services.Core
             racket.Quantity = model.Quantity;
             racket.ImageUrl = model.ImageUrl;
 
-            dbContext.Entry(racket).State = EntityState.Modified;
-
+            // ОПРАВЕНО: Премахнат изцяло dbContext.Entry(racket).State = EntityState.Modified;
+            // Сега EF Core ще ъпдейтне само променените полета, без да чупи скритата дата
             await dbContext.SaveChangesAsync();
 
-            result = true;
-            return result;
+            return true;
         }
 
         public async Task<RacketDeleteViewModel> GetRacketForDeletingAsync(string userId, int? id)
@@ -174,9 +200,9 @@ namespace TennisAcademyApp.Services.Core
 
             return model;
         }
+
         public async Task<bool> DeleteRacketAsync(string userId, int id)
         {
-            bool result = false;
             var user = await userManager.FindByIdAsync(userId);
             var racket = await dbContext.Rackets.FindAsync(id);
 
@@ -187,9 +213,8 @@ namespace TennisAcademyApp.Services.Core
 
             dbContext.Rackets.Remove(racket);
             await dbContext.SaveChangesAsync();
-            result = true;
 
-            return result;
+            return true;
         }
     }
 }

@@ -9,36 +9,7 @@
     ViewData["Title"] = isBg ? "Треньорски състав" : "Coaches";
 }
 
-<style>
-    .search-wrapper {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        transition: all 0.3s ease;
-    }
-
-        .search-wrapper:focus-within {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-        }
-
-    .coach-card {
-        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
-    }
-
-        .coach-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 1rem 3rem rgba(0,0,0,0.175) !important;
-        }
-
-    .zoom-img {
-        transition: transform 0.5s ease;
-    }
-
-    .coach-card:hover .zoom-img {
-        transform: scale(1.05);
-    }
-</style>
+<link rel="stylesheet" href="~/css/coach.css" asp-append-version="true" />
 
 <div class="text-center my-5">
     <h2 class="fw-bold display-5 text-light">@(isBg ? "Запознайте се с нашите треньори!" : "Meet Our Professional Coaches!")</h2>
@@ -102,12 +73,22 @@
 
 @if (Model.TotalPages > 1)
 {
-    <nav class="d-flex justify-content-center mt-5">
-        <ul class="pagination gap-2">
+    <nav aria-label="Page navigation" class="mt-5">
+        <ul class="pagination justify-content-center">
+
+            <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                <a class="page-link btn btn-outline-success me-1 rounded-3"
+                   asp-action="Index"
+                   asp-route-page="@(Model.PageNumber - 1)"
+                   asp-route-searchQuery="@Model.SearchQuery">
+                    &laquo; @(isBg ? "Предишна" : "Previous")
+                </a>
+            </li>
+
             @for (int i = 1; i <= Model.TotalPages; i++)
             {
-                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                    <a class="page-link border-0 rounded-3 shadow-sm px-3.5 py-2 fw-semibold @(i == Model.PageNumber ? "bg-primary text-light" : "bg-card text-muted")"
+                <li class="page-item mx-1">
+                    <a class="page-link rounded-3 @(i == Model.PageNumber ? "bg-success text-light border-success" : "bg-card text-success border-secondary")"
                        asp-action="Index"
                        asp-route-page="@i"
                        asp-route-searchQuery="@Model.SearchQuery">
@@ -115,6 +96,16 @@
                     </a>
                 </li>
             }
+
+            <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                <a class="page-link btn btn-outline-success ms-1 rounded-3"
+                   asp-action="Index"
+                   asp-route-page="@(Model.PageNumber + 1)"
+                   asp-route-searchQuery="@Model.SearchQuery">
+                    @(isBg ? "Следваща" : "Next") &raquo;
+                </a>
+            </li>
+
         </ul>
     </nav>
 }

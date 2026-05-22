@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using TennisAcademyApp.Data;
 using TennisAcademyApp.Data.Models;
 using TennisAcademyApp.Services.Core.Contracts;
@@ -21,27 +25,29 @@ namespace TennisAcademyApp.Services.Core
         private readonly TennisAcademyDbContext dbContext;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IConfiguration configuration;
+
         public CoachService(TennisAcademyDbContext dbContext, UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
             this.dbContext = dbContext;
             this.userManager = userManager;
             this.configuration = configuration;
         }
+
         private string TransliterateToBg(string text)
         {
             if (string.IsNullOrWhiteSpace(text)) return text;
 
             var latinToCyrillic = new Dictionary<string, string>
-    {
-        {"Ch", "Ч"}, {"Ch'", "Ч"}, {"Sh", "Ш"}, {"Shch", "Щ"}, {"Zh", "Ж"}, {"Ya", "Я"}, {"Yu", "Ю"}, {"Yu'", "Ю"}, {"Ye", "Е"},
-        {"ch", "ч"}, {"sh", "ш"}, {"shch", "щ"}, {"zh", "ж"}, {"ya", "я"}, {"yu", "ю"}, {"ye", "е"},
-        {"A", "А"}, {"B", "Б"}, {"V", "В"}, {"G", "Г"}, {"D", "Д"}, {"E", "Е"}, {"Z", "З"}, {"I", "И"}, {"J", "Й"},
-        {"K", "К"}, {"L", "Л"}, {"M", "М"}, {"N", "Н"}, {"O", "О"}, {"P", "П"}, {"R", "Р"}, {"S", "С"}, {"T", "Т"},
-        {"U", "У"}, {"F", "Ф"}, {"H", "Х"}, {"C", "Ц"}, {"Y", "Й"}, {"X", "Х"}, {"W", "В"}, {"Q", "К"},
-        {"a", "а"}, {"b", "б"}, {"v", "в"}, {"g", "г"}, {"d", "д"}, {"e", "е"}, {"z", "з"}, {"i", "и"}, {"j", "й"},
-        {"k", "к"}, {"l", "л"}, {"m", "м"}, {"n", "н"}, {"o", "о"}, {"p", "п"}, {"r", "р"}, {"s", "с"}, {"t", "т"},
-        {"u", "у"}, {"f", "ф"}, {"h", "х"}, {"c", "ц"}, {"y", "й"}, {"x", "х"}, {"w", "в"}, {"q", "к"}
-    };
+            {
+                {"Ch", "Ч"}, {"Ch'", "Ч"}, {"Sh", "Ш"}, {"Shch", "Щ"}, {"Zh", "Ж"}, {"Ya", "Я"}, {"Yu", "Ю"}, {"Yu'", "Ю"}, {"Ye", "Е"},
+                {"ch", "ч"}, {"sh", "ш"}, {"shch", "щ"}, {"zh", "ж"}, {"ya", "я"}, {"yu", "ю"}, {"ye", "е"},
+                {"A", "А"}, {"B", "Б"}, {"V", "В"}, {"G", "Г"}, {"D", "Д"}, {"E", "Е"}, {"Z", "З"}, {"I", "И"}, {"J", "Й"},
+                {"K", "К"}, {"L", "Л"}, {"M", "М"}, {"N", "Н"}, {"O", "О"}, {"P", "П"}, {"R", "Р"}, {"S", "С"}, {"T", "Т"},
+                {"U", "У"}, {"F", "Ф"}, {"H", "Х"}, {"C", "Ц"}, {"Y", "Й"}, {"X", "Х"}, {"W", "В"}, {"Q", "К"},
+                {"a", "а"}, {"b", "б"}, {"v", "в"}, {"g", "г"}, {"d", "д"}, {"e", "е"}, {"z", "з"}, {"i", "и"}, {"j", "й"},
+                {"k", "к"}, {"l", "л"}, {"m", "м"}, {"n", "н"}, {"o", "о"}, {"p", "п"}, {"r", "р"}, {"s", "с"}, {"t", "т"},
+                {"u", "у"}, {"f", "ф"}, {"h", "х"}, {"c", "ц"}, {"y", "й"}, {"x", "х"}, {"w", "в"}, {"q", "к"}
+            };
 
             foreach (var item in latinToCyrillic)
             {
@@ -50,6 +56,7 @@ namespace TennisAcademyApp.Services.Core
 
             return text;
         }
+
         public async Task<IEnumerable<CoachScheduleViewModel>> GetTrainerScheduleAsync(string userId)
         {
             return await dbContext.Reservations
@@ -62,18 +69,16 @@ namespace TennisAcademyApp.Services.Core
                     Duration = r.Duration,
                     Note = r.Note,
                     NoteBg = r.NoteBg,
-
                     SurfaceName = r.Surface.Name,
                     SurfaceNameBg = r.Surface.NameBg,
-
                     TrainingTypeName = r.TrainingType.Name,
                     TrainingTypeNameBg = r.TrainingType.NameBg,
-
                     PlayerName = r.Player.UserName ?? "",
                     PlayerEmail = r.Player.Email ?? ""
                 })
                 .ToListAsync();
         }
+
         public async Task<PaginatedCoachesViewModel> GetCoachesByPageAsync(string? searchQuery, int page, int pageSize)
         {
             var currentCulture = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
@@ -111,20 +116,18 @@ namespace TennisAcademyApp.Services.Core
 
             var totalPages = (int)Math.Ceiling(totalCoaches / (double)pageSize);
 
-            var model = new PaginatedCoachesViewModel
+            return new PaginatedCoachesViewModel
             {
                 Coaches = coaches,
                 PageNumber = page,
                 TotalPages = totalPages,
                 SearchQuery = searchQuery
             };
-
-            return model;
         }
 
         public async Task<IEnumerable<CoachDropDownModel>> GetGoachesForDropDownAsync()
         {
-            var coachesDropDown = await dbContext.Coaches
+            return await dbContext.Coaches
                 .AsNoTracking()
                 .Select(c => new CoachDropDownModel
                 {
@@ -134,16 +137,11 @@ namespace TennisAcademyApp.Services.Core
                     ImageUrl = c.ImageUrl
                 })
                 .ToListAsync();
-
-            return coachesDropDown;
         }
 
         public async Task<CoachDetailsViewModel> GetCoachDetailsAsync(string userId, int id)
         {
-            CoachDetailsViewModel? coachDetails = null;
-
-            var user = await userManager.FindByIdAsync(userId);
-            var coach = await GetCoachByIdAsync(id);
+            var coach = await dbContext.Coaches.FirstOrDefaultAsync(c => c.CoachId == id);
 
             if (coach == null)
             {
@@ -164,23 +162,17 @@ namespace TennisAcademyApp.Services.Core
                 })
                 .ToListAsync();
 
-            coachDetails = new CoachDetailsViewModel
+            return new CoachDetailsViewModel
             {
                 CoachId = coach.CoachId,
                 CoachAge = coach.Age,
                 ImageUrl = coach.ImageUrl,
                 CoachReservations = coachReservations,
-
                 CoachName = isBg ? coach.NameBg : coach.Name,
                 Description = isBg ? coach.DescriptionBg : coach.Description,
                 Nationality = isBg ? coach.NationalityBg : coach.Nationality,
-
-                IsInUserFavorites = userId != null ?
-                            await dbContext.UserFavourites.AnyAsync(uc => uc.UserId == userId
-                            && uc.CoachId == coach.CoachId) : false
+                IsInUserFavorites = userId != null && await dbContext.UserFavourites.AnyAsync(uc => uc.UserId == userId && uc.CoachId == coach.CoachId)
             };
-
-            return coachDetails;
         }
 
         public async Task<bool> AddCoachAsync(string userId, AddCoachInputModel inputModel)
@@ -218,13 +210,25 @@ namespace TennisAcademyApp.Services.Core
 
             string nameBgResult = TransliterateToBg(inputModel.Name);
 
+            // ЗАЩИТА: Инициализираме променливите с оригиналния текст, в случай че Google API-то върне грешка 429
             var translator = new GoogleTranslator();
-            var translatedDescription = await translator.TranslateAsync(inputModel.Description, "bg", "en");
+            string translatedDescResult = inputModel.Description;
+            string finalNationalityBg = inputModel.Nationality;
 
-            var translationContext = await translator.TranslateAsync($"He is {inputModel.Nationality.Trim()}", "bg", "en");
-            string translatedPhrase = translationContext.Translation;
-            string rawNationality = translatedPhrase.Split(' ').Last().Replace(".", "");
-            string finalNationalityBg = char.ToUpper(rawNationality[0]) + rawNationality.Substring(1);
+            try
+            {
+                var translatedDescription = await translator.TranslateAsync(inputModel.Description, "bg", "en");
+                translatedDescResult = translatedDescription.Translation;
+
+                var translationContext = await translator.TranslateAsync($"He is {inputModel.Nationality.Trim()}", "bg", "en");
+                string translatedPhrase = translationContext.Translation;
+                string rawNationality = translatedPhrase.Split(' ').Last().Replace(".", "");
+                finalNationalityBg = char.ToUpper(rawNationality[0]) + rawNationality.Substring(1);
+            }
+            catch (Exception)
+            {
+                // При Rate Limit (429) от Google прескачаме превода, за да не счупим CRUD операцията
+            }
 
             var coach = new Data.Models.Coach
             {
@@ -232,14 +236,11 @@ namespace TennisAcademyApp.Services.Core
                 NameBg = nameBgResult,
                 ImageUrl = inputModel.ImageUrl ?? "~/pictures/DefaultUserImage.webp",
                 Age = inputModel.Age,
-
                 Nationality = inputModel.Nationality,
                 NationalityBg = finalNationalityBg,
-
                 Description = inputModel.Description,
-                DescriptionBg = translatedDescription.Translation,
+                DescriptionBg = translatedDescResult,
                 IsDeleted = false,
-
                 UserId = coachUser.Id
             };
 
@@ -264,7 +265,7 @@ namespace TennisAcademyApp.Services.Core
             }
             var coach = await GetCoachByIdAsync(id);
 
-            var model = new CoachEditInputModel
+            return new CoachEditInputModel
             {
                 CoachId = coach.CoachId,
                 Name = coach.Name,
@@ -273,7 +274,6 @@ namespace TennisAcademyApp.Services.Core
                 Description = coach.Description,
                 ImageUrl = coach.ImageUrl,
             };
-            return model;
         }
 
         public async Task<bool> EdittedCoachAsync(string userId, CoachEditInputModel model)
@@ -288,12 +288,25 @@ namespace TennisAcademyApp.Services.Core
 
             string nameBgResult = TransliterateToBg(model.Name);
 
+            // ЗАЩИТА: Инициализираме променливите с оригиналния текст
             var translator = new GoogleTranslator();
-            var translatedDescription = await translator.TranslateAsync(model.Description, "bg", "en");
-            var translationContext = await translator.TranslateAsync($"He is {model.Nationality.Trim()}", "bg", "en");
-            string translatedPhrase = translationContext.Translation;
-            string rawNationality = translatedPhrase.Split(' ').Last().Replace(".", "");
-            string finalNationalityBg = char.ToUpper(rawNationality[0]) + rawNationality.Substring(1);
+            string translatedDescResult = model.Description;
+            string finalNationalityBg = model.Nationality;
+
+            try
+            {
+                var translatedDescription = await translator.TranslateAsync(model.Description, "bg", "en");
+                translatedDescResult = translatedDescription.Translation;
+
+                var translationContext = await translator.TranslateAsync($"He is {model.Nationality.Trim()}", "bg", "en");
+                string translatedPhrase = translationContext.Translation;
+                string rawNationality = translatedPhrase.Split(' ').Last().Replace(".", "");
+                finalNationalityBg = char.ToUpper(rawNationality[0]) + rawNationality.Substring(1);
+            }
+            catch (Exception)
+            {
+                // Прескачаме превода, ако Google ни блокира временно с Too Many Requests
+            }
 
             coach.Name = model.Name;
             coach.NameBg = nameBgResult;
@@ -302,9 +315,9 @@ namespace TennisAcademyApp.Services.Core
             coach.Nationality = model.Nationality;
             coach.NationalityBg = finalNationalityBg;
             coach.Description = model.Description;
-            coach.DescriptionBg = translatedDescription.Translation;
+            coach.DescriptionBg = translatedDescResult;
 
-            dbContext.Entry(coach).State = EntityState.Modified;
+            // КОРЕКЦИЯ: Изтрит изцяло ръчният EntityState.Modified, за да работи правилно със скритата колона
             await dbContext.SaveChangesAsync();
 
             return true;
@@ -321,18 +334,16 @@ namespace TennisAcademyApp.Services.Core
 
             var coach = await GetCoachByIdAsync(id);
 
-            var model = new DeleteCoachViewModel
+            return new DeleteCoachViewModel
             {
                 CoachId = coach.CoachId,
                 Name = coach.Name,
                 ImageUrl = coach.ImageUrl,
             };
-            return model;
         }
 
         public async Task<bool> DeletedCoachAsync(string userId, DeleteCoachViewModel model)
         {
-            var user = await userManager.FindByIdAsync(userId);
             var coach = await dbContext.Coaches.FindAsync(model.CoachId);
 
             if (coach == null)
@@ -351,7 +362,6 @@ namespace TennisAcademyApp.Services.Core
             if (id.HasValue)
             {
                 var coach = await dbContext.Coaches
-                    .AsNoTracking()
                     .FirstOrDefaultAsync(c => c.CoachId == id.Value);
                 if (coach == null)
                 {

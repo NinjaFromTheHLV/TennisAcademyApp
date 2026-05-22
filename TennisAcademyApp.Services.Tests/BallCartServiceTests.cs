@@ -1,15 +1,17 @@
-﻿//using NUnit.Framework;
-//using Moq;
-//using Microsoft.AspNetCore.Identity;
+﻿//using Microsoft.AspNetCore.Identity;
 //using Microsoft.EntityFrameworkCore;
-//using TennisAcademyApp.Data;
-//using TennisAcademyApp.Data.Models;
-//using TennisAcademyApp.Services.Core;
-//using static TennisAcademyApp.GCommon.Validations.ErrorMessages.BallCart;
+//using Moq;
+//using NUnit.Framework;
 //using System;
 //using System.Collections.Generic;
 //using System.Linq;
 //using System.Threading.Tasks;
+//using TennisAcademyApp.Data;
+//using TennisAcademyApp.Data.Models;
+//using TennisAcademyApp.Services.Core;
+//using TennisAcademyApp.Services.Core.Contracts;
+//using TennisAcademyApp.ViewModels.Ranking;
+//using static TennisAcademyApp.GCommon.Validations.ErrorMessages.BallCart;
 
 //namespace TennisAcademyApp.Tests.Services
 //{
@@ -18,6 +20,7 @@
 //    {
 //        private TennisAcademyDbContext dbContext;
 //        private Mock<UserManager<ApplicationUser>> userManagerMock;
+//        private Mock<IRankingService> rankingServiceMock;
 //        private BallCartService ballCartService;
 
 //        [SetUp]
@@ -33,7 +36,11 @@
 //            userManagerMock = new Mock<UserManager<ApplicationUser>>(
 //                userStoreMock.Object, null, null, null, null, null, null, null, null);
 
-//            ballCartService = new BallCartService(dbContext, userManagerMock.Object);
+//            rankingServiceMock = new Mock<IRankingService>();
+//            rankingServiceMock.Setup(s => s.GetLeaderboardAsync())
+//                              .ReturnsAsync(new List<UserRankingViewModel>());
+
+//            ballCartService = new BallCartService(dbContext, userManagerMock.Object, rankingServiceMock.Object);
 //        }
 
 //        [Test]

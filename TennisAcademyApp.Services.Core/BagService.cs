@@ -1,6 +1,9 @@
 ﻿using GTranslate.Translators;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using TennisAcademyApp.Data;
 using TennisAcademyApp.Data.Models;
 using TennisAcademyApp.Services.Core.Contracts;
@@ -46,8 +49,8 @@ namespace TennisAcademyApp.Services.Core
         {
             if (id.HasValue)
             {
+                // ОПРАВЕНО: Махнат AsNoTracking(), за да може обектът да се следи от контекста при редакция
                 var bag = await dbContext.Bags
-                    .AsNoTracking()
                     .FirstOrDefaultAsync(b => b.Id == id.Value);
 
                 if (bag == null)
@@ -72,12 +75,22 @@ namespace TennisAcademyApp.Services.Core
             if (IsAdmin)
             {
                 var translator = new GoogleTranslator();
+                string brandBgResult = model.Brand;
+                string modelBgResult = model.Model;
 
-                var brandTranslation = await translator.TranslateAsync(model.Brand, "bg", "en");
-                string brandBgResult = brandTranslation.Translation;
+                // ЗАЩИТА: Предотвратява гърмене при грешка 429 от Google API
+                try
+                {
+                    var brandTranslation = await translator.TranslateAsync(model.Brand, "bg", "en");
+                    brandBgResult = brandTranslation.Translation;
 
-                var modelTranslation = await translator.TranslateAsync(model.Model, "bg", "en");
-                string modelBgResult = modelTranslation.Translation;
+                    var modelTranslation = await translator.TranslateAsync(model.Model, "bg", "en");
+                    modelBgResult = modelTranslation.Translation;
+                }
+                catch (Exception)
+                {
+                    // Ако Google API е блокирано, оставяме стойностите по подразбиране
+                }
 
                 var bag = new Bag
                 {
@@ -100,7 +113,6 @@ namespace TennisAcademyApp.Services.Core
 
         public async Task<BagEditFormModel> GetBagForEditingAsync(string userId, int? id)
         {
-            BagEditFormModel? model = null;
             var user = await userManager.FindByIdAsync(userId);
             bool IsAdmin = await userManager.IsInRoleAsync(user, "Admin");
             if (!IsAdmin || userId == null)
@@ -110,7 +122,7 @@ namespace TennisAcademyApp.Services.Core
 
             var bag = await FindBagByIdAsync(id);
 
-            model = new BagEditFormModel
+            var model = new BagEditFormModel
             {
                 Id = bag.Id,
                 Brand = bag.Brand,
@@ -125,8 +137,7 @@ namespace TennisAcademyApp.Services.Core
 
         public async Task<bool> EditBagAsync(BagEditFormModel model)
         {
-            bool result = false;
-
+            // Зареждаме следен запис от базата без AsNoTracking
             var bag = await dbContext.Bags.FirstOrDefaultAsync(b => b.Id == model.Id);
 
             if (bag == null)
@@ -135,13 +146,24 @@ namespace TennisAcademyApp.Services.Core
             }
 
             var translator = new GoogleTranslator();
+            string brandBgResult = model.Brand;
+            string modelBgResult = model.Model;
 
-            var brandTranslation = await translator.TranslateAsync(model.Brand, "bg", "en");
-            string brandBgResult = brandTranslation.Translation;
+            // ЗАЩИТА: Предотвратява краш при Rate Limit (429)
+            try
+            {
+                var brandTranslation = await translator.TranslateAsync(model.Brand, "bg", "en");
+                brandBgResult = brandTranslation.Translation;
 
-            var modelTranslation = await translator.TranslateAsync(model.Model, "bg", "en");
-            string modelBgResult = modelTranslation.Translation;
+                var modelTranslation = await translator.TranslateAsync(model.Model, "bg", "en");
+                modelBgResult = modelTranslation.Translation;
+            }
+            catch (Exception)
+            {
+                // При грешка запазваме текста без превод
+            }
 
+            // Променяме само бизнес полетата
             bag.Brand = model.Brand;
             bag.BrandBg = brandBgResult;
             bag.Model = model.Model;
@@ -150,12 +172,11 @@ namespace TennisAcademyApp.Services.Core
             bag.Quantity = model.Quantity;
             bag.ImageUrl = model.ImageUrl;
 
-            dbContext.Entry(bag).State = EntityState.Modified;
-
+            // ОПРАВЕНО: Премахнат изцяло dbContext.Entry(bag).State = EntityState.Modified;
+            // EF Core сам ще ъпдейтне променените колони без да чупи скритата дата
             await dbContext.SaveChangesAsync();
 
-            result = true;
-            return result;
+            return true;
         }
 
         public async Task<BagDeleteViewModel> GetBagForDeletingAsync(string userId, int? id)
@@ -185,7 +206,6 @@ namespace TennisAcademyApp.Services.Core
 
         public async Task<bool> DeleteBagAsync(string userId, BagDeleteViewModel model)
         {
-            bool result = false;
             var user = await userManager.FindByIdAsync(userId);
 
             var bag = await dbContext.Bags.FindAsync(model.Id);
@@ -197,9 +217,8 @@ namespace TennisAcademyApp.Services.Core
 
             dbContext.Bags.Remove(bag);
             await dbContext.SaveChangesAsync();
-            result = true;
 
-            return result;
+            return true;
         }
     }
 }

@@ -12,8 +12,8 @@ using TennisAcademyApp.Data;
 namespace TennisAcademyApp.Data.Migrations
 {
     [DbContext(typeof(TennisAcademyDbContext))]
-    [Migration("20260519092231_AddTrainingTypeNameBg")]
-    partial class AddTrainingTypeNameBg
+    [Migration("20260522164529_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -78,7 +78,88 @@ namespace TennisAcademyApp.Data.Migrations
                     b.ToTable("AspNetRoleClaims", "22180021");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", "22180021");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", "22180021");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", "22180021");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", "22180021");
+                });
+
+            modelBuilder.Entity("TennisAcademyApp.Data.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -96,6 +177,17 @@ namespace TennisAcademyApp.Data.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("FirstName")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("LastName")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("LastWheelSpinDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -143,91 +235,6 @@ namespace TennisAcademyApp.Data.Migrations
                     b.ToTable("AspNetUsers", "22180021");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AspNetUserClaims", "22180021");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
-                {
-                    b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
-
-                    b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
-
-                    b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("LoginProvider", "ProviderKey");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AspNetUserLogins", "22180021");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("RoleId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUserRoles", "22180021");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("UserId", "LoginProvider", "Name");
-
-                    b.ToTable("AspNetUserTokens", "22180021");
-                });
-
             modelBuilder.Entity("TennisAcademyApp.Data.Models.AuditLog", b =>
                 {
                     b.Property<int>("Id")
@@ -237,8 +244,7 @@ namespace TennisAcademyApp.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
@@ -272,7 +278,12 @@ namespace TennisAcademyApp.Data.Migrations
                     b.Property<string>("Brand")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
-                        .HasComment("Bag Brand");
+                        .HasComment("Bag Brand in English");
+
+                    b.Property<string>("BrandBg")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("Bag Brand in Bulgarian");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
@@ -280,15 +291,19 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasComment("Bag Image");
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Model")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
-                        .HasComment("Bag Model");
+                        .HasComment("Bag Model in English");
+
+                    b.Property<string>("ModelBg")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("Bag Model in Bulgarian");
 
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
@@ -311,8 +326,10 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = 1,
                             Brand = "Wilson",
+                            BrandBg = "Уилсън",
                             ImageUrl = "https://cdn.media.amplience.net/i/sportinglife/25918789_0/Team-3-Pack-Tennis-Bag?$default$&fmt=auto&w=540&h=540",
                             Model = "Team 3-Pack",
+                            ModelBg = "Тийм 3-Пак",
                             Price = 59.99m,
                             Quantity = 10
                         },
@@ -320,8 +337,10 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = 2,
                             Brand = "Head",
+                            BrandBg = "Хед",
                             ImageUrl = "https://media.strefatenisa.com.pl/public/media/20/c1/2b/1721072068/head-tour-team-6r-combi-black-mixed-1.jpg?ts=1745860751",
                             Model = "Tour Team 6R",
+                            ModelBg = "Тур Тийм 6Р",
                             Price = 89.99m,
                             Quantity = 7
                         },
@@ -329,8 +348,10 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = 3,
                             Brand = "Babolat",
+                            BrandBg = "Баболат",
                             ImageUrl = "https://m.media-amazon.com/images/I/61vGrieRbCL._UF1000,1000_QL80_.jpg",
                             Model = "Pure Drive RHx6",
+                            ModelBg = "Пюр Драйв Ер Ха х6",
                             Price = 99.99m,
                             Quantity = 5
                         },
@@ -338,8 +359,10 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = 4,
                             Brand = "Yonex",
+                            BrandBg = "Йонекс",
                             ImageUrl = "https://www.midwestracquetsports.com/images/xl/BAG92429BK.jpg?v=1",
                             Model = "Pro Series 9-Pack",
+                            ModelBg = "Про Сериес 9-Пак",
                             Price = 129.99m,
                             Quantity = 4
                         });
@@ -355,9 +378,14 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasColumnType("nvarchar(450)")
                         .HasComment("Foreign Key of IdentityUser");
 
+                    b.Property<bool>("IsGift")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsOrdered")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
@@ -365,7 +393,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasColumnType("int")
                         .HasComment("Quantity of Bags in Cart");
 
-                    b.HasKey("BagId", "UserId");
+                    b.HasKey("BagId", "UserId", "IsGift");
 
                     b.HasIndex("UserId");
 
@@ -384,23 +412,32 @@ namespace TennisAcademyApp.Data.Migrations
                     b.Property<string>("Brand")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
-                        .HasComment("Ball Brand");
+                        .HasComment("Ball Brand in English");
+
+                    b.Property<string>("BrandBg")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("Ball Brand in Bulgarian");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
-                        .HasComment("Racket Image");
+                        .HasComment("Ball Image");
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Model")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
-                        .HasComment("Ball Model");
+                        .HasComment("Ball Model in English");
+
+                    b.Property<string>("ModelBg")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("Ball Model in Bulgarian");
 
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
@@ -423,8 +460,10 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = 1,
                             Brand = "Wilson",
+                            BrandBg = "Уилсън",
                             ImageUrl = "https://m.media-amazon.com/images/I/715MEN61aPL._UF1000,1000_QL80_.jpg",
                             Model = "US Open Extra Duty",
+                            ModelBg = "Ю Ес Оупън Екстра Дюти",
                             Price = 12.99m,
                             Quantity = 50
                         },
@@ -432,8 +471,10 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = 2,
                             Brand = "Head",
+                            BrandBg = "Хед",
                             ImageUrl = "https://cdn.sportdepot.bg/files/catalog/detail/570823_01.jpg",
                             Model = "Tour XT",
+                            ModelBg = "Тур Екс Те",
                             Price = 11.49m,
                             Quantity = 35
                         },
@@ -441,8 +482,10 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = 3,
                             Brand = "Dunlop",
+                            BrandBg = "Дънлоп",
                             ImageUrl = "https://m.media-amazon.com/images/I/618MvroxyXL._UF1000,1000_QL80_.jpg",
                             Model = "ATP Championship",
+                            ModelBg = "Ей Ти Пи Чемпиъншип",
                             Price = 10.99m,
                             Quantity = 40
                         });
@@ -458,9 +501,14 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasColumnType("nvarchar(450)")
                         .HasComment("Foreign Key of IdentityUser");
 
+                    b.Property<bool>("IsGift")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsOrdered")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
@@ -468,7 +516,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasColumnType("int")
                         .HasComment("Quantity of Balls in Cart");
 
-                    b.HasKey("BallId", "UserId");
+                    b.HasKey("BallId", "UserId", "IsGift");
 
                     b.HasIndex("UserId");
 
@@ -506,8 +554,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
@@ -532,7 +579,13 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)")
+                        .HasComment("Identity User Identifier linked to this coach");
+
                     b.HasKey("CoachId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Coaches", "22180021", t =>
                         {
@@ -548,7 +601,7 @@ namespace TennisAcademyApp.Data.Migrations
                             Age = 38,
                             Description = "One of the greatest tennis players of all time, known for his clay court dominance.",
                             DescriptionBg = "Един от най-великите тенисисти на всички времена, известен с доминацията си на клей кортове.",
-                            ImageUrl = "~/pictures/rafa.jpg",
+                            ImageUrl = "https://imageio.forbes.com/specials-images/imageserve/5ece8a5c938ec500060aae37/0x0.jpg?format=jpg&crop=2462,2460,x503,y156,safe&height=416&width=416&fit=bounds",
                             IsDeleted = false,
                             Name = "Rafael Nadal",
                             NameBg = "Рафаел Надал",
@@ -621,7 +674,12 @@ namespace TennisAcademyApp.Data.Migrations
                     b.Property<string>("Brand")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
-                        .HasComment("Racket Brand");
+                        .HasComment("Racket Brand in English");
+
+                    b.Property<string>("BrandBg")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("Racket Brand in Bulgarian");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
@@ -629,15 +687,19 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasComment("Racket Image");
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Model")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
-                        .HasComment("Racket Model");
+                        .HasComment("Racket Model in English");
+
+                    b.Property<string>("ModelBg")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("Racket Model in Bulgarian");
 
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
@@ -660,8 +722,10 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = 1,
                             Brand = "Wilson",
+                            BrandBg = "Уилсън",
                             ImageUrl = "https://cdncloudcart.com/28710/products/images/134337/tenis-raketa-wilson-pro-staff-rf-97-v13-0-tns-fr-image_6358bfebb40a9_800x800.jpeg?1666760684",
                             Model = "Pro Staff 97",
+                            ModelBg = "Про Стаф 97",
                             Price = 349.99m,
                             Quantity = 5
                         },
@@ -669,8 +733,10 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = 2,
                             Brand = "Babolat",
+                            BrandBg = "Баболат",
                             ImageUrl = "https://babolat.bg/image/cache/catalog/tennis/2024/rackets/101474/101474-Pure_Drive_98-136-1-Face_2-250x250.jpg",
                             Model = "Pure Drive",
+                            ModelBg = "Пюр Драйв",
                             Price = 299.99m,
                             Quantity = 8
                         },
@@ -678,8 +744,10 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = 3,
                             Brand = "Head",
+                            BrandBg = "Хед",
                             ImageUrl = "https://i.sportisimo.com/products/images/1104/1104555/700x700/head-graphene-360-speed-mp_1.jpg",
                             Model = "Graphene 360+ Speed",
+                            ModelBg = "Графен 360+ Спийд",
                             Price = 279.99m,
                             Quantity = 10
                         },
@@ -687,8 +755,10 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = 4,
                             Brand = "Yonex",
+                            BrandBg = "Йонекс",
                             ImageUrl = "https://us.yonex.com/cdn/shop/files/EZ0898_BlastBlue_5868.jpg?v=1739481973&width=1946",
                             Model = "Ezone 98",
+                            ModelBg = "Езоун 98",
                             Price = 319.99m,
                             Quantity = 6
                         },
@@ -696,8 +766,10 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = 5,
                             Brand = "Prince",
+                            BrandBg = "Принс",
                             ImageUrl = "https://images.squarespace-cdn.com/content/v1/56e9b38c2b8dde820241b62d/1471886555425-JT9KKFKPOL4FNLAV9ZB0/r2.jpg",
                             Model = "Tour 100P",
+                            ModelBg = "Тур 100П",
                             Price = 259.99m,
                             Quantity = 4
                         },
@@ -705,8 +777,10 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = 6,
                             Brand = "Tecnifibre",
+                            BrandBg = "Технифайбър",
                             ImageUrl = "https://www.tecnifibre.com/dw/image/v2/BHDN_PRD/on/demandware.static/-/Sites-tecnifibre-master-catalog/default/dwcf93310b/hi-res/T-FIGHT%202025/Packshots/305S/14FI305S5_04.jpg?sw=608&sh=608&sm=fit",
                             Model = "TFight 305",
+                            ModelBg = "Т-Файт 305",
                             Price = 289.99m,
                             Quantity = 7
                         });
@@ -722,12 +796,17 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasColumnType("nvarchar(450)")
                         .HasComment("Foreign Key of IdentityUser");
 
+                    b.Property<bool>("IsGift")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("BallId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsOrdered")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
@@ -735,7 +814,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasColumnType("int")
                         .HasComment("Quantity of Rackets in Cart");
 
-                    b.HasKey("RacketId", "UserId");
+                    b.HasKey("RacketId", "UserId", "IsGift");
 
                     b.HasIndex("BallId");
 
@@ -768,14 +847,16 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasColumnType("int")
                         .HasComment("Duration of the session");
 
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
@@ -833,18 +914,22 @@ namespace TennisAcademyApp.Data.Migrations
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
-                        .HasComment("Ïmage of the surface");
+                        .HasComment("Image of the surface");
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
-                        .HasComment("Surface Name");
+                        .HasComment("Surface Name in English");
+
+                    b.Property<string>("NameBg")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("Surface Name in Bulgarian");
 
                     b.HasKey("Id");
 
@@ -858,20 +943,361 @@ namespace TennisAcademyApp.Data.Migrations
                         {
                             Id = 1,
                             ImageUrl = "https://www.edwardssports.co.uk/pub/media/magefan_blog/Clay_Tennis_Courts.jpg",
-                            Name = "Clay"
+                            Name = "Clay",
+                            NameBg = "Клей (Червен корт)"
                         },
                         new
                         {
                             Id = 2,
                             ImageUrl = "https://www.tennisnerd.net/wp-content/uploads/2024/06/grass-tennis.webp",
-                            Name = "Grass"
+                            Name = "Grass",
+                            NameBg = "Трева"
                         },
                         new
                         {
                             Id = 3,
                             ImageUrl = "https://asltenniscourts.com.au/wp-content/uploads/2021/03/AdobeStock_253105355-1024x683.jpeg",
-                            Name = "Hard"
+                            Name = "Hard",
+                            NameBg = "Твърда настилка (Хард корт)"
                         });
+                });
+
+            modelBuilder.Entity("TennisAcademyApp.Data.Models.Tournament", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DescriptionBg")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("EntryFee")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastModified_22180021")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<int>("MaxParticipants")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("TitleBg")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("Tournaments", "22180021");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CategoryId = 1,
+                            Description = "Annual spring tournament open for all non-professional male players. Format: Direct elimination.",
+                            DescriptionBg = "Годишен пролетен турнир, отворен за всички непрофесионални играчи (мъже). Формат: Директна елиминация.",
+                            EndDate = new DateTime(2026, 5, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EntryFee = 40.00m,
+                            IsDeleted = false,
+                            MaxParticipants = 32,
+                            StartDate = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Title = "Spring Clay Court Open",
+                            TitleBg = "Пролетен отворен шампионат на клей"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CategoryId = 2,
+                            Description = "Special dynamic tournament for women. Beautiful trophies and sponsor prizes provided.",
+                            DescriptionBg = "Специален динамичен турнир за жени. Осигурени са красиви трофеи и награди от спонсори.",
+                            EndDate = new DateTime(2026, 6, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EntryFee = 35.00m,
+                            IsDeleted = false,
+                            MaxParticipants = 16,
+                            StartDate = new DateTime(2026, 6, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Title = "Academy Women's Cup",
+                            TitleBg = "Купа на Академията за жени"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CategoryId = 3,
+                            Description = "Tournament targeted at young talents up to 18 years old. Great opportunity to boost local ranking points.",
+                            DescriptionBg = "Турнир, насочен към млади таланти до 18 години. Страхотна възможност за трупане на точки за местната ранглиста.",
+                            EndDate = new DateTime(2026, 6, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EntryFee = 20.00m,
+                            IsDeleted = false,
+                            MaxParticipants = 24,
+                            StartDate = new DateTime(2026, 6, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Title = "Junior Summer Slams",
+                            TitleBg = "Младежки летен шлем"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CategoryId = 4,
+                            Description = "Bring your partner and fight for the grand trophy. Fun and highly competitive atmosphere.",
+                            DescriptionBg = "Доведете партньора си и се борете за голямия трофей. Забавна и силно конкурентна атмосфера.",
+                            EndDate = new DateTime(2026, 7, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EntryFee = 50.00m,
+                            IsDeleted = false,
+                            MaxParticipants = 16,
+                            StartDate = new DateTime(2026, 7, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Title = "Midsummer Mixed Doubles",
+                            TitleBg = "Летни Смесени Двойки"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CategoryId = 5,
+                            Description = "Exclusively for players aged 45 and above. Hard court battles, tactical play, and great experience.",
+                            DescriptionBg = "Ексклузивно за играчи на възраст 45 и повече години. Битки на твърди кортове, тактическа игра и страхотно изживяване.",
+                            EndDate = new DateTime(2026, 7, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EntryFee = 45.00m,
+                            IsDeleted = false,
+                            MaxParticipants = 32,
+                            StartDate = new DateTime(2026, 7, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Title = "Masters Veterans Tournament",
+                            TitleBg = "Мастърс Турнир за Ветерани"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CategoryId = 6,
+                            Description = "Perfect tournament for recreation players who want to try competitive tennis. Matches played after 18:00.",
+                            DescriptionBg = "Перфектен турнир за любители, които искат да се пробват в състезателния тенис. Мачовете се играят след 18:00 часа.",
+                            EndDate = new DateTime(2026, 8, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EntryFee = 30.00m,
+                            IsDeleted = false,
+                            MaxParticipants = 64,
+                            StartDate = new DateTime(2026, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Title = "Weekend Warrior Amateur League",
+                            TitleBg = "Лига 'Уикенд Воини' за Аматьори"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            CategoryId = 1,
+                            Description = "Experience the thrill of playing under the lights. Evening matches on fast hard courts.",
+                            DescriptionBg = "Изживейте тръпката от играта под светлините на прожекторите. Вечерни мачове на бързи твърди кортове.",
+                            EndDate = new DateTime(2026, 8, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EntryFee = 55.00m,
+                            IsDeleted = false,
+                            MaxParticipants = 32,
+                            StartDate = new DateTime(2026, 8, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Title = "August Night Hardcourt Championship",
+                            TitleBg = "Августовски Нощен Шампионат"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            CategoryId = 2,
+                            Description = "Gathering the best local female players for an end-of-season showdown on clay.",
+                            DescriptionBg = "Събиране на най-добрите местни тенисистки за сблъсък в края на сезона на клей корт.",
+                            EndDate = new DateTime(2026, 9, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EntryFee = 35.00m,
+                            IsDeleted = false,
+                            MaxParticipants = 16,
+                            StartDate = new DateTime(2026, 9, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Title = "Autumn Women Single Open",
+                            TitleBg = "Есенен Отворен Шампионат за Жени"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            CategoryId = 3,
+                            Description = "An exciting singles tournament for juniors to celebrate the new school season. Lots of prizes.",
+                            DescriptionBg = "Вълнуващ сингъл турнир за юноши по случай новия учебен сезон. Множество награди.",
+                            EndDate = new DateTime(2026, 9, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EntryFee = 15.00m,
+                            IsDeleted = false,
+                            MaxParticipants = 32,
+                            StartDate = new DateTime(2026, 9, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Title = "Back to School Youth Cup",
+                            TitleBg = "Младежка Купа 'Обратно на Училище'"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            CategoryId = 4,
+                            Description = "The ultimate team tournament before moving to indoor courts. Group phase followed by eliminations.",
+                            DescriptionBg = "Финалният отборен турнир преди преместването в закрити кортове. Групова фаза, последвана от елиминации.",
+                            EndDate = new DateTime(2026, 10, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EntryFee = 60.00m,
+                            IsDeleted = false,
+                            MaxParticipants = 16,
+                            StartDate = new DateTime(2026, 10, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Title = "Golden Autumn Doubles",
+                            TitleBg = "Златна Есен Смесени Двойки"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            CategoryId = 1,
+                            Description = "The first grand tournament of the winter season inside the academy’s premium heated halls.",
+                            DescriptionBg = "Първият голям турнир за зимния сезон вътре в премиум отопляемите зали на академията.",
+                            EndDate = new DateTime(2026, 11, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EntryFee = 50.00m,
+                            IsDeleted = false,
+                            MaxParticipants = 32,
+                            StartDate = new DateTime(2026, 11, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Title = "Indoor Premium Cup",
+                            TitleBg = "Закрит Премиум Шампионат"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            CategoryId = 5,
+                            Description = "Winter edition of our highly anticipated veteran tournament. Keep the competitive spirit alive.",
+                            DescriptionBg = "Зимно издание на нашия дългоочакван ветерански турнир. Поддържайте състезателния дух жив.",
+                            EndDate = new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EntryFee = 45.00m,
+                            IsDeleted = false,
+                            MaxParticipants = 16,
+                            StartDate = new DateTime(2026, 11, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Title = "Legends 45+ Winter Trophy",
+                            TitleBg = "Зимна Трофейна Лига за Легенди 45+"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            CategoryId = 6,
+                            Description = "Our final event of the year. All entry fees will be donated to local youth sports development.",
+                            DescriptionBg = "Последното ни събитие за годината. Всички такси за участие ще бъдат дарени за развитието на местния младежки спорт.",
+                            EndDate = new DateTime(2026, 12, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EntryFee = 40.00m,
+                            IsDeleted = false,
+                            MaxParticipants = 64,
+                            StartDate = new DateTime(2026, 12, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Title = "Christmas Academy Charity Slams",
+                            TitleBg = "Коледен Благотворителен Шлем на Академията"
+                        });
+                });
+
+            modelBuilder.Entity("TennisAcademyApp.Data.Models.TournamentCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastModified_22180021")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("NameBg")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TournamentCategories", "22180021");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            IsDeleted = false,
+                            Name = "Singles Men",
+                            NameBg = "Сингъл Мъже"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            IsDeleted = false,
+                            Name = "Singles Women",
+                            NameBg = "Сингъл Жени"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            IsDeleted = false,
+                            Name = "Juniors",
+                            NameBg = "Юноши"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            IsDeleted = false,
+                            Name = "Doubles Mixed",
+                            NameBg = "Смесени Двойки"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            IsDeleted = false,
+                            Name = "Veterans 45+",
+                            NameBg = "Ветерани 45+"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            IsDeleted = false,
+                            Name = "Amateur League",
+                            NameBg = "Аматьорска Лига"
+                        });
+                });
+
+            modelBuilder.Entity("TennisAcademyApp.Data.Models.TournamentUser", b =>
+                {
+                    b.Property<int>("TournamentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("EnrolledOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModified_22180021")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.HasKey("TournamentId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TournamentsUsers", "22180021");
                 });
 
             modelBuilder.Entity("TennisAcademyApp.Data.Models.TrainingType", b =>
@@ -884,8 +1310,7 @@ namespace TennisAcademyApp.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
@@ -944,8 +1369,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasComment("Foreign Key which references to Coach");
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
@@ -970,7 +1394,7 @@ namespace TennisAcademyApp.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("TennisAcademyApp.Data.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -979,7 +1403,7 @@ namespace TennisAcademyApp.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("TennisAcademyApp.Data.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -994,7 +1418,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("TennisAcademyApp.Data.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1003,7 +1427,7 @@ namespace TennisAcademyApp.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("TennisAcademyApp.Data.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1018,7 +1442,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                    b.HasOne("TennisAcademyApp.Data.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1037,13 +1461,22 @@ namespace TennisAcademyApp.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                    b.HasOne("TennisAcademyApp.Data.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Ball");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TennisAcademyApp.Data.Models.Coach", b =>
+                {
+                    b.HasOne("TennisAcademyApp.Data.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
@@ -1060,7 +1493,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                    b.HasOne("TennisAcademyApp.Data.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1079,7 +1512,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Player")
+                    b.HasOne("TennisAcademyApp.Data.Models.ApplicationUser", "Player")
                         .WithMany()
                         .HasForeignKey("PlayerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1106,6 +1539,36 @@ namespace TennisAcademyApp.Data.Migrations
                     b.Navigation("TrainingType");
                 });
 
+            modelBuilder.Entity("TennisAcademyApp.Data.Models.Tournament", b =>
+                {
+                    b.HasOne("TennisAcademyApp.Data.Models.TournamentCategory", "Category")
+                        .WithMany("Tournaments")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("TennisAcademyApp.Data.Models.TournamentUser", b =>
+                {
+                    b.HasOne("TennisAcademyApp.Data.Models.Tournament", "Tournament")
+                        .WithMany("Participants")
+                        .HasForeignKey("TournamentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TennisAcademyApp.Data.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Tournament");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("TennisAcademyApp.Data.Models.UserFavourite", b =>
                 {
                     b.HasOne("TennisAcademyApp.Data.Models.Coach", "Coach")
@@ -1114,7 +1577,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                    b.HasOne("TennisAcademyApp.Data.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -1150,6 +1613,16 @@ namespace TennisAcademyApp.Data.Migrations
             modelBuilder.Entity("TennisAcademyApp.Data.Models.Surface", b =>
                 {
                     b.Navigation("Reservations");
+                });
+
+            modelBuilder.Entity("TennisAcademyApp.Data.Models.Tournament", b =>
+                {
+                    b.Navigation("Participants");
+                });
+
+            modelBuilder.Entity("TennisAcademyApp.Data.Models.TournamentCategory", b =>
+                {
+                    b.Navigation("Tournaments");
                 });
 
             modelBuilder.Entity("TennisAcademyApp.Data.Models.TrainingType", b =>

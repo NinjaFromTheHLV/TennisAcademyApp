@@ -10,6 +10,8 @@
         public decimal EntryFee { get; set; }
         public string CategoryName { get; set; } = null!;
         public string CategoryNameBg { get; set; } = null!;
+        public string Description { get; set; } = null!;
+        public string DescriptionBg { get; set; }
         public int MaxParticipants { get; set; }
         public int CurrentParticipantsCount { get; set; }
     }

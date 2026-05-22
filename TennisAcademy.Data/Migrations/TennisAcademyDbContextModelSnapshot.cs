@@ -103,12 +103,10 @@ namespace TennisAcademyApp.Data.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -145,12 +143,10 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -245,8 +241,7 @@ namespace TennisAcademyApp.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
@@ -293,8 +288,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasComment("Bag Image");
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
@@ -388,8 +382,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
@@ -429,8 +422,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasComment("Ball Image");
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
@@ -513,8 +505,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
@@ -560,8 +551,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
@@ -694,8 +684,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasComment("Racket Image");
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
@@ -814,8 +803,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
@@ -865,8 +853,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
@@ -927,8 +914,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasComment("Image of the surface");
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
@@ -1002,8 +988,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
@@ -1226,8 +1211,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
@@ -1302,8 +1286,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
@@ -1324,8 +1307,7 @@ namespace TennisAcademyApp.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
@@ -1384,8 +1366,7 @@ namespace TennisAcademyApp.Data.Migrations
                         .HasComment("Foreign Key which references to Coach");
 
                     b.Property<DateTime>("LastModified_22180021")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 

@@ -1,10 +1,12 @@
-﻿//using NUnit.Framework;
-//using Moq;
-//using Microsoft.AspNetCore.Identity;
+﻿//using Microsoft.AspNetCore.Identity;
 //using Microsoft.EntityFrameworkCore;
+//using Moq;
+//using NUnit.Framework;
 //using TennisAcademyApp.Data;
 //using TennisAcademyApp.Data.Models;
 //using TennisAcademyApp.Services.Core;
+//using TennisAcademyApp.Services.Core.Contracts;
+//using TennisAcademyApp.ViewModels.Ranking;
 //using static TennisAcademyApp.GCommon.Validations.ErrorMessages.RacketCart;
 
 //namespace TennisAcademyApp.Tests.Services
@@ -14,6 +16,7 @@
 //    {
 //        private TennisAcademyDbContext dbContext;
 //        private Mock<UserManager<ApplicationUser>> userManagerMock;
+//        private Mock<IRankingService> rankingServiceMock; 
 //        private RacketCartService racketCartService;
 
 //        [SetUp]
@@ -29,7 +32,11 @@
 //            userManagerMock = new Mock<UserManager<ApplicationUser>>(
 //                userStoreMock.Object, null, null, null, null, null, null, null, null);
 
-//            racketCartService = new RacketCartService(dbContext, userManagerMock.Object);
+//            rankingServiceMock = new Mock<IRankingService>();
+//            rankingServiceMock.Setup(s => s.GetLeaderboardAsync())
+//                              .ReturnsAsync(new List<UserRankingViewModel>());
+
+//            racketCartService = new RacketCartService(dbContext, userManagerMock.Object, rankingServiceMock.Object);
 //        }
 
 //        [Test]

@@ -9,6 +9,8 @@
     ViewData["Title"] = isBg ? "Детайли за треньора" : "Coach Details";
 }
 
+<link rel="stylesheet" href="~/css/coach.css" asp-append-version="true" />
+
 <div class="container mt-4">
     <div class="card shadow border-0 rounded-4 overflow-hidden mb-5">
         <div class="row g-0">
@@ -57,44 +59,62 @@
     </div>
 
     <div class="card shadow border-0 rounded-4 overflow-hidden mb-5">
-        <div class="card-header bg-card border-bottom p-3">
-            <h4 class="mb-0 fw-semibold"><i class="bi bi-calendar-week text-primary me-2"></i>@(isBg ? "Предстоящ график" : "Upcoming Schedule")</h4>
+        <div class="card-header bg-light border-bottom p-3 d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 fw-semibold"><i class="bi bi-calendar-week text-primary me-2"></i>@(isBg ? "График на треньора" : "Coach Schedule")</h4>
+            <button id="toggleScheduleBtn" class="btn btn-primary" onclick="toggleSchedule()">
+                @(isBg ? "Виж графика" : "View Schedule")
+            </button>
         </div>
-        <div class="card-body p-4">
-            @if (Model.CoachReservations == null || !Model.CoachReservations.Any())
-            {
-                <div class="alert alert-info text-center border-0 mb-0 rounded-3">
-                    <i class="bi bi-info-circle me-2"></i>@(isBg ? "Този треньор в момента няма насрочени уроци." : "This coach currently has no scheduled lessons.")
-                </div>
-            }
-            else
-            {
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead>
-                            <tr>
-                                <th class="text-center px-3">@(isBg ? "Дата и час" : "Date & Time")</th>
-                                <th class="text-start px-3">@(isBg ? "Тип тренировка" : "Training Type")</th>
-                                <th class="text-center px-3">@(isBg ? "Действие" : "Action")</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var res in Model.CoachReservations)
-                            {
+
+        <div id="scheduleSection" class="schedule-collapse">
+            <div class="card-body p-4">
+                @if (Model.CoachReservations == null || !Model.CoachReservations.Any())
+                {
+                    <div class="alert alert-info text-center border-0 mb-0 rounded-3">
+                        <i class="bi bi-info-circle me-2"></i>@(isBg ? "Този треньор в момента няма насрочени уроци." : "This coach currently has no scheduled lessons.")
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
                                 <tr>
-                                    <td class="text-center fw-semibold px-3">@res.Date</td>
-                                    <td class="text-start text-muted px-3">@(isBg ? (res.TrainingTypeNameBg ?? res.TrainingTypeName) : res.TrainingTypeName)</td>
-                                    <td class="text-center px-3">
-                                        <a asp-controller="Reservation" asp-action="Details" asp-route-id="@res.ReservationId" class="btn btn-outline-primary btn-sm px-3 rounded-2">
-                                            <i class="bi bi-eye me-1"></i>@(isBg ? "Преглед" : "View Booking")
-                                        </a>
-                                    </td>
+                                    <th class="px-3">@(isBg ? "Дата и час" : "Date & Time")</th>
+                                    <th class="px-3">@(isBg ? "Тип тренировка" : "Training Type")</th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
+                            </thead>
+                            <tbody>
+                                @foreach (var res in Model.CoachReservations)
+                                {
+                                    <tr>
+                                        <td class="px-3 text-muted">@res.Date</td>
+                                        <td class="px-3 fw-bold">@(isBg ? (res.TrainingTypeNameBg ?? res.TrainingTypeName) : res.TrainingTypeName)</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+    function toggleSchedule() {
+        const section = document.getElementById('scheduleSection');
+        const btn = document.getElementById('toggleScheduleBtn');
+        const isBg = @Json.Serialize(isBg);
+
+        section.classList.toggle('show');
+
+        if (section.classList.contains('show')) {
+            btn.textContent = isBg ? "Скрий графика" : "Hide Schedule";
+            btn.classList.replace('btn-primary', 'btn-outline-secondary');
+        } else {
+            btn.textContent = isBg ? "Виж графика" : "View Schedule";
+            btn.classList.replace('btn-outline-secondary', 'btn-primary');
+        }
+    }
+</script>

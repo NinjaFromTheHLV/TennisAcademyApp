@@ -104,6 +104,7 @@ namespace TennisAcademyApp.Areas.Admin.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
+
             catch (DbUpdateConcurrencyException)
             {
                 ModelState.AddModelError(string.Empty, "Внимание: Записът беше променен от друг потребител, докато го редактирахте. Вашите промени не бяха запазени. Моля, заредете страницата наново и опитайте отново.");

@@ -14,11 +14,13 @@ namespace TennisAcademyApp.Services.Core
     {
         private readonly TennisAcademyDbContext dbContext;
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly IDateTimeProvider dateTimeProvider;
 
-        public ReservationService(TennisAcademyDbContext dbContext, UserManager<ApplicationUser> userManager)
+        public ReservationService(TennisAcademyDbContext dbContext, UserManager<ApplicationUser> userManager, IDateTimeProvider dateTimeProvider)
         {
             this.dbContext = dbContext;
             this.userManager = userManager;
+            this.dateTimeProvider = dateTimeProvider;
         }
 
         public async Task<IEnumerable<ReservationIndexViewModel>?> GetFilteredUserReservationsAsync(string userId, string? searchTerm, DateTime? fromDate, DateTime? toDate, string? sortOrder)
@@ -182,7 +184,7 @@ namespace TennisAcademyApp.Services.Core
         {
             bool result = false;
             var expiredReservations = await dbContext.Reservations
-                .Where(r => r.Date <= DateTime.Now && !r.IsCompleted && !r.IsDeleted)
+                .Where(r => r.Date <= dateTimeProvider.Now && !r.IsCompleted && !r.IsDeleted)
                 .ToListAsync();
 
             if (expiredReservations.Any())
@@ -335,15 +337,15 @@ namespace TennisAcademyApp.Services.Core
 
         public async Task DateValidationAsync(ReservationCreateInputModel model)
         {
-            if (model.Date < DateTime.Now)
+            if (model.Date < dateTimeProvider.Now)
             {
                 throw new ArgumentException(PastDateErrorMessage);
             }
-            if (model.Date < DateTime.Now.AddHours(2))
+            if (model.Date < dateTimeProvider.Now.AddHours(2))
             {
                 throw new ArgumentException(TwoHoursErrorMessage);
             }
-            if (model.Date > DateTime.Now.AddDays(60))
+            if (model.Date > dateTimeProvider.Now.AddDays(60))
             {
                 throw new ArgumentException(FutureDateErrorMessage);
             }

@@ -17,6 +17,7 @@ namespace TennisAcademyApp
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddHttpContextAccessor();
             // Add services to the container.
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             builder.Services.AddDbContext<TennisAcademyDbContext>(options =>
@@ -57,6 +58,7 @@ namespace TennisAcademyApp
             builder.Services.AddScoped<IRankingService, RankingService>();
             builder.Services.AddScoped<IWheelService, WheelService>();
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IDateTimeProvider, DateTimeProvider>();
 
             var app = builder.Build(); // <--- Container is locked here
 
