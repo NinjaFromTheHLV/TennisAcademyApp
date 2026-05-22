@@ -1,4 +1,7 @@
-﻿body {
+﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
     display: flex;
     min-height: 100vh;
     overflow-x: hidden;
@@ -26,12 +29,9 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    font-weight: 500;
 }
 
-.dropdown-toggle::after {
-    margin-left: auto;
-}
-<style >
 .dropdown-toggle::after {
     display: inline-block;
     margin-left: auto;
@@ -57,5 +57,3 @@
     .nav-item .collapse .nav-link:hover {
         opacity: 1;
     }
-
-</style >

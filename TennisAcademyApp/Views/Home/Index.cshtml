@@ -195,6 +195,7 @@
         if (!isOpen) {
             const randomText = quotes[Math.floor(Math.random() * quotes.length)];
             document.getElementById('quote-text').innerText = randomText;
+
             card.classList.add('is-open');
         } else {
             card.classList.remove('is-open');
