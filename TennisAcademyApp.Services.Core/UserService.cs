@@ -145,11 +145,17 @@ namespace TennisAcademyApp.Services.Core
             var tournamentRegistrations = dbContext.TournamentsUsers.Where(tu => tu.UserId == userId);
             dbContext.TournamentsUsers.RemoveRange(tournamentRegistrations);
 
+            var coach = await dbContext.Coaches.FirstOrDefaultAsync(c => c.UserId == userId);
+            if (coach != null)
+            {
+                dbContext.Coaches.Remove(coach);
+            }
+
             await dbContext.SaveChangesAsync();
 
             var result = await userManager.DeleteAsync(user);
-
             return result.Succeeded;
+
         }
     }
 }
