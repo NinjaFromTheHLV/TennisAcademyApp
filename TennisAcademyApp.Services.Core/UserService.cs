@@ -126,43 +126,30 @@ namespace TennisAcademyApp.Services.Core
 
         public async Task<bool> RemoveUserAsync(string userId)
         {
-            bool isRemoved = false;
             var user = await userManager.FindByIdAsync(userId);
-
             if (user == null)
             {
                 return false;
             }
 
-            var userReservations = dbContext.Reservations
-                .Where(r => r.PlayerId == userId);
+            var userReservations = dbContext.Reservations.Where(r => r.PlayerId == userId);
             dbContext.Reservations.RemoveRange(userReservations);
 
-            var userFavourites = dbContext.UserFavourites
-                .Where(uf => uf.UserId == userId);
+            var userFavourites = dbContext.UserFavourites.Where(uf => uf.UserId == userId);
             dbContext.UserFavourites.RemoveRange(userFavourites);
 
-            var racketCart = dbContext.RacketCart
-                .Where(rc => rc.UserId == userId);
-            dbContext.RacketCart.RemoveRange(racketCart);
+            dbContext.RacketCart.RemoveRange(dbContext.RacketCart.Where(rc => rc.UserId == userId));
+            dbContext.BallCart.RemoveRange(dbContext.BallCart.Where(bc => bc.UserId == userId));
+            dbContext.BagCart.RemoveRange(dbContext.BagCart.Where(bc => bc.UserId == userId));
 
-            var ballCart = dbContext.BallCart
-                .Where(bc => bc.UserId == userId);
-            dbContext.BallCart.RemoveRange(ballCart);
-
-            var bagCart = dbContext.BagCart
-                .Where(bc => bc.UserId == userId);
-            dbContext.BagCart.RemoveRange(bagCart);
+            var tournamentRegistrations = dbContext.TournamentsUsers.Where(tu => tu.UserId == userId);
+            dbContext.TournamentsUsers.RemoveRange(tournamentRegistrations);
 
             await dbContext.SaveChangesAsync();
 
             var result = await userManager.DeleteAsync(user);
-            if (result.Succeeded)
-            {
-                isRemoved = true;
-            }
 
-            return isRemoved;
+            return result.Succeeded;
         }
     }
 }
