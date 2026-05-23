@@ -50,7 +50,6 @@ namespace TennisAcademyApp.Services.Core
         {
             if (id.HasValue)
             {
-                // ОПРАВЕНО: Махнат AsNoTracking(), за да се следи обекта при Edit операции
                 var ball = await dbContext.Balls
                     .FirstOrDefaultAsync(b => b.Id == id.Value);
 
@@ -73,7 +72,6 @@ namespace TennisAcademyApp.Services.Core
             if (user == null || !await userManager.IsInRoleAsync(user, "Admin"))
                 return false;
 
-            // Използваме TextUtility за стабилен резултат без API заявки
             string brandBg = TextUtility.CapitalizeNames(TextUtility.TransliterateToBg(model.Brand));
             string modelBg = TextUtility.CapitalizeNames(TextUtility.TransliterateToBg(model.Model));
 
@@ -126,7 +124,6 @@ namespace TennisAcademyApp.Services.Core
                 throw new ArgumentException(BallNotFoundErrorMessage);
             }
 
-            // Пак използваме TextUtility за консистентност
             string brandBg = TextUtility.CapitalizeNames(TextUtility.TransliterateToBg(model.Brand));
             string modelBg = TextUtility.CapitalizeNames(TextUtility.TransliterateToBg(model.Model));
 

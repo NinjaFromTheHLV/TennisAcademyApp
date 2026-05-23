@@ -50,7 +50,7 @@ namespace TennisAcademyApp.Services.Core
         {
             if (id.HasValue)
             {
-                // ОПРАВЕНО: Махнат AsNoTracking(), за да може обектът да се следи от контекста при Edit операции
+                
                 var racket = await dbContext.Rackets
                     .FirstOrDefaultAsync(r => r.Id == id.Value);
 
@@ -72,7 +72,6 @@ namespace TennisAcademyApp.Services.Core
             if (user == null || !await userManager.IsInRoleAsync(user, "Admin"))
                 throw new ArgumentException("You have to be an Admin to add rackets");
 
-            // Използваме TextUtility за стабилен резултат без API заявки
             string brandBg = TextUtility.CapitalizeNames(TextUtility.TransliterateToBg(model.Brand));
             string modelBg = TextUtility.CapitalizeNames(TextUtility.TransliterateToBg(model.Model));
 
@@ -122,7 +121,6 @@ namespace TennisAcademyApp.Services.Core
             if (racket == null)
                 throw new ArgumentException(RacketNotFoundErrorMessage);
 
-            // Пак използваме TextUtility за консистентност
             string brandBg = TextUtility.CapitalizeNames(TextUtility.TransliterateToBg(model.Brand));
             string modelBg = TextUtility.CapitalizeNames(TextUtility.TransliterateToBg(model.Model));
 

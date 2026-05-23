@@ -72,7 +72,6 @@ namespace TennisAcademyApp.Services.Core
                 throw new InvalidOperationException(InvalidQuantityErrorMessage);
             }
 
-            // Търсим само артикули, които НЕ са подаръци, за да ги групираме правилно
             var existingItem = await dbContext.BallCart
                 .FirstOrDefaultAsync(bc => bc.UserId == userId && bc.BallId == ballId && !bc.IsGift);
 
@@ -96,7 +95,7 @@ namespace TennisAcademyApp.Services.Core
                     BallId = ballId,
                     Quantity = quantity,
                     IsOrdered = false,
-                    IsGift = false // Явно указваме, че е купен артикул
+                    IsGift = false 
                 };
                 await dbContext.BallCart.AddAsync(cartItem);
             }

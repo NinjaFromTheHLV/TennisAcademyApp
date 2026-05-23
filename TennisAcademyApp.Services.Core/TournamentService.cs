@@ -65,7 +65,7 @@ namespace TennisAcademyApp.Services.Core
                 })
                 .ToListAsync();
 
-            // 4. Зареждане на категориите за падащото меню
+
             var categories = await dbContext.TournamentCategories
                 .Where(c => !c.IsDeleted)
                 .Select(c => new SelectListItem

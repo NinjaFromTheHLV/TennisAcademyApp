@@ -93,7 +93,6 @@ namespace TennisAcademyApp.Controllers
 
             try
             {
-                // 2. Пълним списъците един по един. Ако някой гръмне, ще разберем точно кой е в конзолата
                 var coachesData = await coachService.GetGoachesForDropDownAsync();
                 if (coachesData != null) model.Coaches = coachesData;
 
@@ -107,10 +106,9 @@ namespace TennisAcademyApp.Controllers
             }
             catch (Exception ex)
             {
-                // Отпечатва точната грешка от Service слоя в Output прозореца на Visual Studio
                 Console.WriteLine($"[CREATE RESERVATION ERROR]: {ex.Message}");
 
-                // Връщаме празен модел към View-то, за да НЕ гърми "line 27", а просто падащите менюта да останат празни
+                
                 return View(model);
             }
         }
