@@ -25,7 +25,7 @@
 </head>
 <body>
 
-    <nav id="sidebar" class="navbar-dark bg-card border-end d-flex flex-column p-3">
+    <nav id="sidebar" class="navbar-dark bg-card border-end d-flex flex-column p-3 collapsed">
         <div class="d-flex align-items-center justify-content-between mb-4">
             @if (User.IsInRole(Admin))
             {
@@ -142,6 +142,12 @@
         </ul>
     </nav>
 
+    <script>
+        if (sessionStorage.getItem('sidebarCollapsed') === 'false') {
+            document.getElementById('sidebar').classList.remove('collapsed');
+        }
+    </script>
+
     <div id="content-wrapper">
         <header class="navbar navbar-expand navbar-light bg-card border-bottom p-3">
             <div class="container-fluid p-0">
@@ -150,6 +156,7 @@
                 </button>
 
                 <div class="ms-auto d-flex align-items-center gap-3">
+
                     <div class="dropdown">
                         <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                             🌐 @(isBg ? "Български" : "English")
@@ -175,7 +182,7 @@
             </div>
         </header>
 
-        <div class="container-fluid p-4 flex-grow-1">
+        <div class="container-fluid p-4 flex-grow-1 @ViewData["ContentClass"]">
             <main role="main">
                 @RenderBody()
             </main>
@@ -265,11 +272,19 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     <script>
-        document.getElementById('sidebarToggle').addEventListener('click', function () {
-            document.getElementById('sidebar').classList.toggle('collapsed');
+        document.addEventListener("DOMContentLoaded", function () {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+
+            sidebarToggle.addEventListener('click', function () {
+                sidebar.classList.toggle('collapsed');
+                sessionStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+            });
         });
     </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
